@@ -97,10 +97,11 @@ Plans:
   3. Integration test validates that calculateLCC() produces final LCC/WLC values matching the golden fixture
   4. Formula mode test confirms excel_replica produces the known buggy value and excel_bugfixed produces the corrected value
   5. Edge case tests pass for zero area, minimum period, no energy inputs, no services, no income, and all-zero costs
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md -- Golden reference fixture (input + hand-calculated expected outputs) and shared test helpers
+- [ ] 05-02-PLAN.md -- Unit tests (6 modules), integration test, formula mode test, edge case tests
 
 ### Phase 6: Database Seed
 **Goal**: A developer or reviewer can log in with demo credentials and see a fully populated project with realistic LCC data
