@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Excel Workbook Audit** - Programmatic extraction of all formulas, EN 15459 data, and energy sources from CRAVEzero workbook
 - [x] **Phase 3: Schema, Types & Constants** - Prisma schema with Decimal types, engine type interfaces, EN 15459 constants, and validation rules
 - [x] **Phase 4: Calculation Engine** - Pure TypeScript functions implementing 35+ LCC formulas with formula mode toggle
-- [ ] **Phase 5: Engine Tests** - Golden dataset validation of all engine modules against Excel reference values
+- [x] **Phase 5: Engine Tests** - Golden dataset validation of all engine modules against Excel reference values
 - [ ] **Phase 6: Database Seed** - Demo user, project, and 3 variants with realistic data matching Excel tutorial
 - [ ] **Phase 7: tRPC API & Authentication** - Type-safe API layer with protected procedures and email/password auth
 - [ ] **Phase 8: UI Implementation** - Glass morphism wizard UI with data entry forms, results dashboard, and interactive charts
@@ -100,8 +100,8 @@ Plans:
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 05-01-PLAN.md -- Golden reference fixture (input + hand-calculated expected outputs) and shared test helpers
-- [ ] 05-02-PLAN.md -- Unit tests (6 modules), integration test, formula mode test, edge case tests
+- [x] 05-01-PLAN.md -- Golden reference fixture (input + hand-calculated expected outputs) and shared test helpers
+- [x] 05-02-PLAN.md -- Unit tests (6 modules), integration test, formula mode test, edge case tests
 
 ### Phase 6: Database Seed
 **Goal**: A developer or reviewer can log in with demo credentials and see a fully populated project with realistic LCC data
@@ -170,7 +170,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 2. Excel Workbook Audit | 2/2 | Complete | 2026-03-26 |
 | 3. Schema, Types & Constants | 2/2 | Complete | 2026-03-26 |
 | 4. Calculation Engine | 4/4 | Complete | 2026-03-26 |
-| 5. Engine Tests | 0/? | Not started | - |
+| 5. Engine Tests | 2/2 | Complete | 2026-03-26 |
 | 6. Database Seed | 0/? | Not started | - |
 | 7. tRPC API & Authentication | 0/? | Not started | - |
 | 8. UI Implementation | 0/? | Not started | - |

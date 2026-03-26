@@ -55,11 +55,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Engine Tests
 
-- [ ] **TEST-01**: Golden fixture extracted from Excel with all intermediate and final values
-- [ ] **TEST-02**: Unit tests per module (discount, energy, maintenance, aggregate, residual, income)
-- [ ] **TEST-03**: Integration test validates full calculateLCC() against golden fixture
-- [ ] **TEST-04**: Formula mode test: excel_replica produces buggy value, excel_bugfixed produces corrected
-- [ ] **TEST-05**: Edge cases: zero area, min period, no energy, no services, no income, all-zero costs
+- [x] **TEST-01**: Golden fixture extracted from Excel with all intermediate and final values
+- [x] **TEST-02**: Unit tests per module (discount, energy, maintenance, aggregate, residual, income)
+- [x] **TEST-03**: Integration test validates full calculateLCC() against golden fixture
+- [x] **TEST-04**: Formula mode test: excel_replica produces buggy value, excel_bugfixed produces corrected
+- [x] **TEST-05**: Edge cases: zero area, min period, no energy, no services, no income, all-zero costs
 
 ### Database Seed
 
@@ -193,11 +193,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CALC-15 | Phase 4 | Complete |
 | CALC-16 | Phase 4 | Complete |
 | CALC-17 | Phase 4 | Complete |
-| TEST-01 | Phase 5 | Pending |
-| TEST-02 | Phase 5 | Pending |
-| TEST-03 | Phase 5 | Pending |
-| TEST-04 | Phase 5 | Pending |
-| TEST-05 | Phase 5 | Pending |
+| TEST-01 | Phase 5 | Complete |
+| TEST-02 | Phase 5 | Complete |
+| TEST-03 | Phase 5 | Complete |
+| TEST-04 | Phase 5 | Complete |
+| TEST-05 | Phase 5 | Complete |
 | SEED-01 | Phase 6 | Pending |
 | SEED-02 | Phase 6 | Pending |
 | SEED-03 | Phase 6 | Pending |
