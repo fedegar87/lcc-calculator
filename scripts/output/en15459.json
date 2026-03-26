@@ -1,0 +1,798 @@
+{
+  "source": "EN 15459:2018 via CRAVEzero workbook",
+  "extracted_from": "Calc!B405:H483",
+  "extraction_date": "2026-03-26",
+  "count": 79,
+  "components": [
+    {
+      "index": 1,
+      "name": "Air conditioning units",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 2,
+      "name": "Air coolers",
+      "lifespan_min": 15,
+      "lifespan_max": 20,
+      "lifespan_avg": 18,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 3,
+      "name": "Air heaters, electric",
+      "lifespan_min": 15,
+      "lifespan_max": 20,
+      "lifespan_avg": 18,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 4,
+      "name": "Air heaters, steam",
+      "lifespan_min": 15,
+      "lifespan_max": 20,
+      "lifespan_avg": 18,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 5,
+      "name": "Air heaters, water",
+      "lifespan_min": 15,
+      "lifespan_max": 20,
+      "lifespan_avg": 18,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.03
+    },
+    {
+      "index": 6,
+      "name": "Boiler condensing",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.015
+    },
+    {
+      "index": 7,
+      "name": "Boiler- direct evacuation",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.015
+    },
+    {
+      "index": 8,
+      "name": "Boiler - Flue evacuation",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.015
+    },
+    {
+      "index": 9,
+      "name": "Burners, oil and gas",
+      "lifespan_min": 10,
+      "lifespan_max": 10,
+      "lifespan_avg": 10,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.06,
+      "maintenance_pct_avg": 0.05
+    },
+    {
+      "index": 10,
+      "name": "Chimney",
+      "lifespan_min": 15,
+      "lifespan_max": 20,
+      "lifespan_avg": 18,
+      "maintenance_pct_min": null,
+      "maintenance_pct_max": null,
+      "maintenance_pct_avg": null
+    },
+    {
+      "index": 11,
+      "name": "Condensers",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 12,
+      "name": "Control equipment",
+      "lifespan_min": 15,
+      "lifespan_max": 20,
+      "lifespan_avg": 18,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.03
+    },
+    {
+      "index": 13,
+      "name": "Control system - Central",
+      "lifespan_min": 15,
+      "lifespan_max": 25,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 14,
+      "name": "Control system- room control",
+      "lifespan_min": 15,
+      "lifespan_max": 25,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 15,
+      "name": "Control valves, automatic",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.06,
+      "maintenance_pct_max": 0.06,
+      "maintenance_pct_avg": 0.06
+    },
+    {
+      "index": 16,
+      "name": "Control valves, manual",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 17,
+      "name": "Convectors",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 18,
+      "name": "Cooling compressors",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 19,
+      "name": "Cooling panels and ceilings",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 20,
+      "name": "Dampers",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 21,
+      "name": "Dampers with control motors",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 22,
+      "name": "Diffusers",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 23,
+      "name": "Dual duct boxes",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 24,
+      "name": "Duct system for filtered air",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 25,
+      "name": "Duct system for non filtered air",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.06,
+      "maintenance_pct_max": 0.06,
+      "maintenance_pct_avg": 0.06
+    },
+    {
+      "index": 26,
+      "name": "Electric board",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.005,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.0075
+    },
+    {
+      "index": 27,
+      "name": "Electric heater - thermal storage heater",
+      "lifespan_min": 20,
+      "lifespan_max": 25,
+      "lifespan_avg": 23,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 28,
+      "name": "Electric heating - convector",
+      "lifespan_min": 20,
+      "lifespan_max": 25,
+      "lifespan_avg": 23,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 29,
+      "name": "Electric floor heating",
+      "lifespan_min": 25,
+      "lifespan_max": 50,
+      "lifespan_avg": 38,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 30,
+      "name": "Electric wiring",
+      "lifespan_min": 25,
+      "lifespan_max": 50,
+      "lifespan_avg": 38,
+      "maintenance_pct_min": 0.005,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.0075
+    },
+    {
+      "index": 31,
+      "name": "Water floor heating",
+      "lifespan_min": 50,
+      "lifespan_max": 50,
+      "lifespan_avg": 50,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 32,
+      "name": "Evaporators",
+      "lifespan_min": 15,
+      "lifespan_max": 20,
+      "lifespan_avg": 18,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 33,
+      "name": "Expansion vessels - membrane",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.005,
+      "maintenance_pct_max": 0.005,
+      "maintenance_pct_avg": 0.005
+    },
+    {
+      "index": 34,
+      "name": "Expansion vessels with pad",
+      "lifespan_min": 15,
+      "lifespan_max": 25,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 35,
+      "name": "Expansion vessels, stainless",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 36,
+      "name": "Expansion vessels, steel",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 37,
+      "name": "Extract air grills",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.1,
+      "maintenance_pct_max": 0.1,
+      "maintenance_pct_avg": 0.1
+    },
+    {
+      "index": 38,
+      "name": "Fan coil units",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 39,
+      "name": "Fans",
+      "lifespan_min": 15,
+      "lifespan_max": 20,
+      "lifespan_avg": 18,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 40,
+      "name": "Fans with variable flow",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.06,
+      "maintenance_pct_max": 0.06,
+      "maintenance_pct_avg": 0.06
+    },
+    {
+      "index": 41,
+      "name": "Filter frames",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 42,
+      "name": "Filter material to be exchanged",
+      "lifespan_min": 1,
+      "lifespan_max": 1,
+      "lifespan_avg": 1,
+      "maintenance_pct_min": 0,
+      "maintenance_pct_max": 0,
+      "maintenance_pct_avg": 0
+    },
+    {
+      "index": 43,
+      "name": "Filter material, to be cleaned",
+      "lifespan_min": 10,
+      "lifespan_max": 10,
+      "lifespan_avg": 10,
+      "maintenance_pct_min": 0.1,
+      "maintenance_pct_max": 0.1,
+      "maintenance_pct_avg": 0.1
+    },
+    {
+      "index": 44,
+      "name": "Fire dampers, easy accessible",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.08,
+      "maintenance_pct_max": 0.08,
+      "maintenance_pct_avg": 0.08
+    },
+    {
+      "index": 45,
+      "name": "Fire dampers, hidden",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.15,
+      "maintenance_pct_max": 0.15,
+      "maintenance_pct_avg": 0.15
+    },
+    {
+      "index": 46,
+      "name": "Fuel tank",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.005,
+      "maintenance_pct_max": 0.005,
+      "maintenance_pct_avg": 0.005
+    },
+    {
+      "index": 47,
+      "name": "Gas tank",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.005,
+      "maintenance_pct_max": 0.005,
+      "maintenance_pct_avg": 0.005
+    },
+    {
+      "index": 48,
+      "name": "Grills in general",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 49,
+      "name": "Heat pumps",
+      "lifespan_min": 15,
+      "lifespan_max": 20,
+      "lifespan_avg": 18,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.03
+    },
+    {
+      "index": 50,
+      "name": "Heat recovery units, cyclic",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 51,
+      "name": "Heat recovery units, static",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 52,
+      "name": "Humidifiers, steam",
+      "lifespan_min": 4,
+      "lifespan_max": 10,
+      "lifespan_avg": 7,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 53,
+      "name": "Humidifiers, water",
+      "lifespan_min": 10,
+      "lifespan_max": 10,
+      "lifespan_avg": 10,
+      "maintenance_pct_min": 0.06,
+      "maintenance_pct_max": 0.06,
+      "maintenance_pct_avg": 0.06
+    },
+    {
+      "index": 54,
+      "name": "Meters",
+      "lifespan_min": 10,
+      "lifespan_max": 10,
+      "lifespan_avg": 10,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 55,
+      "name": "Valve",
+      "lifespan_min": 10,
+      "lifespan_max": 10,
+      "lifespan_avg": 10,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 56,
+      "name": "Motors, diesel",
+      "lifespan_min": 10,
+      "lifespan_max": 10,
+      "lifespan_avg": 10,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 57,
+      "name": "Motors, electric",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 58,
+      "name": "Pipes, Cu",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 59,
+      "name": "Pipes, composite or (look at Water floor heating)",
+      "lifespan_min": 50,
+      "lifespan_max": 50,
+      "lifespan_avg": 50,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 60,
+      "name": "Pipes, stainless",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 61,
+      "name": "Pipes, steel in closed system",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 62,
+      "name": "Pipes, steel in open system",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 63,
+      "name": "Piping systems",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.005,
+      "maintenance_pct_max": 0.005,
+      "maintenance_pct_avg": 0.005
+    },
+    {
+      "index": 64,
+      "name": "Pumps-circulation",
+      "lifespan_min": 10,
+      "lifespan_max": 20,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 65,
+      "name": "Pumps - regulated",
+      "lifespan_min": 10,
+      "lifespan_max": 15,
+      "lifespan_avg": 13,
+      "maintenance_pct_min": 0.015,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.0175
+    },
+    {
+      "index": 66,
+      "name": "Radiators paint",
+      "lifespan_min": 20,
+      "lifespan_max": 30,
+      "lifespan_avg": 25,
+      "maintenance_pct_min": 0,
+      "maintenance_pct_max": 0,
+      "maintenance_pct_avg": 0
+    },
+    {
+      "index": 67,
+      "name": "Radiators, water",
+      "lifespan_min": 30,
+      "lifespan_max": 40,
+      "lifespan_avg": 35,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.015
+    },
+    {
+      "index": 68,
+      "name": "Shut off valves, automatic",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 69,
+      "name": "Shut off valves, manual",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.02,
+      "maintenance_pct_max": 0.02,
+      "maintenance_pct_avg": 0.02
+    },
+    {
+      "index": 70,
+      "name": "Solar collector (Vacuum collector or plate collector)",
+      "lifespan_min": 15,
+      "lifespan_max": 25,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.005,
+      "maintenance_pct_max": 0.005,
+      "maintenance_pct_avg": 0.005
+    },
+    {
+      "index": 71,
+      "name": "Sound traps",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 72,
+      "name": "Tank storage for DHW",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 73,
+      "name": "Tank storage with internal heat exchanger for DHW",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 74,
+      "name": "Thermostats for radiators",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.04,
+      "maintenance_pct_max": 0.04,
+      "maintenance_pct_avg": 0.04
+    },
+    {
+      "index": 75,
+      "name": "Valve with auxiliary power",
+      "lifespan_min": 10,
+      "lifespan_max": 10,
+      "lifespan_avg": 10,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    },
+    {
+      "index": 76,
+      "name": "Valve-Thermostatic",
+      "lifespan_min": 20,
+      "lifespan_max": 20,
+      "lifespan_avg": 20,
+      "maintenance_pct_min": 0.015,
+      "maintenance_pct_max": 0.015,
+      "maintenance_pct_avg": 0.015
+    },
+    {
+      "index": 77,
+      "name": "Variable flow units",
+      "lifespan_min": 15,
+      "lifespan_max": 15,
+      "lifespan_avg": 15,
+      "maintenance_pct_min": 0.06,
+      "maintenance_pct_max": 0.06,
+      "maintenance_pct_avg": 0.06
+    },
+    {
+      "index": 78,
+      "name": "V-belt drive",
+      "lifespan_min": 10,
+      "lifespan_max": 10,
+      "lifespan_avg": 10,
+      "maintenance_pct_min": 0.06,
+      "maintenance_pct_max": 0.06,
+      "maintenance_pct_avg": 0.06
+    },
+    {
+      "index": 79,
+      "name": "Wiring",
+      "lifespan_min": 30,
+      "lifespan_max": 30,
+      "lifespan_avg": 30,
+      "maintenance_pct_min": 0.01,
+      "maintenance_pct_max": 0.01,
+      "maintenance_pct_avg": 0.01
+    }
+  ]
+}

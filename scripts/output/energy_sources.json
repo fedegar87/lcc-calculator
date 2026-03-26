@@ -1,0 +1,142 @@
+{
+  "source": "CRAVEzero workbook Project Information sheet",
+  "extracted_from": "PI!C131:C149",
+  "extraction_date": "2026-03-26",
+  "count": 19,
+  "note": "Index 1 maps to row 131 (header row). Valid selectable sources are indices 2-19 (rows 132-149).",
+  "sources": [
+    {
+      "index": 1,
+      "row": 131,
+      "name": "…",
+      "category": "fuel_source",
+      "is_header": true
+    },
+    {
+      "index": 2,
+      "row": 132,
+      "name": "Oil",
+      "category": "fuel_source",
+      "is_header": false
+    },
+    {
+      "index": 3,
+      "row": 133,
+      "name": "Natural Gas",
+      "category": "fuel_source",
+      "is_header": false
+    },
+    {
+      "index": 4,
+      "row": 134,
+      "name": "Liquified Petroleum Gas (LPG)",
+      "category": "fuel_source",
+      "is_header": false
+    },
+    {
+      "index": 5,
+      "row": 135,
+      "name": "Coal",
+      "category": "fuel_source",
+      "is_header": false
+    },
+    {
+      "index": 6,
+      "row": 136,
+      "name": "Wood",
+      "category": "fuel_source",
+      "is_header": false
+    },
+    {
+      "index": 7,
+      "row": 137,
+      "name": "Wood logs",
+      "category": "fuel_source",
+      "is_header": false
+    },
+    {
+      "index": 8,
+      "row": 138,
+      "name": "Pellets",
+      "category": "fuel_source",
+      "is_header": false
+    },
+    {
+      "index": 9,
+      "row": 139,
+      "name": "Solid biomass",
+      "category": "fuel_source",
+      "is_header": false
+    },
+    {
+      "index": 10,
+      "row": 140,
+      "name": "Liquid and gas biomass",
+      "category": "fuel_source",
+      "is_header": false
+    },
+    {
+      "index": 11,
+      "row": 141,
+      "name": "Liquid biomass",
+      "category": "fuel_source",
+      "is_header": false
+    },
+    {
+      "index": 12,
+      "row": 142,
+      "name": "National Electricity-Mix",
+      "category": "energy_carrier",
+      "is_header": false
+    },
+    {
+      "index": 13,
+      "row": 143,
+      "name": "Electricity from Photovoltaics",
+      "category": "energy_carrier",
+      "is_header": false
+    },
+    {
+      "index": 14,
+      "row": 144,
+      "name": "District heating: General value adopted at national level",
+      "category": "energy_carrier",
+      "is_header": false
+    },
+    {
+      "index": 15,
+      "row": 145,
+      "name": "Energy from non-recyclable waste materials",
+      "category": "energy_carrier",
+      "is_header": false
+    },
+    {
+      "index": 16,
+      "row": 146,
+      "name": "District cooling: General value adopted at national level ",
+      "category": "energy_carrier",
+      "is_header": false
+    },
+    {
+      "index": 17,
+      "row": 147,
+      "name": "Energy produced by Solar Thermal panels",
+      "category": "energy_carrier",
+      "is_header": false
+    },
+    {
+      "index": 18,
+      "row": 148,
+      "name": "Energy produced from Photovoltaic panels",
+      "category": "energy_carrier",
+      "is_header": false
+    },
+    {
+      "index": 19,
+      "row": 149,
+      "name": "Energy produced by local wind plants",
+      "category": "energy_carrier",
+      "is_header": false
+    }
+  ]
+}
