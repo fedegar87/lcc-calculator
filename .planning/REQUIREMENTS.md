@@ -35,23 +35,23 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Calculation Engine
 
-- [ ] **CALC-01**: Real interest rate calculated via simplified Fisher formula (FIN-001)
-- [ ] **CALC-02**: Discount factors array generated for reference period (FIN-002)
-- [ ] **CALC-03**: Energy price escalation with compound growth per energy source (NRG-001)
-- [ ] **CALC-04**: Energy cost calculation for 5 end-use types with correct system counts (NRG-002..007)
-- [ ] **CALC-05**: Building element maintenance with flat annual % discounted by Rint (MNT-001, MNT-002)
-- [ ] **CALC-06**: Building service maintenance with EN 15459 lookup and replacement cycles (MNT-003, MNT-004)
-- [ ] **CALC-07**: Formula mode toggle supports excel_replica and excel_bugfixed for MNT-BUG-001
-- [ ] **CALC-08**: Energy aggregation: consumed, produced, cumulated time series (CAL-001..004)
-- [ ] **CALC-09**: Maintenance aggregation: elements + services, cumulated (CAL-005..008)
-- [ ] **CALC-10**: Construction cost aggregation by category with materials/labor totals (AGG-001..004)
-- [ ] **CALC-11**: Non-construction, design, and site management costs aggregated (AGG-005..007)
-- [ ] **CALC-12**: O&M = energy consumed - PV produced + maintenance (AGG-008..011)
-- [ ] **CALC-13**: LCC = design + construction + O&M + site management (AGG-012)
-- [ ] **CALC-14**: WLC = LCC + non-construction costs (AGG-013)
-- [ ] **CALC-15**: KPI ratios (DC/LCC, CC/LCC, LC/LCC, OC/LCC) with null-safe division (AGG-014)
-- [ ] **CALC-16**: Residual value per ISO 15686-5 for building services (RES-001, METHOD_IMPROVEMENT)
-- [ ] **CALC-17**: Income analysis: net annual income, simple payback, NPV (INC-001..003, METHOD_IMPROVEMENT)
+- [x] **CALC-01**: Real interest rate calculated via simplified Fisher formula (FIN-001)
+- [x] **CALC-02**: Discount factors array generated for reference period (FIN-002)
+- [x] **CALC-03**: Energy price escalation with compound growth per energy source (NRG-001)
+- [x] **CALC-04**: Energy cost calculation for 5 end-use types with correct system counts (NRG-002..007)
+- [x] **CALC-05**: Building element maintenance with flat annual % discounted by Rint (MNT-001, MNT-002)
+- [x] **CALC-06**: Building service maintenance with EN 15459 lookup and replacement cycles (MNT-003, MNT-004)
+- [x] **CALC-07**: Formula mode toggle supports excel_replica and excel_bugfixed for MNT-BUG-001
+- [x] **CALC-08**: Energy aggregation: consumed, produced, cumulated time series (CAL-001..004)
+- [x] **CALC-09**: Maintenance aggregation: elements + services, cumulated (CAL-005..008)
+- [x] **CALC-10**: Construction cost aggregation by category with materials/labor totals (AGG-001..004)
+- [x] **CALC-11**: Non-construction, design, and site management costs aggregated (AGG-005..007)
+- [x] **CALC-12**: O&M = energy consumed - PV produced + maintenance (AGG-008..011)
+- [x] **CALC-13**: LCC = design + construction + O&M + site management (AGG-012)
+- [x] **CALC-14**: WLC = LCC + non-construction costs (AGG-013)
+- [x] **CALC-15**: KPI ratios (DC/LCC, CC/LCC, LC/LCC, OC/LCC) with null-safe division (AGG-014)
+- [x] **CALC-16**: Residual value per ISO 15686-5 for building services (RES-001, METHOD_IMPROVEMENT)
+- [x] **CALC-17**: Income analysis: net annual income, simple payback, NPV (INC-001..003, METHOD_IMPROVEMENT)
 
 ### Engine Tests
 
@@ -176,23 +176,23 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-07 | Phase 3 | Complete |
 | DATA-08 | Phase 3 | Complete |
 | DATA-09 | Phase 3 | Complete |
-| CALC-01 | Phase 4 | Pending |
-| CALC-02 | Phase 4 | Pending |
-| CALC-03 | Phase 4 | Pending |
-| CALC-04 | Phase 4 | Pending |
-| CALC-05 | Phase 4 | Pending |
-| CALC-06 | Phase 4 | Pending |
-| CALC-07 | Phase 4 | Pending |
-| CALC-08 | Phase 4 | Pending |
-| CALC-09 | Phase 4 | Pending |
-| CALC-10 | Phase 4 | Pending |
-| CALC-11 | Phase 4 | Pending |
-| CALC-12 | Phase 4 | Pending |
-| CALC-13 | Phase 4 | Pending |
-| CALC-14 | Phase 4 | Pending |
-| CALC-15 | Phase 4 | Pending |
-| CALC-16 | Phase 4 | Pending |
-| CALC-17 | Phase 4 | Pending |
+| CALC-01 | Phase 4 | Complete |
+| CALC-02 | Phase 4 | Complete |
+| CALC-03 | Phase 4 | Complete |
+| CALC-04 | Phase 4 | Complete |
+| CALC-05 | Phase 4 | Complete |
+| CALC-06 | Phase 4 | Complete |
+| CALC-07 | Phase 4 | Complete |
+| CALC-08 | Phase 4 | Complete |
+| CALC-09 | Phase 4 | Complete |
+| CALC-10 | Phase 4 | Complete |
+| CALC-11 | Phase 4 | Complete |
+| CALC-12 | Phase 4 | Complete |
+| CALC-13 | Phase 4 | Complete |
+| CALC-14 | Phase 4 | Complete |
+| CALC-15 | Phase 4 | Complete |
+| CALC-16 | Phase 4 | Complete |
+| CALC-17 | Phase 4 | Complete |
 | TEST-01 | Phase 5 | Pending |
 | TEST-02 | Phase 5 | Pending |
 | TEST-03 | Phase 5 | Pending |

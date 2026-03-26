@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-26T19:30:16.290Z"
+status: in_progress
+last_updated: "2026-03-26T21:20:00.000Z"
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
+  total_phases: 4
+  completed_phases: 4
+  total_plans: 10
+  completed_plans: 10
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Accurate, standards-compliant LCC calculations that replicate verified Excel workbook behavior while fixing known bugs and adding residual value + income analysis.
-**Current focus:** Phase 3 - Schema, Types & Constants
+**Current focus:** Phase 5 - Engine Tests
 
 ## Current Position
 
-Phase: 3 of 9 (Schema, Types & Constants)
-Plan: 2 of 2 in current phase (COMPLETE)
+Phase: 4 of 9 (Calculation Engine) — COMPLETE
+Plan: 4 of 4 in current phase (COMPLETE)
 Status: Phase Complete
-Last activity: 2026-03-26 -- Completed 03-02-PLAN.md (Engine types, constants, validation)
+Last activity: 2026-03-26 -- Completed all 4 plans (discount, energy, maintenance, residual, income, aggregate, orchestrator)
 
-Progress: [██████░░░░] 33%
+Progress: [████████░░] 44%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 9 min
-- Total execution time: 0.9 hours
+- Total plans completed: 10
+- Average duration: 7 min
+- Total execution time: 1.1 hours
 
 **By Phase:**
 
@@ -43,14 +43,13 @@ Progress: [██████░░░░] 33%
 | 01-project-scaffolding | 2 | 29 min | 15 min |
 | 02-excel-workbook-audit | 2 | 16 min | 8 min |
 | 03-schema-types-constants | 2 | 9 min | 5 min |
+| 04-calculation-engine | 4 | 5 min | 1 min |
 
 **Recent Trend:**
-- Last 5 plans: 12 min, 8 min, 8 min, 3 min, 6 min
+- Last 5 plans: 8 min, 3 min, 6 min, 1 min, 1 min
 - Trend: improving
 
 *Updated after each plan completion*
-| Phase 03 P01 | 3min | 2 tasks | 2 files |
-| Phase 03 P02 | 6min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -69,11 +68,10 @@ Recent decisions affecting current work:
 - DEC-016: ESLint FlatCompat wrapper for eslint-config-next v15 + ESLint 9
 - DEC-017: Better Auth model conventions over Auth.js (Session.token, Account.accountId/providerId, Verification model)
 - DEC-018: IncomeInput flat fields (rent1/2/3, otherIncome1/2/3) instead of JSON for type safety
-- [Phase 03]: Better Auth model conventions over Auth.js (Session.token, Account.accountId/providerId, Verification model)
-- [Phase 03]: IncomeInput flat fields (rent1/2/3, otherIncome1/2/3) instead of JSON for type safety and direct SQL queries
 - [Phase 03]: FormulaMode as string literal union decoupled from Prisma enum
 - [Phase 03]: EN 15459 constants imported from audit JSON via resolveJsonModule (zero manual transcription)
 - [Phase 03]: Plain TypeScript validation at engine layer (not Zod), Zod reserved for API boundary
+- [Phase 04]: KPI divisor is investmentCost (construction + design + site mgmt), NOT LCC — verified from Excel formulas
 
 ### Pending Todos
 
@@ -86,5 +84,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-26
-Stopped at: Completed 03-02-PLAN.md. Phase 03 complete.
+Stopped at: Completed Phase 04 calculation engine. All 7 modules implemented, 767 lines, TypeScript compiles clean.
 Resume file: None

@@ -13,9 +13,9 @@ LCCzero replaces the CRAVEzero Excel workbook with a web application for Life-Cy
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Project Scaffolding** - Next.js 15 project with TypeScript, Tailwind, Prisma, tRPC, Vitest, and GitLab remote
-- [ ] **Phase 2: Excel Workbook Audit** - Programmatic extraction of all formulas, EN 15459 data, and energy sources from CRAVEzero workbook
-- [ ] **Phase 3: Schema, Types & Constants** - Prisma schema with Decimal types, engine type interfaces, EN 15459 constants, and validation rules
-- [ ] **Phase 4: Calculation Engine** - Pure TypeScript functions implementing 35+ LCC formulas with formula mode toggle
+- [x] **Phase 2: Excel Workbook Audit** - Programmatic extraction of all formulas, EN 15459 data, and energy sources from CRAVEzero workbook
+- [x] **Phase 3: Schema, Types & Constants** - Prisma schema with Decimal types, engine type interfaces, EN 15459 constants, and validation rules
+- [x] **Phase 4: Calculation Engine** - Pure TypeScript functions implementing 35+ LCC formulas with formula mode toggle
 - [ ] **Phase 5: Engine Tests** - Golden dataset validation of all engine modules against Excel reference values
 - [ ] **Phase 6: Database Seed** - Demo user, project, and 3 variants with realistic data matching Excel tutorial
 - [ ] **Phase 7: tRPC API & Authentication** - Type-safe API layer with protected procedures and email/password auth
@@ -51,8 +51,8 @@ Plans:
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 02-01-PLAN.md -- Python extraction scripts: EN 15459 table, energy sources, and all formulas to JSON
-- [ ] 02-02-PLAN.md -- Formula map (35+ IDs) and architecture decisions (DEC-001 through DEC-010) documentation
+- [x] 02-01-PLAN.md -- Python extraction scripts: EN 15459 table, energy sources, and all formulas to JSON
+- [x] 02-02-PLAN.md -- Formula map (35+ IDs) and architecture decisions (DEC-001 through DEC-010) documentation
 
 ### Phase 3: Schema, Types & Constants
 **Goal**: Data layer and type system are defined so that the engine, database, and API all share a single source of truth for domain structures
@@ -66,8 +66,8 @@ Plans:
 **Plans**: 2 plans in 1 wave (parallel)
 
 Plans:
-- [ ] 03-01-PLAN.md -- Prisma schema: all models, enums, relations, Decimal types, Better Auth, cascade deletes
-- [ ] 03-02-PLAN.md -- Engine types, EN 15459 constants from audit JSON, input validation with tests
+- [x] 03-01-PLAN.md -- Prisma schema: all models, enums, relations, Decimal types, Better Auth, cascade deletes
+- [x] 03-02-PLAN.md -- Engine types, EN 15459 constants from audit JSON, input validation with tests
 
 ### Phase 4: Calculation Engine
 **Goal**: Pure calculation engine produces correct LCC/WLC results for any valid input, matching Excel behavior in replica mode and fixing known bugs in bugfixed mode
@@ -82,10 +82,10 @@ Plans:
 **Plans**: 4 plans in 2 waves
 
 Plans:
-- [ ] 04-01-PLAN.md -- Discount and energy cost modules (FIN-001/002, NRG-001..007)
-- [ ] 04-02-PLAN.md -- Maintenance cost module with MNT-BUG-001 toggle (MNT-001..004, CAL-005..008)
-- [ ] 04-03-PLAN.md -- Residual value and income analysis (RES-001, INC-001..003)
-- [ ] 04-04-PLAN.md -- Aggregation module and calculateLCC orchestrator (AGG-001..014, CAL-001..004)
+- [x] 04-01-PLAN.md -- Discount and energy cost modules (FIN-001/002, NRG-001..007)
+- [x] 04-02-PLAN.md -- Maintenance cost module with MNT-BUG-001 toggle (MNT-001..004, CAL-005..008)
+- [x] 04-03-PLAN.md -- Residual value and income analysis (RES-001, INC-001..003)
+- [x] 04-04-PLAN.md -- Aggregation module and calculateLCC orchestrator (AGG-001..014, CAL-001..004)
 
 ### Phase 5: Engine Tests
 **Goal**: Engine correctness is proven against a golden dataset extracted from the Excel workbook, covering all modules and edge cases
@@ -166,9 +166,9 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Project Scaffolding | 2/2 | Complete | 2026-03-26 |
-| 2. Excel Workbook Audit | 0/? | Not started | - |
-| 3. Schema, Types & Constants | 0/? | Not started | - |
-| 4. Calculation Engine | 0/? | Not started | - |
+| 2. Excel Workbook Audit | 2/2 | Complete | 2026-03-26 |
+| 3. Schema, Types & Constants | 2/2 | Complete | 2026-03-26 |
+| 4. Calculation Engine | 4/4 | Complete | 2026-03-26 |
 | 5. Engine Tests | 0/? | Not started | - |
 | 6. Database Seed | 0/? | Not started | - |
 | 7. tRPC API & Authentication | 0/? | Not started | - |
