@@ -1,0 +1,151 @@
+{
+  "meta": {
+    "description": "Golden reference dataset for LCC engine tests. Values computed step-by-step from formula specifications. Base variant, 40-year period, excel_bugfixed mode.",
+    "referencePeriod": 40,
+    "formulaMode": "excel_bugfixed",
+    "generated": "2026-03-26"
+  },
+  "input": {
+    "referencePeriod": 40,
+    "interestRate": 0.0151,
+    "inflationRate": 0.0056,
+    "treatedFloorArea": 1750,
+    "energyPrices": [
+      { "index": 3, "name": "Natural Gas", "pricePerKwh": 0.065, "annualIncrease": 0.02 },
+      { "index": 12, "name": "National Electricity-Mix", "pricePerKwh": 0.22, "annualIncrease": 0.025 },
+      { "index": 13, "name": "Electricity from Photovoltaics", "pricePerKwh": 0.12, "annualIncrease": 0.015 }
+    ],
+    "energyInputs": [
+      { "endUse": "HEATING_1", "energySourceIndex": 3, "specificConsumption": 25 },
+      { "endUse": "HEATING_2", "energySourceIndex": 3, "specificConsumption": 10 },
+      { "endUse": "COOLING_1", "energySourceIndex": 12, "specificConsumption": 15 },
+      { "endUse": "HOUSEHOLD_ELECTRICITY", "energySourceIndex": 12, "specificConsumption": 20 },
+      { "endUse": "PV_PRODUCTION", "energySourceIndex": 13, "specificConsumption": 8 }
+    ],
+    "costItems": [
+      { "category": "A1_ROOFS", "materialCost": 120000, "laborCost": 80000, "otherCost": 5000 },
+      { "category": "A5_WINDOWS", "materialCost": 90000, "laborCost": 60000, "otherCost": 3000 },
+      { "category": "B1_HEATING", "materialCost": 45000, "laborCost": 25000, "otherCost": 2000 }
+    ],
+    "serviceComponents": [
+      { "name": "Heat pump", "constructionCost": 35000, "en15459ComponentIndex": 6 },
+      { "name": "Ventilation unit", "constructionCost": 18000, "en15459ComponentIndex": 1 }
+    ],
+    "buildingElementMaintenancePercent": 0.01,
+    "wlcInput": {
+      "landCost": 200000,
+      "enablingCosts": 15000,
+      "planningFees": 8000,
+      "userSupportPropMgmt": 3000,
+      "userSupportCharges": 1500,
+      "userSupportAdmin": 800,
+      "financeCost": 5000,
+      "designCostsTotal": 25000,
+      "siteManagementCostsTotal": 12000
+    },
+    "designCosts": [
+      { "lineNumber": 1, "description": "General design", "preliminaryCost": 10000, "definitiveCost": 8000, "executiveCost": 4000, "siteManagementCost": 3000 }
+    ],
+    "incomeInput": {
+      "rents": [{ "monthlyPerM2": 8, "area": 1200, "taxes": 2400 }],
+      "otherIncomes": [{ "amount": 6000, "taxes": 800 }]
+    }
+  },
+  "expected": {
+    "realInterestRate": 0.009447096260938745,
+    "discountFactors": {
+      "year0": 1.0,
+      "year1": 0.99064131612649,
+      "year5": 0.9540742717548438,
+      "year10": 0.9102577160245356,
+      "year15": 0.868453467525336,
+      "year20": 0.828569109582204,
+      "year30": 0.7542114252567801,
+      "year40": 0.6865267693538463
+    },
+    "energy": {
+      "heating": {
+        "nominalYear1": 4060.875,
+        "actualizedYear1": 4022.8705546252,
+        "cumulatedYear40": 198515.73491276335
+      },
+      "cooling": {
+        "nominalYear1": 5919.375,
+        "actualizedYear1": 5863.977440646241,
+        "cumulatedYear40": 320982.6754736095
+      },
+      "dhw": {
+        "nominalYear1": 0,
+        "actualizedYear1": 0,
+        "cumulatedYear40": 0
+      },
+      "household": {
+        "nominalYear1": 7892.5,
+        "actualizedYear1": 7818.636587528321,
+        "cumulatedYear40": 427976.90063147916
+      },
+      "pv": {
+        "nominalYear1": 1705.2,
+        "actualizedYear1": 1689.2415722588903,
+        "cumulatedYear40": 75349.52721992528
+      }
+    },
+    "maintenance": {
+      "elementsYear1": 3526.7461333858737,
+      "elementsYear10": 3081.7311547885165,
+      "elementsCumulatedYear40": 106903.48451982642,
+      "servicesYear1": 1226.4801497389421,
+      "servicesYear15": 14795.368965362177,
+      "servicesYear20": 26468.839146662052,
+      "servicesYear30": 11816.623094261928,
+      "servicesCumulatedYear40": 106477.1299123935,
+      "totalMaintenance": 213380.61443221994,
+      "maintenanceCostPerM2": 121.93177967555425
+    },
+    "maintenanceReplica": {
+      "servicesYear15": 16148.01014277021,
+      "servicesYear30": 16063.592243589232,
+      "servicesCumulatedYear40": 112076.74023912885
+    },
+    "aggregate": {
+      "totalMaterials": 255000,
+      "totalLabor": 165000,
+      "totalConstruction": 430000,
+      "constructionByCategory": {
+        "A1_ROOFS": 205000,
+        "A5_WINDOWS": 153000,
+        "B1_HEATING": 72000
+      },
+      "nonConstructionCosts": 233300,
+      "designCosts": 25000,
+      "buildingSiteManagement": 12000,
+      "energyConsumed": 947475.311017852,
+      "energyProduced": 75349.52721992528,
+      "maintenanceAtRefPeriod": 213380.61443221994,
+      "operationAndMaintenance": 1085506.3982301466,
+      "lcc": 1552506.3982301466,
+      "wlc": 1785806.3982301466
+    },
+    "kpis": {
+      "investmentCost": 467000,
+      "kpiDesignOverLCC": 0.05353319057815846,
+      "kpiConstructionOverLCC": 0.5460385438972163,
+      "kpiLaborOverLCC": 0.3533190578158458,
+      "kpiOMOverLCC": 2.3244248356105923,
+      "kpiLCCPerM2": 887.1465132743695,
+      "kpiWLCPerM2": 1020.4607989886553
+    },
+    "residual": {
+      "heatPumpResidual": 24028.43692738462,
+      "ventilationResidual": 4119.1606161230775,
+      "totalResidualValue": 28147.597543507698,
+      "lccNetResidual": 1524358.8006866388
+    },
+    "income": {
+      "netAnnualIncome": 118000,
+      "simplePaybackYears": 13.156833883306327,
+      "npvIncomeStream": 3915472.034427059,
+      "netPresentValue": 2362965.6361969123
+    }
+  }
+}
