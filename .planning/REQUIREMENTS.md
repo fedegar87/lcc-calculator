@@ -16,10 +16,10 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Excel Audit
 
 - [x] **AUDIT-01**: All Excel formulas extracted programmatically from CRAVEzero workbook (7 sheets)
-- [x] **AUDIT-02**: EN 15459 lookup table extracted (80+ HVAC components with lifespan, maintenance %)
+- [x] **AUDIT-02**: EN 15459 lookup table extracted (79 HVAC components with lifespan, maintenance %)
 - [x] **AUDIT-03**: Energy source list extracted from Project Information sheet
-- [ ] **AUDIT-04**: Formula map documented with 35+ formula IDs (FIN, NRG, MNT, CAL, AGG, RES, INC)
-- [ ] **AUDIT-05**: Architecture decisions documented (DEC-001 through DEC-010)
+- [x] **AUDIT-04**: Formula map documented with 35+ formula IDs (FIN, NRG, MNT, CAL, AGG, RES, INC)
+- [x] **AUDIT-05**: Architecture decisions documented (DEC-001 through DEC-010)
 
 ### Schema & Types
 
@@ -165,8 +165,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUDIT-01 | Phase 2 | Complete |
 | AUDIT-02 | Phase 2 | Complete |
 | AUDIT-03 | Phase 2 | Complete |
-| AUDIT-04 | Phase 2 | Pending |
-| AUDIT-05 | Phase 2 | Pending |
+| AUDIT-04 | Phase 2 | Complete |
+| AUDIT-05 | Phase 2 | Complete |
 | DATA-01 | Phase 3 | Pending |
 | DATA-02 | Phase 3 | Pending |
 | DATA-03 | Phase 3 | Pending |
