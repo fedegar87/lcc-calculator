@@ -159,13 +159,89 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated by roadmapper) | | |
+| SETUP-01 | Phase 1 | Pending |
+| SETUP-02 | Phase 1 | Pending |
+| SETUP-03 | Phase 1 | Pending |
+| AUDIT-01 | Phase 2 | Pending |
+| AUDIT-02 | Phase 2 | Pending |
+| AUDIT-03 | Phase 2 | Pending |
+| AUDIT-04 | Phase 2 | Pending |
+| AUDIT-05 | Phase 2 | Pending |
+| DATA-01 | Phase 3 | Pending |
+| DATA-02 | Phase 3 | Pending |
+| DATA-03 | Phase 3 | Pending |
+| DATA-04 | Phase 3 | Pending |
+| DATA-05 | Phase 3 | Pending |
+| DATA-06 | Phase 3 | Pending |
+| DATA-07 | Phase 3 | Pending |
+| DATA-08 | Phase 3 | Pending |
+| DATA-09 | Phase 3 | Pending |
+| CALC-01 | Phase 4 | Pending |
+| CALC-02 | Phase 4 | Pending |
+| CALC-03 | Phase 4 | Pending |
+| CALC-04 | Phase 4 | Pending |
+| CALC-05 | Phase 4 | Pending |
+| CALC-06 | Phase 4 | Pending |
+| CALC-07 | Phase 4 | Pending |
+| CALC-08 | Phase 4 | Pending |
+| CALC-09 | Phase 4 | Pending |
+| CALC-10 | Phase 4 | Pending |
+| CALC-11 | Phase 4 | Pending |
+| CALC-12 | Phase 4 | Pending |
+| CALC-13 | Phase 4 | Pending |
+| CALC-14 | Phase 4 | Pending |
+| CALC-15 | Phase 4 | Pending |
+| CALC-16 | Phase 4 | Pending |
+| CALC-17 | Phase 4 | Pending |
+| TEST-01 | Phase 5 | Pending |
+| TEST-02 | Phase 5 | Pending |
+| TEST-03 | Phase 5 | Pending |
+| TEST-04 | Phase 5 | Pending |
+| TEST-05 | Phase 5 | Pending |
+| SEED-01 | Phase 6 | Pending |
+| SEED-02 | Phase 6 | Pending |
+| SEED-03 | Phase 6 | Pending |
+| API-01 | Phase 7 | Pending |
+| API-02 | Phase 7 | Pending |
+| API-03 | Phase 7 | Pending |
+| API-04 | Phase 7 | Pending |
+| API-05 | Phase 7 | Pending |
+| API-06 | Phase 7 | Pending |
+| API-07 | Phase 7 | Pending |
+| AUTH-01 | Phase 7 | Pending |
+| AUTH-02 | Phase 7 | Pending |
+| AUTH-03 | Phase 7 | Pending |
+| AUTH-04 | Phase 7 | Pending |
+| AUTH-05 | Phase 7 | Pending |
+| UI-01 | Phase 8 | Pending |
+| UI-02 | Phase 8 | Pending |
+| UI-03 | Phase 8 | Pending |
+| UI-04 | Phase 8 | Pending |
+| UI-05 | Phase 8 | Pending |
+| UI-06 | Phase 8 | Pending |
+| UI-07 | Phase 8 | Pending |
+| UI-08 | Phase 8 | Pending |
+| UI-09 | Phase 8 | Pending |
+| UI-10 | Phase 8 | Pending |
+| UI-11 | Phase 8 | Pending |
+| UI-12 | Phase 8 | Pending |
+| UI-13 | Phase 8 | Pending |
+| UI-14 | Phase 8 | Pending |
+| UI-15 | Phase 8 | Pending |
+| UI-16 | Phase 8 | Pending |
+| UI-17 | Phase 8 | Pending |
+| UI-18 | Phase 8 | Pending |
+| UI-19 | Phase 8 | Pending |
+| UI-20 | Phase 8 | Pending |
+| EXPORT-01 | Phase 9 | Pending |
+| EXPORT-02 | Phase 9 | Pending |
+| EXPORT-03 | Phase 9 | Pending |
 
 **Coverage:**
 - v1 requirements: 62 total
-- Mapped to phases: 0
-- Unmapped: 62
+- Mapped to phases: 62
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-26*
-*Last updated: 2026-03-26 after initial definition*
+*Last updated: 2026-03-26 after roadmap creation*
