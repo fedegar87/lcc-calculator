@@ -79,10 +79,13 @@ Plans:
   3. Formula mode toggle produces different maintenance values for MNT-BUG-001 (excel_replica uses buggy exponent, excel_bugfixed uses correct exponent)
   4. Residual value calculation follows ISO 15686-5 for building services (METHOD_IMPROVEMENT, not in Excel)
   5. Income analysis produces net annual income, simple payback period, and NPV (METHOD_IMPROVEMENT, not in Excel)
-**Plans**: TBD
+**Plans**: 4 plans in 2 waves
 
 Plans:
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md -- Discount and energy cost modules (FIN-001/002, NRG-001..007)
+- [ ] 04-02-PLAN.md -- Maintenance cost module with MNT-BUG-001 toggle (MNT-001..004, CAL-005..008)
+- [ ] 04-03-PLAN.md -- Residual value and income analysis (RES-001, INC-001..003)
+- [ ] 04-04-PLAN.md -- Aggregation module and calculateLCC orchestrator (AGG-001..014, CAL-001..004)
 
 ### Phase 5: Engine Tests
 **Goal**: Engine correctness is proven against a golden dataset extracted from the Excel workbook, covering all modules and edge cases
