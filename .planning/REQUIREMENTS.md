@@ -29,9 +29,9 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **DATA-04**: EnergyInput with 8 EndUse types (heating 1/2, cooling 1/2, DHW 1/2, household, PV)
 - [x] **DATA-05**: ServiceComponent, WLCInput, DesignCost, IncomeInput, MaintenanceConfig models
 - [x] **DATA-06**: ResultSnapshot with engine version, formula mode, input hash for reproducibility
-- [ ] **DATA-07**: Engine type interfaces (VariantInput, LCCResult, YearlyEnergyCosts) defined
-- [ ] **DATA-08**: EN 15459 constants extracted from audit as TypeScript constants
-- [ ] **DATA-09**: Input validation rules with plausible range checks
+- [x] **DATA-07**: Engine type interfaces (VariantInput, LCCResult, YearlyEnergyCosts) defined
+- [x] **DATA-08**: EN 15459 constants extracted from audit as TypeScript constants
+- [x] **DATA-09**: Input validation rules with plausible range checks
 
 ### Calculation Engine
 
@@ -173,9 +173,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-04 | Phase 3 | Complete |
 | DATA-05 | Phase 3 | Complete |
 | DATA-06 | Phase 3 | Complete |
-| DATA-07 | Phase 3 | Pending |
-| DATA-08 | Phase 3 | Pending |
-| DATA-09 | Phase 3 | Pending |
+| DATA-07 | Phase 3 | Complete |
+| DATA-08 | Phase 3 | Complete |
+| DATA-09 | Phase 3 | Complete |
 | CALC-01 | Phase 4 | Pending |
 | CALC-02 | Phase 4 | Pending |
 | CALC-03 | Phase 4 | Pending |
