@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-last_updated: "2026-03-26T22:10:00.000Z"
+last_updated: "2026-03-26T23:00:00.000Z"
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 12
-  completed_plans: 12
+  total_phases: 6
+  completed_phases: 6
+  total_plans: 13
+  completed_plans: 13
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Accurate, standards-compliant LCC calculations that replicate verified Excel workbook behavior while fixing known bugs and adding residual value + income analysis.
-**Current focus:** Phase 6 - Database Seed
+**Current focus:** Phase 7 - tRPC API & Authentication
 
 ## Current Position
 
-Phase: 5 of 9 (Engine Tests) — COMPLETE
-Plan: 2 of 2 in current phase (COMPLETE)
+Phase: 6 of 9 (Database Seed) — COMPLETE
+Plan: 1 of 1 in current phase (COMPLETE)
 Status: Phase Complete
-Last activity: 2026-03-26 -- 141 tests passing across 10 test files (6 unit + integration + edge cases + validation + smoke)
+Last activity: 2026-03-26 -- Seed script with demo user, 3 variants, 9 data domains per variant
 
-Progress: [██████████░░] 56%
+Progress: [████████████░░] 67%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 6 min
-- Total execution time: 1.3 hours
+- Total execution time: 1.4 hours
 
 **By Phase:**
 
@@ -45,9 +45,10 @@ Progress: [██████████░░] 56%
 | 03-schema-types-constants | 2 | 9 min | 5 min |
 | 04-calculation-engine | 4 | 5 min | 1 min |
 | 05-engine-tests | 2 | 10 min | 5 min |
+| 06-database-seed | 1 | 5 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 6 min, 1 min, 1 min, 5 min, 5 min
+- Last 5 plans: 1 min, 1 min, 5 min, 5 min, 5 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -73,6 +74,8 @@ Recent decisions affecting current work:
 - [Phase 03]: EN 15459 constants imported from audit JSON via resolveJsonModule (zero manual transcription)
 - [Phase 03]: Plain TypeScript validation at engine layer (not Zod), Zod reserved for API boundary
 - [Phase 04]: KPI divisor is investmentCost (construction + design + site mgmt), NOT LCC — verified from Excel formulas
+- [Phase 06]: Deterministic account ID (seed-credential-{userId}) for idempotent Better Auth credential upsert
+- [Phase 06]: BASE variant seed data matches golden fixture exactly; VARIANT_1/2 differ for meaningful LCC comparison
 
 ### Pending Todos
 
@@ -85,5 +88,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-26
-Stopped at: Completed Phase 05 engine tests. 141 tests across 10 files, golden fixture with hand-computed values, 1003 lines of test code.
+Stopped at: Completed Phase 06 database seed. Seed script with demo user, 3 variants, 9 data domains. Ready for Phase 7 tRPC API.
 Resume file: None
