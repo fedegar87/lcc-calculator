@@ -48,10 +48,11 @@ Plans:
   2. EN 15459 lookup table contains 80+ HVAC components with lifespan and maintenance percentage, validated programmatically
   3. Energy source list is extracted with all fields from the Project Information sheet
   4. Architecture decisions DEC-001 through DEC-010 are documented with rationale from workbook evidence
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md -- Python extraction scripts: EN 15459 table, energy sources, and all formulas to JSON
+- [ ] 02-02-PLAN.md -- Formula map (35+ IDs) and architecture decisions (DEC-001 through DEC-010) documentation
 
 ### Phase 3: Schema, Types & Constants
 **Goal**: Data layer and type system are defined so that the engine, database, and API all share a single source of truth for domain structures
