@@ -63,10 +63,11 @@ Plans:
   2. Engine type interfaces (VariantInput, LCCResult, YearlyEnergyCosts) are importable without any Prisma or framework dependency
   3. EN 15459 constants are available as typed TypeScript arrays with validated lifespan and maintenance ranges
   4. Validation schemas reject out-of-range inputs (negative areas, interest rates > 100%, periods < 1 year)
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave (parallel)
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md -- Prisma schema: all models, enums, relations, Decimal types, Better Auth, cascade deletes
+- [ ] 03-02-PLAN.md -- Engine types, EN 15459 constants from audit JSON, input validation with tests
 
 ### Phase 4: Calculation Engine
 **Goal**: Pure calculation engine produces correct LCC/WLC results for any valid input, matching Excel behavior in replica mode and fixing known bugs in bugfixed mode

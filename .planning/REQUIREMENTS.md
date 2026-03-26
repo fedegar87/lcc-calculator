@@ -23,12 +23,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Schema & Types
 
-- [ ] **DATA-01**: Prisma schema with Decimal types for all monetary values and rates
-- [ ] **DATA-02**: User, Project, Variant, Geometry, BoundaryCondition models defined
-- [ ] **DATA-03**: CostItem with 21 categories (A1-E1) and CostItemDetail for layer breakdown
-- [ ] **DATA-04**: EnergyInput with 8 EndUse types (heating 1/2, cooling 1/2, DHW 1/2, household, PV)
-- [ ] **DATA-05**: ServiceComponent, WLCInput, DesignCost, IncomeInput, MaintenanceConfig models
-- [ ] **DATA-06**: ResultSnapshot with engine version, formula mode, input hash for reproducibility
+- [x] **DATA-01**: Prisma schema with Decimal types for all monetary values and rates
+- [x] **DATA-02**: User, Project, Variant, Geometry, BoundaryCondition models defined
+- [x] **DATA-03**: CostItem with 21 categories (A1-E1) and CostItemDetail for layer breakdown
+- [x] **DATA-04**: EnergyInput with 8 EndUse types (heating 1/2, cooling 1/2, DHW 1/2, household, PV)
+- [x] **DATA-05**: ServiceComponent, WLCInput, DesignCost, IncomeInput, MaintenanceConfig models
+- [x] **DATA-06**: ResultSnapshot with engine version, formula mode, input hash for reproducibility
 - [ ] **DATA-07**: Engine type interfaces (VariantInput, LCCResult, YearlyEnergyCosts) defined
 - [ ] **DATA-08**: EN 15459 constants extracted from audit as TypeScript constants
 - [ ] **DATA-09**: Input validation rules with plausible range checks
@@ -167,12 +167,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUDIT-03 | Phase 2 | Complete |
 | AUDIT-04 | Phase 2 | Complete |
 | AUDIT-05 | Phase 2 | Complete |
-| DATA-01 | Phase 3 | Pending |
-| DATA-02 | Phase 3 | Pending |
-| DATA-03 | Phase 3 | Pending |
-| DATA-04 | Phase 3 | Pending |
-| DATA-05 | Phase 3 | Pending |
-| DATA-06 | Phase 3 | Pending |
+| DATA-01 | Phase 3 | Complete |
+| DATA-02 | Phase 3 | Complete |
+| DATA-03 | Phase 3 | Complete |
+| DATA-04 | Phase 3 | Complete |
+| DATA-05 | Phase 3 | Complete |
+| DATA-06 | Phase 3 | Complete |
 | DATA-07 | Phase 3 | Pending |
 | DATA-08 | Phase 3 | Pending |
 | DATA-09 | Phase 3 | Pending |
