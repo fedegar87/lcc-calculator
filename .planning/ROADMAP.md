@@ -111,10 +111,10 @@ Plans:
   1. Running `npx prisma db seed` creates a demo user with hashed password that can authenticate
   2. Demo project contains 3 variants (BASE, VARIANT_1, VARIANT_2) with data matching the Excel tutorial
   3. All data domains are populated: geometry, boundary conditions, energy inputs, cost items, service components, WLC inputs, income inputs
-**Plans**: TBD
+**Plans**: 1 plan in 1 wave
 
 Plans:
-- [ ] 06-01: TBD
+- [ ] 06-01-PLAN.md -- Seed script with demo user (Better Auth), project with 3 variants, all data domains populated
 
 ### Phase 7: tRPC API & Authentication
 **Goal**: Authenticated users can perform all data operations and trigger calculations through a type-safe API
