@@ -12,7 +12,7 @@ LCCzero replaces the CRAVEzero Excel workbook with a web application for Life-Cy
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Project Scaffolding** - Next.js 15 project with TypeScript, Tailwind, Prisma, tRPC, Vitest, and GitLab remote
+- [x] **Phase 1: Project Scaffolding** - Next.js 15 project with TypeScript, Tailwind, Prisma, tRPC, Vitest, and GitLab remote
 - [ ] **Phase 2: Excel Workbook Audit** - Programmatic extraction of all formulas, EN 15459 data, and energy sources from CRAVEzero workbook
 - [ ] **Phase 3: Schema, Types & Constants** - Prisma schema with Decimal types, engine type interfaces, EN 15459 constants, and validation rules
 - [ ] **Phase 4: Calculation Engine** - Pure TypeScript functions implementing 35+ LCC formulas with formula mode toggle
@@ -36,8 +36,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 01-01-PLAN.md -- Scaffold Next.js 15, install all dependencies, shadcn/ui, Git config
-- [ ] 01-02-PLAN.md -- Configure design system, Prisma 7, tRPC 11, Vitest, package scripts
+- [x] 01-01-PLAN.md -- Scaffold Next.js 15, install all dependencies, shadcn/ui, Git config
+- [x] 01-02-PLAN.md -- Configure design system, Prisma 7, tRPC 11, Vitest, package scripts
 
 ### Phase 2: Excel Workbook Audit
 **Goal**: All formulas, data tables, and domain knowledge are extracted from the Excel workbook into machine-readable artifacts
@@ -160,7 +160,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project Scaffolding | 0/? | Not started | - |
+| 1. Project Scaffolding | 2/2 | Complete | 2026-03-26 |
 | 2. Excel Workbook Audit | 0/? | Not started | - |
 | 3. Schema, Types & Constants | 0/? | Not started | - |
 | 4. Calculation Engine | 0/? | Not started | - |

@@ -11,7 +11,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **SETUP-01**: Project scaffolded with Next.js 15, TypeScript strict, Tailwind v4, Prisma 7, tRPC 11
 - [x] **SETUP-02**: Git repository initialized with conventional commits and GitLab remote
-- [ ] **SETUP-03**: Vitest configured for engine unit testing
+- [x] **SETUP-03**: Vitest configured for engine unit testing
 
 ### Excel Audit
 
@@ -161,7 +161,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | SETUP-01 | Phase 1 | Complete |
 | SETUP-02 | Phase 1 | Complete |
-| SETUP-03 | Phase 1 | Pending |
+| SETUP-03 | Phase 1 | Complete |
 | AUDIT-01 | Phase 2 | Pending |
 | AUDIT-02 | Phase 2 | Pending |
 | AUDIT-03 | Phase 2 | Pending |
