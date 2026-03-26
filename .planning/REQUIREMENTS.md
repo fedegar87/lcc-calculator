@@ -63,9 +63,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Database Seed
 
-- [ ] **SEED-01**: Demo user with hashed password
-- [ ] **SEED-02**: Demo project with 3 variants and realistic data matching Excel tutorial
-- [ ] **SEED-03**: Complete data coverage: geometry, boundary conditions, energy, costs, services, WLC, income
+- [x] **SEED-01**: Demo user with hashed password
+- [x] **SEED-02**: Demo project with 3 variants and realistic data matching Excel tutorial
+- [x] **SEED-03**: Complete data coverage: geometry, boundary conditions, energy, costs, services, WLC, income
 
 ### API Layer
 
@@ -198,9 +198,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-03 | Phase 5 | Complete |
 | TEST-04 | Phase 5 | Complete |
 | TEST-05 | Phase 5 | Complete |
-| SEED-01 | Phase 6 | Pending |
-| SEED-02 | Phase 6 | Pending |
-| SEED-03 | Phase 6 | Pending |
+| SEED-01 | Phase 6 | Complete |
+| SEED-02 | Phase 6 | Complete |
+| SEED-03 | Phase 6 | Complete |
 | API-01 | Phase 7 | Pending |
 | API-02 | Phase 7 | Pending |
 | API-03 | Phase 7 | Pending |

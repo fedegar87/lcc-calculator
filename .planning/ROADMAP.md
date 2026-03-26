@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Schema, Types & Constants** - Prisma schema with Decimal types, engine type interfaces, EN 15459 constants, and validation rules
 - [x] **Phase 4: Calculation Engine** - Pure TypeScript functions implementing 35+ LCC formulas with formula mode toggle
 - [x] **Phase 5: Engine Tests** - Golden dataset validation of all engine modules against Excel reference values
-- [ ] **Phase 6: Database Seed** - Demo user, project, and 3 variants with realistic data matching Excel tutorial
+- [x] **Phase 6: Database Seed** - Demo user, project, and 3 variants with realistic data matching Excel tutorial
 - [ ] **Phase 7: tRPC API & Authentication** - Type-safe API layer with protected procedures and email/password auth
 - [ ] **Phase 8: UI Implementation** - Glass morphism wizard UI with data entry forms, results dashboard, and interactive charts
 - [ ] **Phase 9: Export** - PDF and Excel export with immutable ResultSnapshot creation
@@ -114,7 +114,7 @@ Plans:
 **Plans**: 1 plan in 1 wave
 
 Plans:
-- [ ] 06-01-PLAN.md -- Seed script with demo user (Better Auth), project with 3 variants, all data domains populated
+- [x] 06-01-PLAN.md -- Seed script with demo user (Better Auth), project with 3 variants, all data domains populated
 
 ### Phase 7: tRPC API & Authentication
 **Goal**: Authenticated users can perform all data operations and trigger calculations through a type-safe API
@@ -171,7 +171,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 3. Schema, Types & Constants | 2/2 | Complete | 2026-03-26 |
 | 4. Calculation Engine | 4/4 | Complete | 2026-03-26 |
 | 5. Engine Tests | 2/2 | Complete | 2026-03-26 |
-| 6. Database Seed | 0/? | Not started | - |
+| 6. Database Seed | 1/1 | Complete | 2026-03-26 |
 | 7. tRPC API & Authentication | 0/? | Not started | - |
 | 8. UI Implementation | 0/? | Not started | - |
 | 9. Export | 0/? | Not started | - |
