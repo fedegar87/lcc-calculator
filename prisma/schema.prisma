@@ -7,4 +7,423 @@ datasource db {
   provider = "postgresql"
 }
 
-// Models will be added in Phase 3
+// --- AUTH (Better Auth conventions) ----------------------------------
+
+model User {
+  id            String          @id @default(cuid())
+  name          String
+  email         String          @unique
+  emailVerified Boolean         @default(false)
+  image         String?
+  organization  String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  projects      Project[]
+  memberships   ProjectMember[]
+  snapshots     ResultSnapshot[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// --- PROJECT ---------------------------------------------------------
+
+enum BuildingUse {
+  RESIDENTIAL_SINGLE
+  RESIDENTIAL_MULTI
+  OFFICE
+  EDUCATION
+  COMMERCIAL
+  INDUSTRIAL
+  OTHER
+}
+
+enum MemberRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+model Project {
+  id               String            @id @default(cuid())
+  name             String
+  country          String?
+  region           String?
+  city             String?
+  location         String?
+  author           String?
+  buildingUse      BuildingUse       @default(RESIDENTIAL_MULTI)
+  constructionYear Int?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  userId           String
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variants         Variant[]
+  members          ProjectMember[]
+  snapshots        ResultSnapshot[]
+  revisions        ProjectRevision[]
+  exports          ExportRecord[]
+
+  @@index([userId])
+}
+
+model ProjectMember {
+  id        String     @id @default(cuid())
+  projectId String
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      MemberRole @default(EDITOR)
+  createdAt DateTime   @default(now())
+
+  @@unique([projectId, userId])
+  @@index([userId])
+}
+
+// --- VARIANT ---------------------------------------------------------
+
+enum VariantLabel {
+  BASE
+  VARIANT_1
+  VARIANT_2
+}
+
+model Variant {
+  id                String             @id @default(cuid())
+  label             VariantLabel
+  description       String?
+  projectId         String
+  project           Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  geometry          Geometry?
+  boundaryCondition BoundaryCondition?
+  energyInputs      EnergyInput[]
+  costItems         CostItem[]
+  serviceComponents ServiceComponent[]
+  wlcInput          WLCInput?
+  designCosts       DesignCost[]
+  incomeInput       IncomeInput?
+  maintenanceConfig MaintenanceConfig?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@unique([projectId, label])
+  @@index([projectId])
+}
+
+// --- GEOMETRY --------------------------------------------------------
+// Excel: "Project Information" rows 23-70
+
+model Geometry {
+  id                          String   @id @default(cuid())
+  variantId                   String   @unique
+  variant                     Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  // Heated areas
+  grossFloorArea              Decimal? @db.Decimal(14, 2)
+  netFloorArea                Decimal? @db.Decimal(14, 2)
+  grossVolume                 Decimal? @db.Decimal(14, 2)
+  netVolume                   Decimal? @db.Decimal(14, 2)
+  // Unheated areas
+  unheatedGFA                 Decimal? @db.Decimal(14, 2)
+  unheatedNFA                 Decimal? @db.Decimal(14, 2)
+  unheatedGrossVol            Decimal? @db.Decimal(14, 2)
+  unheatedNetVol              Decimal? @db.Decimal(14, 2)
+  // Other areas
+  balconiesArea               Decimal? @db.Decimal(14, 2)
+  otherSurfacesArea           Decimal? @db.Decimal(14, 2)
+  // Energy calculation data
+  treatedFloorArea            Decimal? @db.Decimal(14, 2)
+  windowArea                  Decimal? @db.Decimal(14, 2)
+  totalThermalEnvelope        Decimal? @db.Decimal(14, 2)
+  // Indicators
+  avgUvalueOpaque             Decimal? @db.Decimal(8, 4)
+  avgUvalueGlazing            Decimal? @db.Decimal(8, 4)
+  avgHeatRecovery             Decimal? @db.Decimal(6, 2)
+  airTightness                Decimal? @db.Decimal(8, 4)
+  pvInstalledCapacity         Decimal? @db.Decimal(12, 2)
+  // Cost check
+  manualDesignConstructionCost Decimal? @db.Decimal(14, 2)
+}
+
+// --- BOUNDARY CONDITIONS ---------------------------------------------
+// Excel: "Project Information" rows 115-154
+
+model BoundaryCondition {
+  id              String  @id @default(cuid())
+  variantId       String  @unique
+  variant         Variant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  stakeholderRole Int?    @default(1)
+  referencePeriod Int     @default(40)
+  interestRate    Decimal @default(0.0151) @db.Decimal(10, 8)
+  inflationRate   Decimal @default(0.0056) @db.Decimal(10, 8)
+  // Shape: [{index, name, pricePerKwh, annualIncrease}]
+  energyPrices    Json    @default("[]")
+}
+
+// --- ENERGY INPUT ----------------------------------------------------
+// Excel: "Project Information" rows 156-171
+
+enum EndUse {
+  HEATING_1
+  HEATING_2
+  COOLING_1
+  COOLING_2
+  DHW_1
+  DHW_2
+  HOUSEHOLD_ELECTRICITY
+  PV_PRODUCTION
+}
+
+model EnergyInput {
+  id                 String   @id @default(cuid())
+  variantId          String
+  variant            Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  endUse             EndUse
+  energySourceIndex  Int      @default(1)
+  specificConsumption Decimal? @db.Decimal(12, 4)
+  pvProductionKwh    Decimal? @db.Decimal(14, 2)
+
+  @@unique([variantId, endUse])
+  @@index([variantId])
+}
+
+// --- CONSTRUCTION COSTS ----------------------------------------------
+// Excel: "Construction cost" sheet
+
+enum CostCategory {
+  // Building Elements (A) -- flat % maintenance, no replacement
+  A1_ROOFS
+  A2_FACADES
+  A3_FLOORS
+  A4_WALLS
+  A5_WINDOWS
+  A6_SHADING
+  A7_DOORS
+  A8_INTERNAL
+  A9_STRUCTURE
+  A10_OTHER
+  // Building Services (B) -- EN 15459 lookup, with replacement
+  B1_HEATING
+  B2_COOLING
+  B3_VENTILATION
+  B4_HVAC_COMBINED
+  B5_ELECTRICAL
+  B6_HYDRAULIC
+  // Renewable Energy Systems (C) -- EN 15459 lookup, with replacement
+  C1_SOLAR_THERMAL
+  C2_PV
+  C3_OTHER_RES
+  // Furnishings (D) -- no maintenance
+  D1_FURNISHINGS
+  // Outdoor (E) -- no maintenance
+  E1_OUTDOOR
+}
+
+model CostItem {
+  id              String           @id @default(cuid())
+  variantId       String
+  variant         Variant          @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  category        CostCategory
+  subcategory     String?
+  description     String?
+  materialCostAgg Decimal?         @default(0) @db.Decimal(14, 2)
+  laborCostAgg    Decimal?         @default(0) @db.Decimal(14, 2)
+  otherCostAgg    Decimal?         @default(0) @db.Decimal(14, 2)
+  details         CostItemDetail[]
+
+  @@index([variantId, category])
+}
+
+model CostItemDetail {
+  id           String    @id @default(cuid())
+  costItemId   String
+  costItem     CostItem  @relation(fields: [costItemId], references: [id], onDelete: Cascade)
+  layerOrder   Int       @default(0)
+  description  String?
+  area         Decimal?  @db.Decimal(14, 2)
+  materialCost Decimal?  @db.Decimal(14, 2)
+  unitPrice    Decimal?  @db.Decimal(10, 4)
+  laborCost    Decimal?  @db.Decimal(14, 2)
+  otherCost    Decimal?  @db.Decimal(14, 2)
+
+  @@index([costItemId])
+}
+
+// --- BUILDING SERVICES (maintenance) ---------------------------------
+// Excel: "Maintenance" rows 37-62
+
+model ServiceComponent {
+  id                   String  @id @default(cuid())
+  variantId            String
+  variant              Variant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  name                 String
+  constructionCost     Decimal @default(0) @db.Decimal(14, 2)
+  en15459ComponentIndex Int     @default(1)
+
+  @@index([variantId])
+}
+
+// --- WLC INPUT -------------------------------------------------------
+// Excel: "WLC" rows 2-27
+
+model WLCInput {
+  id                  String   @id @default(cuid())
+  variantId           String   @unique
+  variant             Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  landArea            Decimal? @default(0) @db.Decimal(14, 2)
+  buildingIndex       Decimal? @db.Decimal(8, 4)
+  floorHeight         Decimal? @db.Decimal(6, 2)
+  landPrice           Decimal? @default(0) @db.Decimal(14, 2)
+  enablingCost1       Decimal? @default(0) @db.Decimal(14, 2)
+  enablingCost2       Decimal? @default(0) @db.Decimal(14, 2)
+  planningFees1       Decimal? @default(0) @db.Decimal(14, 2)
+  planningFees2       Decimal? @default(0) @db.Decimal(14, 2)
+  userSupportPropMgmt Decimal? @default(0) @db.Decimal(14, 2)
+  userSupportCharges  Decimal? @default(0) @db.Decimal(14, 2)
+  userSupportAdmin    Decimal? @default(0) @db.Decimal(14, 2)
+  financeCost         Decimal? @default(0) @db.Decimal(14, 2)
+}
+
+// --- DESIGN COSTS ----------------------------------------------------
+// Excel: "WLC" rows 29-84
+
+model DesignCost {
+  id                 String   @id @default(cuid())
+  variantId          String
+  variant            Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  lineNumber         Int
+  description        String
+  preliminaryCost    Decimal? @default(0) @db.Decimal(14, 2)
+  definitiveCost     Decimal? @default(0) @db.Decimal(14, 2)
+  executiveCost      Decimal? @default(0) @db.Decimal(14, 2)
+  siteManagementCost Decimal? @default(0) @db.Decimal(14, 2)
+
+  @@index([variantId])
+}
+
+// --- INCOME ----------------------------------------------------------
+// Excel: "Project Information" rows 84-113
+
+model IncomeInput {
+  id                 String   @id @default(cuid())
+  variantId          String   @unique
+  variant            Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  rent1MonthlyPerM2  Decimal? @db.Decimal(10, 2)
+  rent1Area          Decimal? @db.Decimal(14, 2)
+  rent1Taxes         Decimal? @db.Decimal(14, 2)
+  rent2MonthlyPerM2  Decimal? @db.Decimal(10, 2)
+  rent2Area          Decimal? @db.Decimal(14, 2)
+  rent2Taxes         Decimal? @db.Decimal(14, 2)
+  rent3MonthlyPerM2  Decimal? @db.Decimal(10, 2)
+  rent3Area          Decimal? @db.Decimal(14, 2)
+  rent3Taxes         Decimal? @db.Decimal(14, 2)
+  otherIncome1       Decimal? @db.Decimal(14, 2)
+  otherIncome1Taxes  Decimal? @db.Decimal(14, 2)
+  otherIncome2       Decimal? @db.Decimal(14, 2)
+  otherIncome2Taxes  Decimal? @db.Decimal(14, 2)
+  otherIncome3       Decimal? @db.Decimal(14, 2)
+  otherIncome3Taxes  Decimal? @db.Decimal(14, 2)
+  expectedPricePerM2 Decimal? @db.Decimal(10, 2)
+}
+
+// --- MAINTENANCE CONFIG ----------------------------------------------
+// Excel: "Project Information" row 175
+
+model MaintenanceConfig {
+  id                               String  @id @default(cuid())
+  variantId                        String  @unique
+  variant                          Variant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  buildingElementMaintenancePercent Decimal @default(0.01) @db.Decimal(8, 6)
+}
+
+// --- SNAPSHOTS & VERSIONING ------------------------------------------
+
+enum FormulaMode {
+  EXCEL_REPLICA
+  EXCEL_BUGFIXED
+}
+
+model ResultSnapshot {
+  id            String         @id @default(cuid())
+  projectId     String
+  project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  variantLabel  VariantLabel
+  engineVersion String
+  formulaMode   FormulaMode    @default(EXCEL_BUGFIXED)
+  inputs        Json
+  inputsHash    String?
+  outputs       Json
+  trigger       String
+  createdAt     DateTime       @default(now())
+  createdById   String?
+  createdBy     User?          @relation(fields: [createdById], references: [id])
+  exportRecords ExportRecord[]
+
+  @@index([projectId])
+}
+
+model ProjectRevision {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  label       String
+  note        String?
+  snapshotIds String[]
+  createdAt   DateTime @default(now())
+
+  @@index([projectId])
+}
+
+model ExportRecord {
+  id         String          @id @default(cuid())
+  projectId  String
+  project    Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  format     String
+  snapshotId String?
+  snapshot   ResultSnapshot? @relation(fields: [snapshotId], references: [id])
+  fileUrl    String?
+  fileName   String?
+  createdAt  DateTime        @default(now())
+
+  @@index([projectId])
+}
