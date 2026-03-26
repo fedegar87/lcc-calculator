@@ -33,10 +33,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. TypeScript strict mode catches type errors at build time
   3. Running `npm test` executes Vitest with zero configuration issues
   4. Git repository has GitLab remote configured and initial commit pushed
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md -- Scaffold Next.js 15, install all dependencies, shadcn/ui, Git config
+- [ ] 01-02-PLAN.md -- Configure design system, Prisma 7, tRPC 11, Vitest, package scripts
 
 ### Phase 2: Excel Workbook Audit
 **Goal**: All formulas, data tables, and domain knowledge are extracted from the Excel workbook into machine-readable artifacts
