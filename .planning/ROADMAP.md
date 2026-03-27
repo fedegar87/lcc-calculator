@@ -130,8 +130,8 @@ Plans:
 
 Plans:
 - [x] 07-01-PLAN.md -- Better Auth config, tRPC context with auth session, protectedProcedure, role middleware, reference router
-- [ ] 07-02-PLAN.md -- Project router (CRUD + members), cost-item router (detail CRUD + aggregates), Next.js middleware
-- [ ] 07-03-PLAN.md -- Variant router (per-section upserts), calculation router (engine integration), export stub, app router merge
+- [x] 07-02-PLAN.md -- Project router (CRUD + members), cost-item router (detail CRUD + aggregates), Next.js middleware
+- [x] 07-03-PLAN.md -- Variant router (per-section upserts), calculation router (engine integration), export stub, app router merge
 
 ### Phase 8: UI Implementation
 **Goal**: Users can create projects, enter all LCC parameters through a guided wizard, and view calculated results with interactive charts
