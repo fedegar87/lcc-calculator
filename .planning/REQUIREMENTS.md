@@ -71,11 +71,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **API-01**: tRPC setup with superjson, protected procedures, auth context
 - [x] **API-02**: Project router: list, getById, create, update, delete, addMember, removeMember
-- [ ] **API-03**: Variant router: upsert geometry, boundary conditions, energy, WLC, design costs, income, maintenance
+- [x] **API-03**: Variant router: upsert geometry, boundary conditions, energy, WLC, design costs, income, maintenance
 - [x] **API-04**: Cost-item router: listByVariant, upsert, delete, batchUpsert
-- [ ] **API-05**: Calculate router: calculate single variant, calculateAll for comparison
+- [x] **API-05**: Calculate router: calculate single variant, calculateAll for comparison
 - [x] **API-06**: Reference router: EN 15459 components, energy sources, cost categories
-- [ ] **API-07**: Export router: PDF and Excel generation with ResultSnapshot creation
+- [x] **API-07**: Export router: PDF and Excel generation with ResultSnapshot creation
 
 ### Authentication
 
@@ -203,11 +203,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SEED-03 | Phase 6 | Complete |
 | API-01 | Phase 7 | Complete |
 | API-02 | Phase 7 | Complete |
-| API-03 | Phase 7 | Pending |
+| API-03 | Phase 7 | Complete |
 | API-04 | Phase 7 | Complete |
-| API-05 | Phase 7 | Pending |
+| API-05 | Phase 7 | Complete |
 | API-06 | Phase 7 | Complete |
-| API-07 | Phase 7 | Pending |
+| API-07 | Phase 7 | Complete |
 | AUTH-01 | Phase 7 | Complete |
 | AUTH-02 | Phase 7 | Complete |
 | AUTH-03 | Phase 7 | Complete |

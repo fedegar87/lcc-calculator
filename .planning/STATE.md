@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-27T09:54:31.000Z"
+last_updated: "2026-03-27T10:09:50.000Z"
 progress:
   total_phases: 7
-  completed_phases: 6
-  total_plans: 15
-  completed_plans: 9
+  completed_phases: 7
+  total_plans: 16
+  completed_plans: 10
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Accurate, standards-compliant LCC calculations that replicate verified Excel workbook behavior while fixing known bugs and adding residual value + income analysis.
-**Current focus:** Phase 7 - tRPC API & Authentication
+**Current focus:** Phase 7 complete. Next: Phase 8 - UI Dashboard
 
 ## Current Position
 
-Phase: 7 of 9 (tRPC API & Authentication)
-Plan: 2 of 3 in current phase (COMPLETE)
-Status: In Progress
-Last activity: 2026-03-27 -- Project CRUD router, cost-item router with aggregate recomputation, Next.js route protection middleware
+Phase: 7 of 9 (tRPC API & Authentication) -- COMPLETE
+Plan: 3 of 3 in current phase (COMPLETE)
+Status: Phase 7 Complete
+Last activity: 2026-03-27 -- Variant/calculation/export routers, merged app router with all 6 sub-routers
 
-Progress: [███████████████░] 78%
+Progress: [████████████████] 83%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: 6 min
-- Total execution time: 1.6 hours
+- Total execution time: 1.7 hours
 
 **By Phase:**
 
@@ -46,10 +46,10 @@ Progress: [███████████████░] 78%
 | 04-calculation-engine | 4 | 5 min | 1 min |
 | 05-engine-tests | 2 | 10 min | 5 min |
 | 06-database-seed | 1 | 5 min | 5 min |
-| 07-trpc-api-authentication | 2/3 | 9 min | 5 min |
+| 07-trpc-api-authentication | 3/3 | 16 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 5 min, 5 min, 4 min, 5 min
+- Last 5 plans: 5 min, 5 min, 4 min, 5 min, 7 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -84,6 +84,10 @@ Recent decisions affecting current work:
 - [Phase 07]: Variant creation always includes default Geometry, BoundaryCondition, MaintenanceConfig sub-records
 - [Phase 07]: batchUpsert uses delete+recreate pattern within transaction for atomic detail replacement
 - [Phase 07]: Cookie-presence middleware for fast redirect; full session validation deferred to tRPC context
+- [Phase 07]: createManyAndReturn for design cost replace pattern (atomic delete+create in transaction)
+- [Phase 07]: buildVariantInput as pure mapping function from Prisma models to engine VariantInput
+- [Phase 07]: WLC designCostsTotal/siteManagementCostsTotal computed from design costs array at calc time
+- [Phase 07]: Income input included only when any rent/income value is non-zero
 
 ### Pending Todos
 
@@ -96,5 +100,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-27
-Stopped at: Completed 07-02 (project/cost-item routers + route protection). Next: 07-03 remaining domain routers.
+Stopped at: Completed 07-03 (variant/calculation/export routers + app router merge). Phase 7 complete. Next: Phase 8.
 Resume file: None
