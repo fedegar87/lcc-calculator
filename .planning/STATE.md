@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-27T17:34:37Z"
+last_updated: "2026-03-27T18:48:46Z"
 progress:
   total_phases: 9
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 21
-  completed_plans: 20
+  completed_plans: 21
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Accurate, standards-compliant LCC calculations that replicate verified Excel workbook behavior while fixing known bugs and adding residual value + income analysis.
-**Current focus:** Phase 8 - UI Implementation (app shell + components + info & WLC + construction & energy forms complete)
+**Current focus:** Phase 8 - UI Implementation COMPLETE. All 5 wizard steps built. Next: Phase 9 - Export
 
 ## Current Position
 
-Phase: 8 of 9 (UI Implementation)
-Plan: 4 of 5 in current phase (08-01 through 08-04 complete)
-Status: In Progress
-Last activity: 2026-03-27 -- Construction & Energy form pages
+Phase: 8 of 9 (UI Implementation -- COMPLETE)
+Plan: 5 of 5 in current phase (08-01 through 08-05 complete)
+Status: In Progress (Phase 9 next)
+Last activity: 2026-03-27 -- Results dashboard & charts
 
-Progress: [████████████████████] 95%
+Progress: [████████████████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
+- Total plans completed: 21
 - Average duration: 7 min
-- Total execution time: 2.2 hours
+- Total execution time: 2.3 hours
 
 **By Phase:**
 
@@ -47,11 +47,11 @@ Progress: [████████████████████] 95%
 | 05-engine-tests | 2 | 10 min | 5 min |
 | 06-database-seed | 1 | 5 min | 5 min |
 | 07-trpc-api-authentication | 3/3 | 16 min | 5 min |
-| 08-ui-implementation | 4/5 | 59 min | 15 min |
+| 08-ui-implementation | 5/5 | 65 min | 13 min |
 
 **Recent Trend:**
-- Last 5 plans: 7 min, 9 min, 18 min, 9 min, 14 min
-- Trend: stabilizing (form pages follow established patterns)
+- Last 5 plans: 9 min, 18 min, 9 min, 14 min, 6 min
+- Trend: Phase 8 complete, all UI wizard steps built
 
 *Updated after each plan completion*
 
@@ -105,6 +105,10 @@ Recent decisions affecting current work:
 - [Phase 08]: base-ui Accordion uses `multiple` boolean prop (not Radix-style type="multiple")
 - [Phase 08]: base-ui Select onValueChange returns string|null -- handled with ?? fallback
 - [Phase 08]: Maintenance slider displays 0-10% but stores as decimal 0-0.1 via /100 conversion
+- [Phase 08]: Recharts v3 Tooltip formatter requires Number(value ?? 0) cast (stricter ValueType includes undefined)
+- [Phase 08]: Vertical BarChart layout for single-bar LCC stacked chart (horizontal bars for readability)
+- [Phase 08]: useQueries for parallel variant calculation in comparison view
+- [Phase 08]: Dashboard/Compare toggle buttons (not tabs) for results page view switching
 
 ### Pending Todos
 
@@ -117,5 +121,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-27
-Stopped at: Completed 08-04 (construction & energy forms). 08-01 through 08-04 done. Next: 08-05.
+Stopped at: Completed 08-05 (results dashboard & charts). Phase 08 complete. Next: Phase 09 - Export.
 Resume file: None

@@ -106,13 +106,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### UI - Results & Charts
 
-- [ ] **UI-14**: KPI cards: LCC, WLC, LCC/m2, payback period
-- [ ] **UI-15**: Construction cost breakdown table by category
-- [ ] **UI-16**: WLC/LCC breakdown table with O&M detail
-- [ ] **UI-17**: Variant comparison side-by-side view
-- [ ] **UI-18**: LCC breakdown stacked bar chart
-- [ ] **UI-19**: Cost evolution line chart over reference period
-- [ ] **UI-20**: Variant comparison grouped bar chart
+- [x] **UI-14**: KPI cards: LCC, WLC, LCC/m2, payback period
+- [x] **UI-15**: Construction cost breakdown table by category
+- [x] **UI-16**: WLC/LCC breakdown table with O&M detail
+- [x] **UI-17**: Variant comparison side-by-side view
+- [x] **UI-18**: LCC breakdown stacked bar chart
+- [x] **UI-19**: Cost evolution line chart over reference period
+- [x] **UI-20**: Variant comparison grouped bar chart
 
 ### Export
 
@@ -226,13 +226,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-11 | Phase 8 | Complete |
 | UI-12 | Phase 8 | Complete |
 | UI-13 | Phase 8 | Complete |
-| UI-14 | Phase 8 | Pending |
-| UI-15 | Phase 8 | Pending |
-| UI-16 | Phase 8 | Pending |
-| UI-17 | Phase 8 | Pending |
-| UI-18 | Phase 8 | Pending |
-| UI-19 | Phase 8 | Pending |
-| UI-20 | Phase 8 | Pending |
+| UI-14 | Phase 8 | Complete |
+| UI-15 | Phase 8 | Complete |
+| UI-16 | Phase 8 | Complete |
+| UI-17 | Phase 8 | Complete |
+| UI-18 | Phase 8 | Complete |
+| UI-19 | Phase 8 | Complete |
+| UI-20 | Phase 8 | Complete |
 | EXPORT-01 | Phase 9 | Pending |
 | EXPORT-02 | Phase 9 | Pending |
 | EXPORT-03 | Phase 9 | Pending |
