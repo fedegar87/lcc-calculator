@@ -64,7 +64,6 @@ function buildVariantInput(variant: any): VariantInput {
       (sum: number, det: any) => sum + resolveDetailCost(det),
       0,
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const laborCost = ci.details.reduce(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (sum: number, det: any) => sum + d(det.laborCost),
