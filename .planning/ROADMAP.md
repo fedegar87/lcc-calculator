@@ -126,10 +126,12 @@ Plans:
   3. Unauthenticated requests to protected tRPC procedures return 401
   4. Project CRUD operations work: create, list, get by ID, update, delete, add/remove member with role control
   5. Calculation endpoint accepts a variant ID and returns complete LCC/WLC results with all intermediate values
-**Plans**: TBD
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 07-01: TBD
+- [ ] 07-01-PLAN.md -- Better Auth config, tRPC context with auth session, protectedProcedure, role middleware, reference router
+- [ ] 07-02-PLAN.md -- Project router (CRUD + members), cost-item router (detail CRUD + aggregates), Next.js middleware
+- [ ] 07-03-PLAN.md -- Variant router (per-section upserts), calculation router (engine integration), export stub, app router merge
 
 ### Phase 8: UI Implementation
 **Goal**: Users can create projects, enter all LCC parameters through a guided wizard, and view calculated results with interactive charts
