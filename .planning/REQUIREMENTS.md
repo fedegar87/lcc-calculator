@@ -90,10 +90,10 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **UI-01**: Glass morphism design system with EURAC brand colors (#C8102E primary)
 - [ ] **UI-02**: Inter font loaded via next/font/google (weights 300-700)
 - [ ] **UI-03**: Responsive sidebar with project list and user menu
-- [ ] **UI-04**: 5-step wizard navigation (Info, WLC, Construction, Energy, Results)
-- [ ] **UI-05**: Variant tabs (Base, Variant 1, Variant 2) with data indicator
-- [ ] **UI-06**: Custom components: GlassCard, InfoTooltip, SliderInput, KPICard
-- [ ] **UI-07**: Framer Motion animations with prefers-reduced-motion respect
+- [x] **UI-04**: 5-step wizard navigation (Info, WLC, Construction, Energy, Results)
+- [x] **UI-05**: Variant tabs (Base, Variant 1, Variant 2) with data indicator
+- [x] **UI-06**: Custom components: GlassCard, InfoTooltip, SliderInput, KPICard
+- [x] **UI-07**: Framer Motion animations with prefers-reduced-motion respect
 
 ### UI - Data Entry
 
@@ -101,7 +101,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **UI-09**: WLC form: non-construction costs, boundary conditions with SliderInput, energy prices table, design costs
 - [ ] **UI-10**: Construction form: accordion per category, detail expansion, service components with EN 15459 dropdown
 - [ ] **UI-11**: Energy form: consumption table with system 1/2, PV, maintenance config
-- [ ] **UI-12**: Autosave with 500ms debounce and visual indicator (Saved/Saving/Failed)
+- [x] **UI-12**: Autosave with 500ms debounce and visual indicator (Saved/Saving/Failed)
 - [ ] **UI-13**: Inline validation feedback on form fields
 
 ### UI - Results & Charts
@@ -216,15 +216,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-01 | Phase 8 | Pending |
 | UI-02 | Phase 8 | Pending |
 | UI-03 | Phase 8 | Pending |
-| UI-04 | Phase 8 | Pending |
-| UI-05 | Phase 8 | Pending |
-| UI-06 | Phase 8 | Pending |
-| UI-07 | Phase 8 | Pending |
+| UI-04 | Phase 8 | Complete |
+| UI-05 | Phase 8 | Complete |
+| UI-06 | Phase 8 | Complete |
+| UI-07 | Phase 8 | Complete |
 | UI-08 | Phase 8 | Pending |
 | UI-09 | Phase 8 | Pending |
 | UI-10 | Phase 8 | Pending |
 | UI-11 | Phase 8 | Pending |
-| UI-12 | Phase 8 | Pending |
+| UI-12 | Phase 8 | Complete |
 | UI-13 | Phase 8 | Pending |
 | UI-14 | Phase 8 | Pending |
 | UI-15 | Phase 8 | Pending |
