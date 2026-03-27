@@ -6,9 +6,4 @@ export default defineConfig({
   migrations: {
     seed: "npx tsx prisma/seed.ts",
   },
-  migrate: {
-    async url() {
-      return process.env.DATABASE_URL!;
-    },
-  },
-});
+} as Parameters<typeof defineConfig>[0]);
