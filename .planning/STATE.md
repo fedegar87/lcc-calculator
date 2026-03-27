@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-27T12:21:42Z"
+last_updated: "2026-03-27T12:46:10Z"
 progress:
   total_phases: 9
   completed_phases: 7
-  total_plans: 20
-  completed_plans: 18
+  total_plans: 21
+  completed_plans: 19
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Accurate, standards-compliant LCC calculations that replicate verified Excel workbook behavior while fixing known bugs and adding residual value + income analysis.
-**Current focus:** Phase 8 - UI Implementation (app shell + custom components complete)
+**Current focus:** Phase 8 - UI Implementation (app shell + components + info & WLC forms complete)
 
 ## Current Position
 
 Phase: 8 of 9 (UI Implementation)
-Plan: 2 of 5 in current phase (08-01 and 08-02 complete)
+Plan: 3 of 5 in current phase (08-01 through 08-03 complete)
 Status: In Progress
-Last activity: 2026-03-27 -- App shell (auth pages, sidebar, project list) + custom components
+Last activity: 2026-03-27 -- Project layout + Info & WLC form pages
 
-Progress: [██████████████████] 90%
+Progress: [███████████████████] 95%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
+- Total plans completed: 19
 - Average duration: 6 min
-- Total execution time: 1.9 hours
+- Total execution time: 2.0 hours
 
 **By Phase:**
 
@@ -47,11 +47,11 @@ Progress: [██████████████████] 90%
 | 05-engine-tests | 2 | 10 min | 5 min |
 | 06-database-seed | 1 | 5 min | 5 min |
 | 07-trpc-api-authentication | 3/3 | 16 min | 5 min |
-| 08-ui-implementation | 2/5 | 36 min | 18 min |
+| 08-ui-implementation | 3/5 | 45 min | 15 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 7 min, 9 min, 9 min, 18 min
-- Trend: increasing (UI plans involve more integration)
+- Last 5 plans: 5 min, 7 min, 9 min, 18 min, 9 min
+- Trend: stabilizing (form pages follow established patterns)
 
 *Updated after each plan completion*
 
@@ -96,6 +96,10 @@ Recent decisions affecting current work:
 - [Phase 08]: base-ui render prop (not asChild) for all slot composition in base-nova shadcn
 - [Phase 08]: Zod v4 string-based form fields with manual parseInt to avoid z.coerce type mismatch with react-hook-form
 - [Phase 08]: Dark mode primary keeps EURAC red (oklch 0.55 0.18 27.5) for brand consistency
+- [Phase 08]: URL search param ?v=VARIANT_ID for active variant (direct linking, simpler than React context)
+- [Phase 08]: key={activeVariantId} on children wrapper forces remount on variant switch (prevents stale form data)
+- [Phase 08]: Record<string, unknown> for variant section props to handle Prisma Int?/Decimal? serialized as unknown
+- [Phase 08]: Separate useAutosave hooks per form section feeding same SaveStatusProvider
 
 ### Pending Todos
 
@@ -108,5 +112,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-27
-Stopped at: Completed 08-01 (app shell: auth pages, sidebar, project list). 08-01 + 08-02 done. Next: 08-03.
+Stopped at: Completed 08-03 (project layout + info & WLC forms). 08-01 through 08-03 done. Next: 08-04.
 Resume file: None
