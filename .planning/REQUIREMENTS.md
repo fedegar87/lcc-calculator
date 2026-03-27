@@ -69,19 +69,19 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### API Layer
 
-- [ ] **API-01**: tRPC setup with superjson, protected procedures, auth context
+- [x] **API-01**: tRPC setup with superjson, protected procedures, auth context
 - [ ] **API-02**: Project router: list, getById, create, update, delete, addMember, removeMember
 - [ ] **API-03**: Variant router: upsert geometry, boundary conditions, energy, WLC, design costs, income, maintenance
 - [ ] **API-04**: Cost-item router: listByVariant, upsert, delete, batchUpsert
 - [ ] **API-05**: Calculate router: calculate single variant, calculateAll for comparison
-- [ ] **API-06**: Reference router: EN 15459 components, energy sources, cost categories
+- [x] **API-06**: Reference router: EN 15459 components, energy sources, cost categories
 - [ ] **API-07**: Export router: PDF and Excel generation with ResultSnapshot creation
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can register with name, email, password
-- [ ] **AUTH-02**: User can log in with email/password and stay logged in
-- [ ] **AUTH-03**: User can log out from any page
+- [x] **AUTH-01**: User can register with name, email, password
+- [x] **AUTH-02**: User can log in with email/password and stay logged in
+- [x] **AUTH-03**: User can log out from any page
 - [ ] **AUTH-04**: Protected routes redirect unauthenticated users to login
 - [ ] **AUTH-05**: Project access controlled by ProjectMember role (owner/editor/viewer)
 
@@ -201,16 +201,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SEED-01 | Phase 6 | Complete |
 | SEED-02 | Phase 6 | Complete |
 | SEED-03 | Phase 6 | Complete |
-| API-01 | Phase 7 | Pending |
+| API-01 | Phase 7 | Complete |
 | API-02 | Phase 7 | Pending |
 | API-03 | Phase 7 | Pending |
 | API-04 | Phase 7 | Pending |
 | API-05 | Phase 7 | Pending |
-| API-06 | Phase 7 | Pending |
+| API-06 | Phase 7 | Complete |
 | API-07 | Phase 7 | Pending |
-| AUTH-01 | Phase 7 | Pending |
-| AUTH-02 | Phase 7 | Pending |
-| AUTH-03 | Phase 7 | Pending |
+| AUTH-01 | Phase 7 | Complete |
+| AUTH-02 | Phase 7 | Complete |
+| AUTH-03 | Phase 7 | Complete |
 | AUTH-04 | Phase 7 | Pending |
 | AUTH-05 | Phase 7 | Pending |
 | UI-01 | Phase 8 | Pending |

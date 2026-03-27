@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-26T21:43:43.972Z"
+status: in-progress
+last_updated: "2026-03-27T09:42:19.000Z"
 progress:
-  total_phases: 6
-  completed_phases: 4
-  total_plans: 13
-  completed_plans: 7
+  total_phases: 7
+  completed_phases: 6
+  total_plans: 14
+  completed_plans: 8
 ---
 
 # Project State
@@ -22,19 +22,19 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 
 ## Current Position
 
-Phase: 6 of 9 (Database Seed) — COMPLETE
-Plan: 1 of 1 in current phase (COMPLETE)
-Status: Phase Complete
-Last activity: 2026-03-26 -- Seed script with demo user, 3 variants, 9 data domains per variant
+Phase: 7 of 9 (tRPC API & Authentication)
+Plan: 1 of 3 in current phase (COMPLETE)
+Status: In Progress
+Last activity: 2026-03-27 -- Better Auth config, tRPC context with auth session, protectedProcedure, role middleware, reference router
 
-Progress: [████████████░░] 67%
+Progress: [██████████████░] 72%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: 6 min
-- Total execution time: 1.4 hours
+- Total execution time: 1.5 hours
 
 **By Phase:**
 
@@ -46,9 +46,10 @@ Progress: [████████████░░] 67%
 | 04-calculation-engine | 4 | 5 min | 1 min |
 | 05-engine-tests | 2 | 10 min | 5 min |
 | 06-database-seed | 1 | 5 min | 5 min |
+| 07-trpc-api-authentication | 1/3 | 4 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 1 min, 1 min, 5 min, 5 min, 5 min
+- Last 5 plans: 1 min, 5 min, 5 min, 5 min, 4 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -76,6 +77,9 @@ Recent decisions affecting current work:
 - [Phase 04]: KPI divisor is investmentCost (construction + design + site mgmt), NOT LCC — verified from Excel formulas
 - [Phase 06]: Deterministic account ID (seed-credential-{userId}) for idempotent Better Auth credential upsert
 - [Phase 06]: BASE variant seed data matches golden fixture exactly; VARIANT_1/2 differ for meaningful LCC comparison
+- [Phase 07]: Middleware typed via cast (AuthenticatedCtx) since requireProjectRole always chains after protectedProcedure
+- [Phase 07]: Export t.middleware from init.ts for role middleware to use proper tRPC middleware builder
+- [Phase 07]: Cost categories as static const array matching Prisma CostCategory enum values with labels/groups
 
 ### Pending Todos
 
@@ -87,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26
-Stopped at: Completed Phase 06 database seed. Seed script with demo user, 3 variants, 9 data domains. Ready for Phase 7 tRPC API.
+Last session: 2026-03-27
+Stopped at: Completed 07-01 (auth + tRPC context + reference router). Next: 07-02 project/variant routers.
 Resume file: None

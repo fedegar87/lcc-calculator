@@ -129,7 +129,7 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 07-01-PLAN.md -- Better Auth config, tRPC context with auth session, protectedProcedure, role middleware, reference router
+- [x] 07-01-PLAN.md -- Better Auth config, tRPC context with auth session, protectedProcedure, role middleware, reference router
 - [ ] 07-02-PLAN.md -- Project router (CRUD + members), cost-item router (detail CRUD + aggregates), Next.js middleware
 - [ ] 07-03-PLAN.md -- Variant router (per-section upserts), calculation router (engine integration), export stub, app router merge
 
