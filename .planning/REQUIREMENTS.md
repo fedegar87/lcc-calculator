@@ -99,8 +99,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **UI-08**: Project info form: metadata, geometry, energy indicators, income
 - [x] **UI-09**: WLC form: non-construction costs, boundary conditions with SliderInput, energy prices table, design costs
-- [ ] **UI-10**: Construction form: accordion per category, detail expansion, service components with EN 15459 dropdown
-- [ ] **UI-11**: Energy form: consumption table with system 1/2, PV, maintenance config
+- [x] **UI-10**: Construction form: accordion per category, detail expansion, service components with EN 15459 dropdown
+- [x] **UI-11**: Energy form: consumption table with system 1/2, PV, maintenance config
 - [x] **UI-12**: Autosave with 500ms debounce and visual indicator (Saved/Saving/Failed)
 - [x] **UI-13**: Inline validation feedback on form fields
 
@@ -222,8 +222,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-07 | Phase 8 | Complete |
 | UI-08 | Phase 8 | Complete |
 | UI-09 | Phase 8 | Complete |
-| UI-10 | Phase 8 | Pending |
-| UI-11 | Phase 8 | Pending |
+| UI-10 | Phase 8 | Complete |
+| UI-11 | Phase 8 | Complete |
 | UI-12 | Phase 8 | Complete |
 | UI-13 | Phase 8 | Complete |
 | UI-14 | Phase 8 | Pending |

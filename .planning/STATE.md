@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-27T12:46:10Z"
+last_updated: "2026-03-27T17:34:37Z"
 progress:
   total_phases: 9
   completed_phases: 7
   total_plans: 21
-  completed_plans: 19
+  completed_plans: 20
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Accurate, standards-compliant LCC calculations that replicate verified Excel workbook behavior while fixing known bugs and adding residual value + income analysis.
-**Current focus:** Phase 8 - UI Implementation (app shell + components + info & WLC forms complete)
+**Current focus:** Phase 8 - UI Implementation (app shell + components + info & WLC + construction & energy forms complete)
 
 ## Current Position
 
 Phase: 8 of 9 (UI Implementation)
-Plan: 3 of 5 in current phase (08-01 through 08-03 complete)
+Plan: 4 of 5 in current phase (08-01 through 08-04 complete)
 Status: In Progress
-Last activity: 2026-03-27 -- Project layout + Info & WLC form pages
+Last activity: 2026-03-27 -- Construction & Energy form pages
 
-Progress: [███████████████████] 95%
+Progress: [████████████████████] 95%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
-- Average duration: 6 min
-- Total execution time: 2.0 hours
+- Total plans completed: 20
+- Average duration: 7 min
+- Total execution time: 2.2 hours
 
 **By Phase:**
 
@@ -47,10 +47,10 @@ Progress: [███████████████████] 95%
 | 05-engine-tests | 2 | 10 min | 5 min |
 | 06-database-seed | 1 | 5 min | 5 min |
 | 07-trpc-api-authentication | 3/3 | 16 min | 5 min |
-| 08-ui-implementation | 3/5 | 45 min | 15 min |
+| 08-ui-implementation | 4/5 | 59 min | 15 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 7 min, 9 min, 18 min, 9 min
+- Last 5 plans: 7 min, 9 min, 18 min, 9 min, 14 min
 - Trend: stabilizing (form pages follow established patterns)
 
 *Updated after each plan completion*
@@ -100,6 +100,11 @@ Recent decisions affecting current work:
 - [Phase 08]: key={activeVariantId} on children wrapper forces remount on variant switch (prevents stale form data)
 - [Phase 08]: Record<string, unknown> for variant section props to handle Prisma Int?/Decimal? serialized as unknown
 - [Phase 08]: Separate useAutosave hooks per form section feeding same SaveStatusProvider
+- [Phase 08]: Construction detail rows use imperative per-detail debounce with refs (not RHF useAutosave)
+- [Phase 08]: Service component CRUD via direct mutations (discrete actions) not debounced autosave
+- [Phase 08]: base-ui Accordion uses `multiple` boolean prop (not Radix-style type="multiple")
+- [Phase 08]: base-ui Select onValueChange returns string|null -- handled with ?? fallback
+- [Phase 08]: Maintenance slider displays 0-10% but stores as decimal 0-0.1 via /100 conversion
 
 ### Pending Todos
 
@@ -112,5 +117,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-27
-Stopped at: Completed 08-03 (project layout + info & WLC forms). 08-01 through 08-03 done. Next: 08-04.
+Stopped at: Completed 08-04 (construction & energy forms). 08-01 through 08-04 done. Next: 08-05.
 Resume file: None
