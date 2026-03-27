@@ -87,9 +87,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### UI - Layout & Navigation
 
-- [ ] **UI-01**: Glass morphism design system with EURAC brand colors (#C8102E primary)
-- [ ] **UI-02**: Inter font loaded via next/font/google (weights 300-700)
-- [ ] **UI-03**: Responsive sidebar with project list and user menu
+- [x] **UI-01**: Glass morphism design system with EURAC brand colors (#C8102E primary)
+- [x] **UI-02**: Inter font loaded via next/font/google (weights 300-700)
+- [x] **UI-03**: Responsive sidebar with project list and user menu
 - [x] **UI-04**: 5-step wizard navigation (Info, WLC, Construction, Energy, Results)
 - [x] **UI-05**: Variant tabs (Base, Variant 1, Variant 2) with data indicator
 - [x] **UI-06**: Custom components: GlassCard, InfoTooltip, SliderInput, KPICard
@@ -213,9 +213,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-03 | Phase 7 | Complete |
 | AUTH-04 | Phase 7 | Complete |
 | AUTH-05 | Phase 7 | Complete |
-| UI-01 | Phase 8 | Pending |
-| UI-02 | Phase 8 | Pending |
-| UI-03 | Phase 8 | Pending |
+| UI-01 | Phase 8 | Complete |
+| UI-02 | Phase 8 | Complete |
+| UI-03 | Phase 8 | Complete |
 | UI-04 | Phase 8 | Complete |
 | UI-05 | Phase 8 | Complete |
 | UI-06 | Phase 8 | Complete |

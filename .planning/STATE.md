@@ -18,14 +18,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Accurate, standards-compliant LCC calculations that replicate verified Excel workbook behavior while fixing known bugs and adding residual value + income analysis.
-**Current focus:** Phase 8 - UI Implementation (custom components and hooks complete)
+**Current focus:** Phase 8 - UI Implementation (app shell + custom components complete)
 
 ## Current Position
 
 Phase: 8 of 9 (UI Implementation)
-Plan: 2 of 5 in current phase
+Plan: 2 of 5 in current phase (08-01 and 08-02 complete)
 Status: In Progress
-Last activity: 2026-03-27 -- Custom components, wizard nav, autosave hook, form inputs
+Last activity: 2026-03-27 -- App shell (auth pages, sidebar, project list) + custom components
 
 Progress: [██████████████████] 90%
 
@@ -47,11 +47,11 @@ Progress: [██████████████████] 90%
 | 05-engine-tests | 2 | 10 min | 5 min |
 | 06-database-seed | 1 | 5 min | 5 min |
 | 07-trpc-api-authentication | 3/3 | 16 min | 5 min |
-| 08-ui-implementation | 2/5 | 18 min | 9 min |
+| 08-ui-implementation | 2/5 | 36 min | 18 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 5 min, 7 min, 9 min, 9 min
-- Trend: slightly increasing (UI plans are more complex)
+- Last 5 plans: 5 min, 7 min, 9 min, 9 min, 18 min
+- Trend: increasing (UI plans involve more integration)
 
 *Updated after each plan completion*
 
@@ -93,6 +93,9 @@ Recent decisions affecting current work:
 - [Phase 08]: SaveStatusProvider as React context (not Zustand) for minimal dependency
 - [Phase 08]: useAutosave skips first render to prevent saving initial form hydration values
 - [Phase 08]: PercentInput stores decimal internally, displays * 100 with 4 decimal scale
+- [Phase 08]: base-ui render prop (not asChild) for all slot composition in base-nova shadcn
+- [Phase 08]: Zod v4 string-based form fields with manual parseInt to avoid z.coerce type mismatch with react-hook-form
+- [Phase 08]: Dark mode primary keeps EURAC red (oklch 0.55 0.18 27.5) for brand consistency
 
 ### Pending Todos
 
@@ -105,5 +108,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-27
-Stopped at: Completed 08-02 (custom components, wizard nav, autosave hook, form inputs). Next: 08-03.
+Stopped at: Completed 08-01 (app shell: auth pages, sidebar, project list). 08-01 + 08-02 done. Next: 08-03.
 Resume file: None
