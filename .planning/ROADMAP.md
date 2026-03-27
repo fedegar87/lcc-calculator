@@ -143,10 +143,14 @@ Plans:
   3. Construction step displays 21 cost categories in accordions with detail expansion and EN 15459 service component dropdown
   4. Results step shows KPI cards (LCC, WLC, LCC/m2, payback), breakdown tables, and 3 interactive chart types (stacked bar, line, grouped bar)
   5. Variant comparison view displays all 3 variants side by side with comparative charts
-**Plans**: TBD
+**Plans**: 5 plans in 3 waves
 
 Plans:
-- [ ] 08-01: TBD
+- [ ] 08-01-PLAN.md -- App shell: layouts, dark mode, auth pages, sidebar, project list
+- [ ] 08-02-PLAN.md -- Custom components (GlassCard, SliderInput, KPICard), hooks (autosave, save status), form helpers, wizard steps, variant tabs
+- [ ] 08-03-PLAN.md -- Project layout, Info form (metadata, geometry, income), WLC form (boundary conditions, energy prices, non-construction, design costs)
+- [ ] 08-04-PLAN.md -- Construction form (21 category accordions, detail rows, EN 15459 combobox), Energy form (consumption table, PV, maintenance config)
+- [ ] 08-05-PLAN.md -- Results dashboard: KPI cards, breakdown tables, 3 chart types (stacked bar, line, grouped bar), variant comparison
 
 ### Phase 9: Export
 **Goal**: Users can generate PDF and Excel reports that capture a complete, immutable snapshot of their LCC analysis
