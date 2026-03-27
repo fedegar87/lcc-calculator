@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-27T09:42:19.000Z"
+last_updated: "2026-03-27T09:54:31.000Z"
 progress:
   total_phases: 7
   completed_phases: 6
-  total_plans: 14
-  completed_plans: 8
+  total_plans: 15
+  completed_plans: 9
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 ## Current Position
 
 Phase: 7 of 9 (tRPC API & Authentication)
-Plan: 1 of 3 in current phase (COMPLETE)
+Plan: 2 of 3 in current phase (COMPLETE)
 Status: In Progress
-Last activity: 2026-03-27 -- Better Auth config, tRPC context with auth session, protectedProcedure, role middleware, reference router
+Last activity: 2026-03-27 -- Project CRUD router, cost-item router with aggregate recomputation, Next.js route protection middleware
 
-Progress: [██████████████░] 72%
+Progress: [███████████████░] 78%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: 6 min
-- Total execution time: 1.5 hours
+- Total execution time: 1.6 hours
 
 **By Phase:**
 
@@ -46,10 +46,10 @@ Progress: [██████████████░] 72%
 | 04-calculation-engine | 4 | 5 min | 1 min |
 | 05-engine-tests | 2 | 10 min | 5 min |
 | 06-database-seed | 1 | 5 min | 5 min |
-| 07-trpc-api-authentication | 1/3 | 4 min | 4 min |
+| 07-trpc-api-authentication | 2/3 | 9 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 1 min, 5 min, 5 min, 5 min, 4 min
+- Last 5 plans: 5 min, 5 min, 5 min, 4 min, 5 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -80,6 +80,10 @@ Recent decisions affecting current work:
 - [Phase 07]: Middleware typed via cast (AuthenticatedCtx) since requireProjectRole always chains after protectedProcedure
 - [Phase 07]: Export t.middleware from init.ts for role middleware to use proper tRPC middleware builder
 - [Phase 07]: Cost categories as static const array matching Prisma CostCategory enum values with labels/groups
+- [Phase 07]: Inline access checks for simple ownership; requireProjectRole middleware for multi-role procedures
+- [Phase 07]: Variant creation always includes default Geometry, BoundaryCondition, MaintenanceConfig sub-records
+- [Phase 07]: batchUpsert uses delete+recreate pattern within transaction for atomic detail replacement
+- [Phase 07]: Cookie-presence middleware for fast redirect; full session validation deferred to tRPC context
 
 ### Pending Todos
 
@@ -92,5 +96,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-27
-Stopped at: Completed 07-01 (auth + tRPC context + reference router). Next: 07-02 project/variant routers.
+Stopped at: Completed 07-02 (project/cost-item routers + route protection). Next: 07-03 remaining domain routers.
 Resume file: None
