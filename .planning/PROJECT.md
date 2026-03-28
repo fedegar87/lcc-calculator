@@ -32,7 +32,22 @@ Accurate, standards-compliant LCC calculations (ISO 15686-5:2017, EN 15459:2018)
 
 ### Active
 
-(None — next milestone requirements TBD via `/gsd:new-milestone`)
+- [ ] Docker Compose for local PostgreSQL with persistent volume
+- [ ] .env template with all required environment variables documented
+- [ ] Database migrations run successfully and seed data loads
+- [ ] Application starts with `npm run dev` and full E2E flow works
+- [ ] Tech debt cleanup: orphaned tRPC procedures, code quality
+
+## Current Milestone: v1.1 Local Dev Operativo
+
+**Goal:** Make the app fully operational in local development — anyone can clone, configure, and run the complete LCC calculator.
+
+**Target features:**
+- Docker Compose for PostgreSQL
+- Environment configuration (.env template)
+- Database setup (migrate + seed)
+- End-to-end verification (register → create project → enter data → calculate → export)
+- Tech debt closure from v1.0 audit
 
 ### Out of Scope
 
@@ -95,4 +110,4 @@ Shipped v1.0 with 51,093 LOC TypeScript across 230 files.
 | validateVariantInput at tRPC boundary | Runtime safety before engine invocation; BAD_REQUEST on failure | ✓ Good |
 
 ---
-*Last updated: 2026-03-28 after v1.0 milestone*
+*Last updated: 2026-03-28 after v1.1 milestone start*
