@@ -1,5 +1,19 @@
 # Milestones
 
+## v1.2 Gap Analysis Fixes (Shipped: 2026-03-28)
+
+**Phases completed:** 1 phase, 2 plans
+
+**Key accomplishments:**
+- Stakeholder Role dropdown (Owner / Tenant / Third Party) added to WLC Boundary Conditions section (GAP-01)
+- MaintenanceConfig slider moved from Energy form to Construction form where it logically belongs (GAP-02)
+- All 2/2 gap analysis requirements from Excel workbook audit closed
+
+### Known Gaps
+- None — all v1.2 requirements complete
+
+---
+
 ## v1.1 Local Dev Operativo (Shipped: 2026-03-28)
 
 **Phases completed:** 5 phases, 9 plans, 0 tasks

@@ -38,27 +38,14 @@
 
 </details>
 
-### v1.2 Gap Analysis Fixes
+<details>
+<summary>v1.2 Gap Analysis Fixes (Phase 16) -- SHIPPED 2026-03-28</summary>
 
-**Milestone Goal:** Close confirmed gaps found during Excel workbook audit -- expose missing UI for existing schema fields and fix misplaced form sections.
+- [x] Phase 16: Gap Analysis Fixes (2/2 plans) -- completed 2026-03-28
 
-- [ ] **Phase 16: Gap Analysis Fixes** - Add stakeholderRole dropdown to WLC form, move MaintenanceConfig from Energy to Construction form
+**Full archive:** [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md)
 
-## Phase Details
-
-### Phase 16: Gap Analysis Fixes
-**Goal**: All confirmed UX gaps from the Excel workbook audit are closed -- stakeholderRole is editable, maintenance config is on the construction page
-**Depends on**: Phase 15 (v1.1 complete)
-**Requirements**: GAP-01, GAP-02
-**Success Criteria** (what must be TRUE):
-  1. WLC form shows a "Stakeholder Role" dropdown (Owner / Tenant / Third Party) in the Boundary Conditions section, and the selection persists after page reload
-  2. MaintenanceConfig slider no longer appears on the Energy form
-  3. MaintenanceConfig slider appears on the Construction form and saves correctly via the existing `upsertMaintenanceConfig` tRPC mutation
-  4. `npm run build` passes with no TypeScript errors
-**Plans**: 2 plans
-Plans:
-- [x] 16-01-PLAN.md -- Add stakeholderRole dropdown to WLC Boundary Conditions
-- [x] 16-02-PLAN.md -- Move MaintenanceConfig from Energy form to Construction form
+</details>
 
 ## Progress
 

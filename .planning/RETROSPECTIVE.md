@@ -95,6 +95,34 @@
 
 ---
 
+## Milestone: v1.2 — Gap Analysis Fixes
+
+**Shipped:** 2026-03-28
+**Phases:** 1 | **Plans:** 2 | **Sessions:** ~1
+
+### What Was Built
+- Stakeholder Role dropdown (Owner / Tenant / Third Party) in WLC Boundary Conditions section
+- MaintenanceConfig slider relocated from Energy form to Construction form
+
+### What Worked
+- **Micro-milestone**: 1 phase, 2 plans, 3 files changed — completed in under 5 minutes total
+- **Surgical scope**: Both changes were pure UI moves with zero schema or API changes needed
+- **Excel audit payoff**: Gap analysis from Phase 2 directly drove targeted fixes — no guesswork
+
+### What Was Inefficient
+- Nothing notable — scope was minimal and well-defined
+
+### Key Lessons
+1. **Gap analysis → fix cycle works**: Structured audit identifies precise gaps; surgical phases close them without collateral changes
+2. **Schema-first pays off**: Both GAP-01 and GAP-02 already had schema and API support — only UI wiring was missing
+
+### Cost Observations
+- Model mix: ~70% opus, ~30% sonnet
+- Sessions: ~1 (part of larger session)
+- Notable: 2 min per plan — fastest plans in the project
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -103,6 +131,7 @@
 |-----------|----------|--------|------------|
 | v1.0 | ~8 | 11 | Full GSD YOLO pipeline: discuss → plan → execute → verify → audit |
 | v1.1 | ~4 | 4 | Infrastructure focus; auto-advance across all phases in 1 day |
+| v1.2 | ~1 | 1 | Micro-milestone: 2 surgical UI fixes from gap analysis in <5 min |
 
 ### Cumulative Quality
 
@@ -110,6 +139,7 @@
 |-----------|-------|----------|-------------------|
 | v1.0 | 152 | Engine 100%, API/UI untested | 0 unnecessary deps |
 | v1.1 | 152 | No new tests (infra milestone) | 0 unnecessary deps |
+| v1.2 | 152 | No new tests (UI-only fixes) | 0 unnecessary deps |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -117,3 +147,4 @@
 2. GSD YOLO mode is effective for well-scoped milestones with clear requirements — 26 plans in 3 days
 3. Small focused milestones (4 phases) ship in a single day with auto-advance — less coordination overhead than large ones
 4. Summary one_liner field consistently empty — needs workflow fix for automated accomplishment extraction
+5. Micro-milestones (<5 min) are viable when audit provides precise, surgical scope — gap analysis → fix cycle works

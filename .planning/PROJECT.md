@@ -37,6 +37,9 @@ Accurate, standards-compliant LCC calculations (ISO 15686-5:2017, EN 15459:2018)
 - ✓ Tech debt closure: orphaned tRPC procedures documented, code quality — v1.1
 - ✓ README quickstart guide: clone-to-login in 8 steps — v1.1
 
+- ✓ WLC form Stakeholder Role dropdown (Owner / Tenant / Third Party) in Boundary Conditions — v1.2
+- ✓ MaintenanceConfig slider moved from Energy to Construction form — v1.2
+
 ### Active
 
 (None — define with next milestone)
@@ -54,7 +57,7 @@ Accurate, standards-compliant LCC calculations (ISO 15686-5:2017, EN 15459:2018)
 
 ## Context
 
-Shipped v1.1 with ~51k LOC TypeScript. Fully operational local dev environment.
+Shipped v1.2 with ~51k LOC TypeScript. All Excel workbook audit gaps closed.
 
 - **Source of truth:** CRAVEzero Excel workbook (`CRAVEzero/200512_LCC_tool_beta_v2.xlsm`) with 7 sheets, ~3000 formula cells
 - **Standards:** ISO 15686-5:2017 (LCC structure), EN 15459:2018 (HVAC maintenance data — 79 components)
@@ -104,6 +107,8 @@ Shipped v1.1 with ~51k LOC TypeScript. Fully operational local dev environment.
 | DEC-019: Prisma 7 datasource in prisma.config.ts | Prisma 7 requires datasource.url in config for migrate commands | ✓ Good |
 | DEC-020: migrate deploy in run.bat | Non-interactive startup; migrate dev is for development only | ✓ Good |
 | DEC-021: Export router disabled | Recharts/RSC incompatibility; needs chart library migration | ⚠️ Revisit |
+| DEC-022: Stakeholder Role in grid column 3 | Fills empty 3rd column after inflationRate on lg screens | ✓ Good |
+| DEC-023: MaintenanceConfig after category accordions | Logically groups maintenance with construction cost data | ✓ Good |
 
 ---
-*Last updated: 2026-03-28 after v1.1 milestone complete*
+*Last updated: 2026-03-28 after v1.2 milestone complete*

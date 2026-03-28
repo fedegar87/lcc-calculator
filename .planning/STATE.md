@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Gap Analysis Fixes
-status: complete
-last_updated: "2026-03-28T18:30:00.000Z"
+status: archived
+last_updated: "2026-03-28T19:40:00.000Z"
 progress:
   total_phases: 16
   completed_phases: 16
@@ -18,43 +18,29 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Accurate, standards-compliant LCC calculations that replicate verified Excel workbook behavior while fixing known bugs and adding residual value + income analysis.
-**Current focus:** v1.2 complete -- all phases shipped
+**Current focus:** v1.2 archived -- all milestones shipped through v1.2
 
 ## Current Position
 
-Phase: 16 of 16 (Gap Analysis Fixes) -- COMPLETE
+Phase: 16 of 16 (Gap Analysis Fixes) -- ARCHIVED
 Plan: 2/2 complete
-Status: v1.2 milestone complete
-Last activity: 2026-03-28 -- Phase 16 complete (Gap Analysis Fixes)
+Status: v1.2 milestone archived
+Last activity: 2026-03-28 -- v1.2 archived
 
 Progress: [####################] 100% v1.0 | [####################] 100% v1.1 | [####################] 100% v1.2
 
 ## Performance Metrics
 
 **Velocity (from v1.0 + v1.1 + v1.2):**
-- Total plans completed: 33
-- Average duration: 7 min
-- Total execution time: ~4 hours
+- Total plans completed: 35
+- Average duration: 6 min
+- Total execution time: ~4.5 hours
 
 ## Accumulated Context
 
 ### Decisions
 
-All v1.0 decisions logged in PROJECT.md Key Decisions table (24 decisions, all Good).
-
-v1.1 decisions:
-- Prisma 7 requires datasource.url in prisma.config.ts (not just schema.prisma) for migrate commands
-- Used `import "dotenv/config"` to load .env before Prisma config env() resolves
-- run.bat uses migrate deploy (not migrate dev) for non-interactive startup
-- Export router disabled: Recharts/RSC incompatibility (React.createContext not available in App Router vendored React)
-- Orphaned tRPC procedures documented with @future JSDoc annotations
-- Export variantLabel now uses z.enum() instead of z.string()
-- README uses port 3000 (matching .env.example defaults), not 3001 from local .env
-
-v1.2 decisions:
-- Stakeholder Role Select placed in BoundaryConditionSection grid after inflationRate (fills 3rd column on lg)
-- MaintenanceConfigSection placed after all category accordion groups in Construction form
-- MaintenanceConfigSection guarded with `{variant && ...}` since variant is fetched async
+All decisions logged in PROJECT.md Key Decisions table (25 decisions total).
 
 ### Pending Todos
 
@@ -67,5 +53,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-28
-Stopped at: v1.2 milestone complete. All 16 phases shipped.
+Stopped at: v1.2 milestone archived. All 16 phases shipped across 3 milestones.
 Resume file: None
