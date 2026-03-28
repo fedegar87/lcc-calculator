@@ -1,10 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { useSaveStatus } from "@/hooks/use-save-status";
+import { useAutosave } from "@/hooks/use-autosave";
 import { GlassCard } from "@/components/shared/glass-card";
+import { InfoTooltip } from "@/components/shared/info-tooltip";
+import { SliderInput } from "@/components/shared/slider-input";
 import { EN15459Combobox } from "@/components/forms/shared/en15459-combobox";
 import {
   Accordion,
@@ -62,6 +68,14 @@ interface CategoryDef {
 
 // Categories that support service components (B and C groups)
 const SERVICE_COMPONENT_GROUPS = new Set(["Building Services", "Renewable Energy"]);
+
+// -- Maintenance Config Schema --
+
+const maintenanceSchema = z.object({
+  buildingElementMaintenancePercent: z.number().min(0).max(100),
+});
+
+type MaintenanceValues = z.infer<typeof maintenanceSchema>;
 
 function formatCurrency(val: number): string {
   return val.toLocaleString("en-US", {
@@ -643,6 +657,74 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
           </GlassCard>
         );
       })}
+      {variant && (
+        <MaintenanceConfigSection variant={variant} variantId={variantId} />
+      )}
     </div>
+  );
+}
+
+// -- Maintenance Config Section --
+
+function MaintenanceConfigSection({
+  variant,
+  variantId,
+}: {
+  variant: {
+    maintenanceConfig: {
+      buildingElementMaintenancePercent: number;
+    } | null;
+  };
+  variantId: string;
+}) {
+  const trpc = useTRPC();
+  const upsertMaintenance = useMutation(
+    trpc.variant.upsertMaintenanceConfig.mutationOptions()
+  );
+
+  const mc = variant.maintenanceConfig;
+
+  const form = useForm<MaintenanceValues>({
+    resolver: zodResolver(maintenanceSchema),
+    mode: "onBlur",
+    defaultValues: {
+      // Display as percentage (0-100), store as decimal (0-1)
+      buildingElementMaintenancePercent:
+        (mc?.buildingElementMaintenancePercent ?? 0.02) * 100,
+    },
+  });
+
+  const onSave = useCallback(
+    async (values: MaintenanceValues) => {
+      await upsertMaintenance.mutateAsync({
+        variantId,
+        buildingElementMaintenancePercent:
+          values.buildingElementMaintenancePercent / 100,
+      });
+    },
+    [variantId, upsertMaintenance]
+  );
+
+  useAutosave({ control: form.control, onSave });
+
+  return (
+    <GlassCard>
+      <div className="flex items-center gap-2 mb-4">
+        <h2 className="text-lg font-semibold">Maintenance Configuration</h2>
+        <InfoTooltip content="Annual maintenance cost as percentage of construction cost for building elements" />
+      </div>
+      <div className="max-w-lg">
+        <SliderInput
+          name="buildingElementMaintenancePercent"
+          control={form.control}
+          label="Building Element Maintenance"
+          min={0}
+          max={10}
+          step={0.1}
+          unit="%"
+          tooltip="Percentage of construction cost allocated annually for building element maintenance"
+        />
+      </div>
+    </GlassCard>
   );
 }
