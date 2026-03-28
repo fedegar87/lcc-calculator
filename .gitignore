@@ -52,3 +52,13 @@ src/generated/
 # IDE
 .vscode/
 .idea/
+
+# One-shot Python extraction scripts (outputs already consumed)
+scripts/extract-*.py
+scripts/audit/extract_*_seed.py
+
+# WIP CRAVEzero seed data (not yet validated)
+prisma/seed-data/cravezero-*.ts
+
+# Claude Code background shell
+.bg-shell/
