@@ -1,17 +1,18 @@
 import React from "react";
-import { renderToStaticMarkup } from "react-dom/server";
 import sharp from "sharp";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Legend,
-  LineChart,
-  Line,
-} from "recharts";
+
+// Dynamic import to avoid Next.js App Router blocking react-dom/server in static analysis
+async function renderToMarkup(element: React.ReactElement): Promise<string> {
+  const { renderToStaticMarkup } = await import("react-dom/server");
+  return renderToStaticMarkup(element);
+}
 import type { LCCResult } from "@/engine/types";
+
+// Dynamic import to avoid React.createContext call at module load time
+// (Recharts uses createContext internally, which is unavailable in RSC bundles)
+async function loadRecharts() {
+  return import("recharts");
+}
 
 // Hex colors for SVG rendering (sharp's librsvg may not support oklch)
 const BAR_COLORS = {
@@ -34,6 +35,9 @@ async function svgToPng(svgString: string): Promise<Buffer> {
 export async function renderLCCStackedBarPng(
   result: LCCResult,
 ): Promise<Buffer> {
+  const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } =
+    await loadRecharts();
+
   const data = [
     {
       name: "LCC",
@@ -44,7 +48,7 @@ export async function renderLCCStackedBarPng(
     },
   ];
 
-  const svg = renderToStaticMarkup(
+  const svg = await renderToMarkup(
     <BarChart
       width={500}
       height={280}
@@ -89,6 +93,9 @@ export async function renderLCCStackedBarPng(
 export async function renderCostEvolutionPng(
   result: LCCResult,
 ): Promise<Buffer> {
+  const { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } =
+    await loadRecharts();
+
   const length = result.heatingCosts.cumulated.length;
 
   const data = Array.from({ length }, (_, i) => {
@@ -107,7 +114,7 @@ export async function renderCostEvolutionPng(
     };
   });
 
-  const svg = renderToStaticMarkup(
+  const svg = await renderToMarkup(
     <LineChart
       width={500}
       height={280}
