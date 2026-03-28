@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Local Dev Operativo
-status: unknown
-last_updated: "2026-03-28T18:27:06.983Z"
+milestone: v1.2
+milestone_name: Gap Analysis Fixes
+status: complete
+last_updated: "2026-03-28T18:30:00.000Z"
 progress:
   total_phases: 16
-  completed_phases: 12
+  completed_phases: 16
   total_plans: 35
-  completed_plans: 25
+  completed_plans: 33
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Accurate, standards-compliant LCC calculations that replicate verified Excel workbook behavior while fixing known bugs and adding residual value + income analysis.
-**Current focus:** v1.1 complete -- all phases shipped
+**Current focus:** v1.2 complete -- all phases shipped
 
 ## Current Position
 
-Phase: 15 of 15 (Documentation) -- COMPLETE
-Plan: 1/1 complete
-Status: v1.1 milestone complete
-Last activity: 2026-03-28 -- Phase 15 complete (Documentation)
+Phase: 16 of 16 (Gap Analysis Fixes) -- COMPLETE
+Plan: 2/2 complete
+Status: v1.2 milestone complete
+Last activity: 2026-03-28 -- Phase 16 complete (Gap Analysis Fixes)
 
-Progress: [####################] 100% v1.0 | [####################] 100% v1.1
+Progress: [####################] 100% v1.0 | [####################] 100% v1.1 | [####################] 100% v1.2
 
 ## Performance Metrics
 
-**Velocity (from v1.0 + v1.1):**
-- Total plans completed: 31
+**Velocity (from v1.0 + v1.1 + v1.2):**
+- Total plans completed: 33
 - Average duration: 7 min
-- Total execution time: ~3.9 hours
+- Total execution time: ~4 hours
 
 ## Accumulated Context
 
@@ -51,6 +51,11 @@ v1.1 decisions:
 - Export variantLabel now uses z.enum() instead of z.string()
 - README uses port 3000 (matching .env.example defaults), not 3001 from local .env
 
+v1.2 decisions:
+- Stakeholder Role Select placed in BoundaryConditionSection grid after inflationRate (fills 3rd column on lg)
+- MaintenanceConfigSection placed after all category accordion groups in Construction form
+- MaintenanceConfigSection guarded with `{variant && ...}` since variant is fetched async
+
 ### Pending Todos
 
 None.
@@ -62,5 +67,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-28
-Stopped at: v1.1 milestone complete. All 15 phases shipped.
+Stopped at: v1.2 milestone complete. All 16 phases shipped.
 Resume file: None
