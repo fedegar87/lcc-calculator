@@ -2,12 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "../init";
 import type { PrismaClient } from "../../../generated/prisma/client";
-
-/** Safely convert Prisma Decimal|null|undefined to plain number */
-function d(val: unknown): number {
-  if (val == null) return 0;
-  return Number(val);
-}
+import { d } from "./_shared";
 
 /** Verify user has OWNER/EDITOR access to a variant's project */
 async function verifyVariantWriteAccess(

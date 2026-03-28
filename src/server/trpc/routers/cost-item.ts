@@ -2,6 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "../init";
 import type { PrismaClient } from "../../../generated/prisma/client";
+import { d, resolveDetailCost } from "./_shared";
 
 const COST_CATEGORY_VALUES = [
   "A1_ROOFS",
@@ -26,23 +27,6 @@ const COST_CATEGORY_VALUES = [
   "D1_FURNISHINGS",
   "E1_OUTDOOR",
 ] as const;
-
-/** Safely convert Prisma Decimal|null|undefined to plain number */
-function d(val: unknown): number {
-  if (val == null) return 0;
-  return Number(val);
-}
-
-/** Resolve detail material cost: MAX(materialCost, unitPrice * area) per architecture decision */
-function resolveDetailCost(detail: {
-  materialCost: unknown;
-  unitPrice: unknown;
-  area: unknown;
-}): number {
-  const mat = d(detail.materialCost);
-  const unitTimesArea = d(detail.unitPrice) * d(detail.area);
-  return Math.max(mat, unitTimesArea);
-}
 
 /** Recompute parent cost item aggregates from its details */
 async function recomputeCostItemAggregates(
