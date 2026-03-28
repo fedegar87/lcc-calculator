@@ -21,6 +21,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 7: tRPC API & Authentication** - Type-safe API layer with protected procedures and email/password auth
 - [x] **Phase 8: UI Implementation** - Glass morphism wizard UI with data entry forms, results dashboard, and interactive charts (completed 2026-03-27)
 - [x] **Phase 9: Export** - PDF and Excel export with immutable ResultSnapshot creation (completed 2026-03-28)
+- [ ] **Phase 10: Variant Creation UI** - Wire UI for creating VARIANT_1/VARIANT_2 via existing addVariant procedure
+- [ ] **Phase 11: Test & Code Quality Cleanup** - Fix test compilation, add calculateAll, validate at API boundary, remove duplicate helpers
 
 ## Phase Details
 
@@ -163,8 +165,31 @@ Plans:
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 09-01-PLAN.md -- Snapshot service, chart renderer, PDF document, Excel workbook, export router mutations
-- [ ] 09-02-PLAN.md -- Export buttons in results page, download utility, loading states, toast feedback
+- [x] 09-01-PLAN.md -- Snapshot service, chart renderer, PDF document, Excel workbook, export router mutations
+- [x] 09-02-PLAN.md -- Export buttons in results page, download utility, loading states, toast feedback
+
+### Phase 10: Variant Creation UI
+**Goal**: Users can create VARIANT_1 and VARIANT_2 from the UI, wiring the existing addVariant tRPC procedure
+**Depends on**: Phase 8
+**Requirements**: UI-05
+**Gap Closure**: Closes UI-05 partial gap and orphaned addVariant procedure (tech debt from audit)
+**Success Criteria** (what must be TRUE):
+  1. User can click "Add Variant" in variant tabs to create VARIANT_1 or VARIANT_2
+  2. New variant appears in tabs immediately after creation
+  3. addVariant tRPC procedure has an active UI consumer
+**Plans**: TBD
+
+### Phase 11: Test & Code Quality Cleanup
+**Goal**: Close remaining low-severity audit gaps: fix test compilation, add batch calculation, validate at API boundary, remove code duplication
+**Depends on**: Phase 10
+**Requirements**: TEST-05, API-05, DATA-09
+**Gap Closure**: Closes TEST-05, API-05, DATA-09 partial gaps and tech debt items from audit
+**Success Criteria** (what must be TRUE):
+  1. edge-cases.test.ts compiles and all edge case tests pass
+  2. calculateAll procedure exists OR useQueries pattern documented as intentional spec
+  3. validateVariantInput called at tRPC mutation boundary before calculation
+  4. No duplicate d() helper between variant.ts and _shared.ts
+**Plans**: TBD
 
 ## Progress
 
@@ -181,4 +206,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 6. Database Seed | 1/1 | Complete | 2026-03-26 |
 | 7. tRPC API & Authentication | 0/? | Not started | - |
 | 8. UI Implementation | 0/? | Complete    | 2026-03-27 |
-| 9. Export | 0/2 | Complete    | 2026-03-28 |
+| 9. Export | 2/2 | Complete    | 2026-03-28 |
+| 10. Variant Creation UI | 0/? | Not started | - |
+| 11. Test & Code Quality Cleanup | 0/? | Not started | - |

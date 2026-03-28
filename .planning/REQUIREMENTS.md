@@ -31,7 +31,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **DATA-06**: ResultSnapshot with engine version, formula mode, input hash for reproducibility
 - [x] **DATA-07**: Engine type interfaces (VariantInput, LCCResult, YearlyEnergyCosts) defined
 - [x] **DATA-08**: EN 15459 constants extracted from audit as TypeScript constants
-- [x] **DATA-09**: Input validation rules with plausible range checks
+- [ ] **DATA-09**: Input validation rules with plausible range checks
 
 ### Calculation Engine
 
@@ -59,7 +59,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **TEST-02**: Unit tests per module (discount, energy, maintenance, aggregate, residual, income)
 - [x] **TEST-03**: Integration test validates full calculateLCC() against golden fixture
 - [x] **TEST-04**: Formula mode test: excel_replica produces buggy value, excel_bugfixed produces corrected
-- [x] **TEST-05**: Edge cases: zero area, min period, no energy, no services, no income, all-zero costs
+- [ ] **TEST-05**: Edge cases: zero area, min period, no energy, no services, no income, all-zero costs
 
 ### Database Seed
 
@@ -73,7 +73,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **API-02**: Project router: list, getById, create, update, delete, addMember, removeMember
 - [x] **API-03**: Variant router: upsert geometry, boundary conditions, energy, WLC, design costs, income, maintenance
 - [x] **API-04**: Cost-item router: listByVariant, upsert, delete, batchUpsert
-- [x] **API-05**: Calculate router: calculate single variant, calculateAll for comparison
+- [ ] **API-05**: Calculate router: calculate single variant, calculateAll for comparison
 - [x] **API-06**: Reference router: EN 15459 components, energy sources, cost categories
 - [x] **API-07**: Export router: PDF and Excel generation with ResultSnapshot creation
 
@@ -91,7 +91,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **UI-02**: Inter font loaded via next/font/google (weights 300-700)
 - [x] **UI-03**: Responsive sidebar with project list and user menu
 - [x] **UI-04**: 5-step wizard navigation (Info, WLC, Construction, Energy, Results)
-- [x] **UI-05**: Variant tabs (Base, Variant 1, Variant 2) with data indicator
+- [ ] **UI-05**: Variant tabs (Base, Variant 1, Variant 2) with data indicator
 - [x] **UI-06**: Custom components: GlassCard, InfoTooltip, SliderInput, KPICard
 - [x] **UI-07**: Framer Motion animations with prefers-reduced-motion respect
 
@@ -175,7 +175,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-06 | Phase 3 | Complete |
 | DATA-07 | Phase 3 | Complete |
 | DATA-08 | Phase 3 | Complete |
-| DATA-09 | Phase 3 | Complete |
+| DATA-09 | Phase 11 | Pending |
 | CALC-01 | Phase 4 | Complete |
 | CALC-02 | Phase 4 | Complete |
 | CALC-03 | Phase 4 | Complete |
@@ -197,7 +197,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-02 | Phase 5 | Complete |
 | TEST-03 | Phase 5 | Complete |
 | TEST-04 | Phase 5 | Complete |
-| TEST-05 | Phase 5 | Complete |
+| TEST-05 | Phase 11 | Pending |
 | SEED-01 | Phase 6 | Complete |
 | SEED-02 | Phase 6 | Complete |
 | SEED-03 | Phase 6 | Complete |
@@ -205,7 +205,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | API-02 | Phase 7 | Complete |
 | API-03 | Phase 7 | Complete |
 | API-04 | Phase 7 | Complete |
-| API-05 | Phase 7 | Complete |
+| API-05 | Phase 11 | Pending |
 | API-06 | Phase 7 | Complete |
 | API-07 | Phase 7 | Complete |
 | AUTH-01 | Phase 7 | Complete |
@@ -217,7 +217,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-02 | Phase 8 | Complete |
 | UI-03 | Phase 8 | Complete |
 | UI-04 | Phase 8 | Complete |
-| UI-05 | Phase 8 | Complete |
+| UI-05 | Phase 10 | Pending |
 | UI-06 | Phase 8 | Complete |
 | UI-07 | Phase 8 | Complete |
 | UI-08 | Phase 8 | Complete |
@@ -239,6 +239,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 - v1 requirements: 62 total
+- Complete: 58
+- Pending (gap closure): 4 (UI-05, TEST-05, API-05, DATA-09)
 - Mapped to phases: 62
 - Unmapped: 0
 
