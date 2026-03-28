@@ -3,7 +3,7 @@
 ## Milestones
 
 - v1.0 **LCCzero Calculator** -- Phases 1-11 (shipped 2026-03-28)
-- **v1.1 Local Dev Operativo** -- Phases 12-15 (in progress)
+- v1.1 **Local Dev Operativo** -- Phases 12-15 (shipped 2026-03-28)
 
 ## Phases
 
@@ -33,7 +33,7 @@
 - [x] **Phase 12: Docker + Environment Setup** - Docker Compose for PostgreSQL and environment configuration (completed 2026-03-28)
 - [x] **Phase 13: Database + Smoke Test** - Migrations, seed data, dev server startup, engine tests pass (completed 2026-03-28)
 - [x] **Phase 14: E2E Verification + Tech Debt** - Full user flow verification and v1.0 tech debt closure (completed 2026-03-28)
-- [ ] **Phase 15: Documentation** - README with complete setup-to-run instructions
+- [x] **Phase 15: Documentation** - README with complete setup-to-run instructions (completed 2026-03-28)
 
 ## Phase Details
 
@@ -78,7 +78,7 @@
   1. README contains prerequisites section listing Node.js, Docker, and npm versions
   2. README contains step-by-step instructions: clone, configure .env, start Docker, migrate, seed, run dev server
   3. A developer following only the README can reach a working login page without asking questions
-**Plans**: TBD
+**Plans**: 15-01 Write README.md (wave 1)
 
 ## Progress
 
@@ -98,7 +98,7 @@
 | 12. Docker + Environment Setup | 2/2 | Complete    | 2026-03-28 | - |
 | 13. Database + Smoke Test | 2/2 | Complete    | 2026-03-28 | - |
 | 14. E2E Verification + Tech Debt | v1.1 | 2/2 | Complete | 2026-03-28 |
-| 15. Documentation | v1.1 | 0/? | Not started | - |
+| 15. Documentation | v1.1 | 1/1 | Complete | 2026-03-28 |
 
 ---
-*Last updated: 2026-03-28 after v1.1 roadmap creation*
+*Last updated: 2026-03-28 after Phase 15 complete -- v1.1 shipped*

@@ -11,7 +11,7 @@ Requirements for local dev operativo. App must be runnable end-to-end by anyone 
 
 - [x] **INFRA-01**: Docker Compose provides PostgreSQL 16 with persistent volume for local development
 - [x] **INFRA-02**: .env.example documents all required environment variables with descriptions and safe defaults
-- [ ] **INFRA-03**: README contains step-by-step setup instructions (prerequisites, clone, configure, run)
+- [x] **INFRA-03**: README contains step-by-step setup instructions (prerequisites, clone, configure, run)
 
 ### Database
 
@@ -68,7 +68,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | INFRA-01 | Phase 12 | Complete |
 | INFRA-02 | Phase 12 | Complete |
-| INFRA-03 | Phase 15 | Pending |
+| INFRA-03 | Phase 15 | Complete |
 | DB-01 | Phase 13 | Complete |
 | DB-02 | Phase 13 | Complete |
 | DB-03 | Phase 12 | Complete |
@@ -87,4 +87,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-28*
-*Last updated: 2026-03-28 after Phase 14 -- E2E-02, E2E-03, DEBT-01, DEBT-02 complete; E2E-04 blocked*
+*Last updated: 2026-03-28 after Phase 15 -- INFRA-03 complete; v1.1 shipped*
