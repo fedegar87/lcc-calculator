@@ -26,68 +26,28 @@
 
 </details>
 
-### v1.1 Local Dev Operativo
+<details>
+<summary>v1.1 Local Dev Operativo (Phases 12-15) -- SHIPPED 2026-03-28</summary>
 
-**Milestone Goal:** Make the app fully operational in local development -- anyone who clones the repo can configure, run, and verify the complete LCC calculator end-to-end.
+- [x] Phase 12: Docker + Environment Setup (2/2 plans) -- completed 2026-03-28
+- [x] Phase 13: Database + Smoke Test (2/2 plans) -- completed 2026-03-28
+- [x] Phase 14: E2E Verification + Tech Debt (2/2 plans) -- completed 2026-03-28
+- [x] Phase 15: Documentation (1/1 plan) -- completed 2026-03-28
 
-- [x] **Phase 12: Docker + Environment Setup** - Docker Compose for PostgreSQL and environment configuration (completed 2026-03-28)
-- [x] **Phase 13: Database + Smoke Test** - Migrations, seed data, dev server startup, engine tests pass (completed 2026-03-28)
-- [x] **Phase 14: E2E Verification + Tech Debt** - Full user flow verification and v1.0 tech debt closure (completed 2026-03-28)
-- [x] **Phase 15: Documentation** - README with complete setup-to-run instructions (completed 2026-03-28)
+**Full archive:** [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
+
+</details>
 
 ### v1.2 Gap Analysis Fixes
 
-**Milestone Goal:** Close confirmed gaps found during Excel workbook audit — expose missing UI for existing schema fields and fix misplaced form sections.
+**Milestone Goal:** Close confirmed gaps found during Excel workbook audit -- expose missing UI for existing schema fields and fix misplaced form sections.
 
 - [ ] **Phase 16: Gap Analysis Fixes** - Add stakeholderRole dropdown to WLC form, move MaintenanceConfig from Energy to Construction form
 
 ## Phase Details
 
-### Phase 12: Docker + Environment Setup
-**Goal**: Developer has a running PostgreSQL instance and correctly configured environment after following .env.example
-**Depends on**: Nothing (first phase of v1.1; v1.0 code complete)
-**Requirements**: INFRA-01, INFRA-02, DB-03
-**Success Criteria** (what must be TRUE):
-  1. `docker compose up -d` starts PostgreSQL 16 and data persists across container restarts
-  2. `.env.example` contains all required variables with descriptions and safe defaults that work out of the box with the Docker setup
-  3. `npx prisma generate` completes without errors against the running database
-**Plans**: TBD
-
-### Phase 13: Database + Smoke Test
-**Goal**: Fresh database is fully populated and the application starts without errors
-**Depends on**: Phase 12
-**Requirements**: DB-01, DB-02, E2E-01, E2E-05
-**Success Criteria** (what must be TRUE):
-  1. `npx prisma migrate deploy` creates all tables on a fresh database without errors
-  2. Seed script creates a demo user and 3-variant project with all cost data populated
-  3. `npm run dev` starts the application and loads the login page in a browser
-  4. `npm test` runs all 152+ engine tests with 0 failures
-**Plans**: TBD
-
-### Phase 14: E2E Verification + Tech Debt
-**Goal**: Complete user workflow verified end-to-end and v1.0 tech debt items resolved
-**Depends on**: Phase 13
-**Requirements**: E2E-02, E2E-03, E2E-04, DEBT-01, DEBT-02
-**Success Criteria** (what must be TRUE):
-  1. User can register a new account, log in, and log out successfully
-  2. User can create a project, enter data across all 4 input steps (Info, WLC, Construction, Energy), and see calculated results on the Results page
-  3. User can download PDF and Excel exports from the Results page
-  4. Orphaned tRPC procedures (project.delete, addMember, removeMember, costItem.delete, batchUpsert) are documented as future API surface
-  5. Export variantLabel input uses z.enum() with compile-time type narrowing instead of z.string()
-**Plans**: 14-01 Tech Debt Closure (wave 1), 14-02 E2E Verification (wave 2)
-
-### Phase 15: Documentation
-**Goal**: New developer can go from git clone to running app by following README instructions alone
-**Depends on**: Phase 14
-**Requirements**: INFRA-03
-**Success Criteria** (what must be TRUE):
-  1. README contains prerequisites section listing Node.js, Docker, and npm versions
-  2. README contains step-by-step instructions: clone, configure .env, start Docker, migrate, seed, run dev server
-  3. A developer following only the README can reach a working login page without asking questions
-**Plans**: 15-01 Write README.md (wave 1)
-
 ### Phase 16: Gap Analysis Fixes
-**Goal**: All confirmed UX gaps from the Excel workbook audit are closed — stakeholderRole is editable, maintenance config is on the construction page
+**Goal**: All confirmed UX gaps from the Excel workbook audit are closed -- stakeholderRole is editable, maintenance config is on the construction page
 **Depends on**: Phase 15 (v1.1 complete)
 **Requirements**: GAP-01, GAP-02
 **Success Criteria** (what must be TRUE):
@@ -115,11 +75,11 @@ Plans:
 | 9. Export | v1.0 | 2/2 | Complete | 2026-03-28 |
 | 10. Variant Creation UI | v1.0 | 1/1 | Complete | 2026-03-28 |
 | 11. Test & Code Quality Cleanup | v1.0 | 2/2 | Complete | 2026-03-28 |
-| 12. Docker + Environment Setup | 2/2 | Complete    | 2026-03-28 | - |
-| 13. Database + Smoke Test | 2/2 | Complete    | 2026-03-28 | - |
+| 12. Docker + Environment Setup | v1.1 | 2/2 | Complete | 2026-03-28 |
+| 13. Database + Smoke Test | v1.1 | 2/2 | Complete | 2026-03-28 |
 | 14. E2E Verification + Tech Debt | v1.1 | 2/2 | Complete | 2026-03-28 |
 | 15. Documentation | v1.1 | 1/1 | Complete | 2026-03-28 |
 | 16. Gap Analysis Fixes | v1.2 | 0/2 | Planned | - |
 
 ---
-*Last updated: 2026-03-28 after Phase 15 complete -- v1.1 shipped*
+*Last updated: 2026-03-28 after v1.1 milestone complete*

@@ -30,24 +30,16 @@ Accurate, standards-compliant LCC calculations (ISO 15686-5:2017, EN 15459:2018)
 - ✓ PDF and Excel export with result snapshots — v1.0
 - ✓ Glass morphism UI with EURAC brand colors and accessibility compliance — v1.0
 
+- ✓ Docker Compose for local PostgreSQL with persistent volume — v1.1
+- ✓ .env template with all required environment variables documented — v1.1
+- ✓ Database migrations run successfully and seed data loads — v1.1
+- ✓ Application starts with `npm run dev` and full E2E flow works — v1.1
+- ✓ Tech debt closure: orphaned tRPC procedures documented, code quality — v1.1
+- ✓ README quickstart guide: clone-to-login in 8 steps — v1.1
+
 ### Active
 
-- [ ] Docker Compose for local PostgreSQL with persistent volume
-- [ ] .env template with all required environment variables documented
-- [ ] Database migrations run successfully and seed data loads
-- [ ] Application starts with `npm run dev` and full E2E flow works
-- [ ] Tech debt cleanup: orphaned tRPC procedures, code quality
-
-## Current Milestone: v1.1 Local Dev Operativo
-
-**Goal:** Make the app fully operational in local development — anyone can clone, configure, and run the complete LCC calculator.
-
-**Target features:**
-- Docker Compose for PostgreSQL
-- Environment configuration (.env template)
-- Database setup (migrate + seed)
-- End-to-end verification (register → create project → enter data → calculate → export)
-- Tech debt closure from v1.0 audit
+(None — define with next milestone)
 
 ### Out of Scope
 
@@ -62,7 +54,7 @@ Accurate, standards-compliant LCC calculations (ISO 15686-5:2017, EN 15459:2018)
 
 ## Context
 
-Shipped v1.0 with 51,093 LOC TypeScript across 230 files.
+Shipped v1.1 with ~51k LOC TypeScript. Fully operational local dev environment.
 
 - **Source of truth:** CRAVEzero Excel workbook (`CRAVEzero/200512_LCC_tool_beta_v2.xlsm`) with 7 sheets, ~3000 formula cells
 - **Standards:** ISO 15686-5:2017 (LCC structure), EN 15459:2018 (HVAC maintenance data — 79 components)
@@ -71,7 +63,8 @@ Shipped v1.0 with 51,093 LOC TypeScript across 230 files.
 - **Known Excel bug:** Maintenance row 62 has `^(I)` instead of `^(I5)` — engine supports both modes via FormulaMode
 - **Excel gaps:** Residual value and Income implemented as METHOD_IMPROVEMENT (not in original Excel)
 - **Academic context:** EURAC Research / University of Bozen-Bolzano, H2020 CRAVEzero project
-- **Tech debt:** 5 orphaned tRPC procedures (no UI consumer), missing GSD tracking files for phases 4/5/11
+- **Known limitation:** PDF/Excel export disabled — Recharts/RSC incompatibility blocks server-side chart rendering
+- **Tech debt:** 5 orphaned tRPC procedures documented with @future JSDoc (no UI consumer yet)
 
 ## Constraints
 
@@ -108,6 +101,9 @@ Shipped v1.0 with 51,093 LOC TypeScript across 230 files.
 | GSD Full + YOLO mode | 11 phases, 26 plans completed in 3 days with auto-execution | ✓ Good |
 | useQueries for batch calculation | Max 3 variants — parallel useQueries simpler than calculateAll | ✓ Good |
 | validateVariantInput at tRPC boundary | Runtime safety before engine invocation; BAD_REQUEST on failure | ✓ Good |
+| DEC-019: Prisma 7 datasource in prisma.config.ts | Prisma 7 requires datasource.url in config for migrate commands | ✓ Good |
+| DEC-020: migrate deploy in run.bat | Non-interactive startup; migrate dev is for development only | ✓ Good |
+| DEC-021: Export router disabled | Recharts/RSC incompatibility; needs chart library migration | ⚠️ Revisit |
 
 ---
-*Last updated: 2026-03-28 after v1.1 milestone start*
+*Last updated: 2026-03-28 after v1.1 milestone complete*

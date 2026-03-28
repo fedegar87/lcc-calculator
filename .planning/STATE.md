@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Local Dev Operativo
-status: complete
-last_updated: "2026-03-28T16:00:00.000Z"
+status: unknown
+last_updated: "2026-03-28T18:27:06.983Z"
 progress:
-  total_phases: 15
-  completed_phases: 15
-  total_plans: 33
-  completed_plans: 31
+  total_phases: 16
+  completed_phases: 12
+  total_plans: 35
+  completed_plans: 25
 ---
 
 # Project State

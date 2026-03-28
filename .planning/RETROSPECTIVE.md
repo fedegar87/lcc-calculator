@@ -53,6 +53,48 @@
 
 ---
 
+## Milestone: v1.1 — Local Dev Operativo
+
+**Shipped:** 2026-03-28
+**Phases:** 4 | **Plans:** 7 | **Sessions:** ~4
+
+### What Was Built
+- Docker Compose with PostgreSQL 16 on persistent named volume for zero-config local dev
+- Prisma 7 initial migration (20 models) + seed script with demo user and 3-variant project
+- Automated run.bat startup script with prerequisite checks
+- E2E verification: auth + data entry flows confirmed; export blocked (Recharts/RSC)
+- Tech debt closure: z.enum() for variantLabel, @future annotations on orphaned procedures
+- README quickstart guide: 8-step clone-to-login with demo credentials, troubleshooting, scripts table
+
+### What Worked
+- **Incremental milestone**: v1.1 was small and focused (4 phases) — completed in a single day
+- **Infrastructure-first**: Docker → migrations → smoke test → verification → docs. Each step built on the previous
+- **Auto-advance pipeline**: All 4 phases ran discuss → plan → execute without interruption
+- **Known limitation handling**: Documenting Recharts/RSC blocker in README and disabling export router was pragmatic — didn't block the rest of v1.1
+
+### What Was Inefficient
+- **Port mismatch**: .env had BETTER_AUTH_URL on port 3001, README used 3000 — caught and fixed but could have been a confusing gap for new devs
+- **Summary one_liner still empty**: Same issue from v1.0 — no summaries have one_liner populated, automated extraction fails
+- **Phase 12/13 missing milestone column in Progress table**: Minor formatting inconsistency caught during completion
+
+### Patterns Established
+- `prisma.config.ts` with dotenv import for Prisma 7 environment loading
+- `migrate deploy` (not `migrate dev`) for non-interactive startup scripts
+- `.env.example` with defaults matching docker-compose.yml credentials
+- Dynamic import for react-dom/server in chart-renderer (workaround for RSC restrictions)
+
+### Key Lessons
+1. **Port configuration is a single source of truth**: .env.example should be THE reference; local .env overrides should be documented
+2. **Recharts is not RSC-compatible**: Any server-side rendering of Recharts components requires a dedicated chart-renderer process or alternative library
+3. **Small milestones ship fast**: 4 phases in 1 day vs 11 phases in 3 days — focused scope reduces coordination overhead
+
+### Cost Observations
+- Model mix: ~60% opus, ~30% sonnet, ~10% haiku
+- Sessions: ~4 in 1 day
+- Notable: Average plan execution ~5 minutes; simpler than v1.0 due to infrastructure focus
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -60,14 +102,18 @@
 | Milestone | Sessions | Phases | Key Change |
 |-----------|----------|--------|------------|
 | v1.0 | ~8 | 11 | Full GSD YOLO pipeline: discuss → plan → execute → verify → audit |
+| v1.1 | ~4 | 4 | Infrastructure focus; auto-advance across all phases in 1 day |
 
 ### Cumulative Quality
 
 | Milestone | Tests | Coverage | Zero-Dep Additions |
 |-----------|-------|----------|-------------------|
 | v1.0 | 152 | Engine 100%, API/UI untested | 0 unnecessary deps |
+| v1.1 | 152 | No new tests (infra milestone) | 0 unnecessary deps |
 
 ### Top Lessons (Verified Across Milestones)
 
 1. Engine-first architecture with golden dataset validation catches formula errors before they propagate to UI
 2. GSD YOLO mode is effective for well-scoped milestones with clear requirements — 26 plans in 3 days
+3. Small focused milestones (4 phases) ship in a single day with auto-advance — less coordination overhead than large ones
+4. Summary one_liner field consistently empty — needs workflow fix for automated accomplishment extraction

@@ -12,8 +12,16 @@ import { SliderInput } from "@/components/shared/slider-input";
 import { CurrencyInput } from "@/components/forms/shared/currency-input";
 import { PercentInput } from "@/components/forms/shared/percent-input";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -192,6 +200,28 @@ function BoundaryConditionSection({
           control={form.control}
           label="Inflation Rate"
         />
+        <div>
+          <Label>Stakeholder Role</Label>
+          <Controller
+            name="stakeholderRole"
+            control={form.control}
+            render={({ field: { value, onChange } }) => (
+              <Select
+                value={value != null ? String(value) : ""}
+                onValueChange={(v) => onChange(v ? Number(v) : null)}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Select role..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Owner</SelectItem>
+                  <SelectItem value="2">Tenant</SelectItem>
+                  <SelectItem value="3">Third Party</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
       </div>
     </GlassCard>
   );
