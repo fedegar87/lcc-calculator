@@ -9,6 +9,7 @@ import {
 } from "@/engine/index";
 import { ENGINE_VERSION } from "@/engine/types";
 import type { FormulaMode } from "@/engine/types";
+import { validateVariantInput } from "@/engine/validation";
 import { VariantLabel as PrismaVariantLabel } from "@/generated/prisma/enums";
 import { buildVariantInput } from "./_shared";
 import { getOrCreateSnapshot } from "@/server/export/snapshot";
@@ -116,6 +117,15 @@ export const exportRouter = createTRPCRouter({
       const formulaMode: FormulaMode = input.formulaMode;
       const variantInput = buildVariantInput(variant);
 
+      // Validate at API boundary before engine invocation
+      const validationErrors = validateVariantInput(variantInput);
+      if (validationErrors.length > 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Input validation failed: ${validationErrors.join("; ")}`,
+        });
+      }
+
       const result = calculateLCC(variantInput, {
         formulaMode,
         maxReplacementCycles: DEFAULT_ENGINE_CONFIG.maxReplacementCycles,
@@ -218,6 +228,15 @@ export const exportRouter = createTRPCRouter({
 
       const formulaMode: FormulaMode = input.formulaMode;
       const variantInput = buildVariantInput(variant);
+
+      // Validate at API boundary before engine invocation
+      const excelValidationErrors = validateVariantInput(variantInput);
+      if (excelValidationErrors.length > 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Input validation failed: ${excelValidationErrors.join("; ")}`,
+        });
+      }
 
       const result = calculateLCC(variantInput, {
         formulaMode,

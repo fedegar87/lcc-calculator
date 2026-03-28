@@ -5,6 +5,7 @@ import {
   calculateLCC,
   DEFAULT_ENGINE_CONFIG,
 } from "@/engine/index";
+import { validateVariantInput } from "@/engine/validation";
 import { buildVariantInput } from "./_shared";
 
 export const calculationRouter = createTRPCRouter({
@@ -67,6 +68,15 @@ export const calculationRouter = createTRPCRouter({
 
       // Build engine input from DB data
       const variantInput = buildVariantInput(variant);
+
+      // Validate at API boundary before engine invocation
+      const validationErrors = validateVariantInput(variantInput);
+      if (validationErrors.length > 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Input validation failed: ${validationErrors.join("; ")}`,
+        });
+      }
 
       // Run calculation
       try {
