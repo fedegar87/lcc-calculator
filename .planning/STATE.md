@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-last_updated: "2026-03-28T06:53:41Z"
+last_updated: "2026-03-28T06:58:23Z"
 progress:
   total_phases: 9
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 23
-  completed_plans: 22
+  completed_plans: 23
 ---
 
 # Project State
@@ -18,21 +18,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Accurate, standards-compliant LCC calculations that replicate verified Excel workbook behavior while fixing known bugs and adding residual value + income analysis.
-**Current focus:** Phase 9 - Export. Plan 01 complete (PDF/Excel pipeline). Plan 02 next (UI export buttons).
+**Current focus:** All 9 phases complete. Milestone v1.0 feature-complete.
 
 ## Current Position
 
-Phase: 9 of 9 (Export)
-Plan: 1 of 2 in current phase (09-01 complete)
-Status: In Progress
-Last activity: 2026-03-28 -- Export pipeline (PDF, Excel, snapshots)
+Phase: 9 of 9 (Export) -- COMPLETE
+Plan: 2 of 2 in current phase (all complete)
+Status: Complete
+Last activity: 2026-03-28 -- Export UI buttons and download utility
 
-Progress: [████████████████████] 96%
+Progress: [████████████████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 22
+- Total plans completed: 23
 - Average duration: 7 min
 - Total execution time: 2.4 hours
 
@@ -48,11 +48,11 @@ Progress: [████████████████████] 96%
 | 06-database-seed | 1 | 5 min | 5 min |
 | 07-trpc-api-authentication | 3/3 | 16 min | 5 min |
 | 08-ui-implementation | 5/5 | 65 min | 13 min |
-| 09-export | 1/2 | 7 min | 7 min |
+| 09-export | 2/2 | 8 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 18 min, 9 min, 14 min, 6 min, 7 min
-- Trend: Phase 9 export pipeline complete, UI buttons next
+- Last 5 plans: 9 min, 14 min, 6 min, 7 min, 1 min
+- Trend: All 23 plans complete. Milestone v1.0 finished.
 
 *Updated after each plan completion*
 
@@ -114,6 +114,7 @@ Recent decisions affecting current work:
 - [Phase 09]: buildVariantInput extracted to _shared.ts for reuse between calculation and export routers
 - [Phase 09]: JSON.parse(JSON.stringify()) for Prisma Json field casting (InputJsonValue type workaround)
 - [Phase 09]: any cast for renderToBuffer (react-pdf DocumentProps type mismatch with component wrapper)
+- [Phase 09]: Export buttons placed after view toggle with separator div for visual grouping
 
 ### Pending Todos
 
@@ -126,5 +127,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-28
-Stopped at: Completed 09-01 (PDF/Excel export pipeline). Next: 09-02 (UI export buttons).
+Stopped at: Completed 09-02 (Export UI buttons). All 9 phases and 23 plans complete. Milestone v1.0 feature-complete.
 Resume file: None
