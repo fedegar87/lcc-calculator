@@ -1,15 +1,17 @@
 import React from "react";
 import sharp from "sharp";
+import type { LCCResult } from "@/engine/types";
 
 // Dynamic import to avoid Next.js App Router blocking react-dom/server in static analysis
 async function renderToMarkup(element: React.ReactElement): Promise<string> {
   const { renderToStaticMarkup } = await import("react-dom/server");
   return renderToStaticMarkup(element);
 }
-import type { LCCResult } from "@/engine/types";
 
-// Dynamic import to avoid React.createContext call at module load time
-// (Recharts uses createContext internally, which is unavailable in RSC bundles)
+// Recharts uses React.createContext at module level, which Next.js App Router's
+// vendored RSC React does not provide. Dynamic import defers the evaluation but
+// turbopack still bundles recharts for the RSC environment.
+// TODO: migrate to a non-React SVG library (d3-based) to enable server-side charts.
 async function loadRecharts() {
   return import("recharts");
 }
