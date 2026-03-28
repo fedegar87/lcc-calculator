@@ -9,15 +9,15 @@ Requirements for local dev operativo. App must be runnable end-to-end by anyone 
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: Docker Compose provides PostgreSQL 16 with persistent volume for local development
-- [ ] **INFRA-02**: .env.example documents all required environment variables with descriptions and safe defaults
+- [x] **INFRA-01**: Docker Compose provides PostgreSQL 16 with persistent volume for local development
+- [x] **INFRA-02**: .env.example documents all required environment variables with descriptions and safe defaults
 - [ ] **INFRA-03**: README contains step-by-step setup instructions (prerequisites, clone, configure, run)
 
 ### Database
 
 - [ ] **DB-01**: Prisma migrations create all tables successfully on a fresh database
 - [ ] **DB-02**: Seed script populates demo user and 3-variant project without errors
-- [ ] **DB-03**: Prisma Client generates without errors after migration
+- [x] **DB-03**: Prisma Client generates without errors after migration
 
 ### End-to-End Verification
 
@@ -66,12 +66,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 12 | Pending |
-| INFRA-02 | Phase 12 | Pending |
+| INFRA-01 | Phase 12 | Complete |
+| INFRA-02 | Phase 12 | Complete |
 | INFRA-03 | Phase 15 | Pending |
 | DB-01 | Phase 13 | Pending |
 | DB-02 | Phase 13 | Pending |
-| DB-03 | Phase 12 | Pending |
+| DB-03 | Phase 12 | Complete |
 | E2E-01 | Phase 13 | Pending |
 | E2E-02 | Phase 14 | Pending |
 | E2E-03 | Phase 14 | Pending |
@@ -87,4 +87,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-28*
-*Last updated: 2026-03-28 after roadmap creation -- traceability complete*
+*Last updated: 2026-03-28 after Phase 12 completion -- INFRA-01, INFRA-02, DB-03 complete*
