@@ -38,7 +38,7 @@ const pctFmt = (v: number | null) =>
   v != null ? `${(v * 100).toFixed(1)}%` : "N/A";
 
 interface LCCReportProps {
-  project: { name: string; city: string | null; description: string | null };
+  project: { name: string; city: string | null };
   variant: { label: string };
   result: LCCResult;
   chartImages: { stackedBar: Buffer; costEvolution: Buffer };
@@ -75,9 +75,6 @@ export function LCCReport({
 
         {/* Project Info Summary */}
         <Text style={styles.sectionTitle}>Project Information</Text>
-        {project.description && (
-          <Text style={{ marginBottom: 4 }}>{project.description}</Text>
-        )}
         <View style={styles.table}>
           <View style={styles.tableRow}>
             <Text style={styles.tableCell}>Variant</Text>

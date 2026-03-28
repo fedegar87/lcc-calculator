@@ -44,7 +44,6 @@ const VARIANT_INCLUDE = {
       id: true,
       name: true,
       city: true,
-      description: true,
       userId: true,
       members: { select: { userId: true, role: true } },
     },
@@ -143,7 +142,6 @@ export const exportRouter = createTRPCRouter({
         project: {
           name: variant.project.name,
           city: variant.project.city,
-          description: variant.project.description,
         },
         variant: { label: input.variantLabel },
         result,
