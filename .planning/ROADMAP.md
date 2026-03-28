@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: UI Implementation** - Glass morphism wizard UI with data entry forms, results dashboard, and interactive charts (completed 2026-03-27)
 - [x] **Phase 9: Export** - PDF and Excel export with immutable ResultSnapshot creation (completed 2026-03-28)
 - [x] **Phase 10: Variant Creation UI** - Wire UI for creating VARIANT_1/VARIANT_2 via existing addVariant procedure (completed 2026-03-28)
-- [ ] **Phase 11: Test & Code Quality Cleanup** - Fix test compilation, add calculateAll, validate at API boundary, remove duplicate helpers
+- [x] **Phase 11: Test & Code Quality Cleanup** - Fix test compilation, add calculateAll, validate at API boundary, remove duplicate helpers (completed 2026-03-28)
 
 ## Phase Details
 
@@ -208,4 +208,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 8. UI Implementation | 0/? | Complete    | 2026-03-27 |
 | 9. Export | 2/2 | Complete    | 2026-03-28 |
 | 10. Variant Creation UI | 1/1 | Complete    | 2026-03-28 |
-| 11. Test & Code Quality Cleanup | 0/? | Not started | - |
+| 11. Test & Code Quality Cleanup | 0/2 | Complete    | 2026-03-28 |
