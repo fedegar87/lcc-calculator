@@ -67,6 +67,7 @@ function ProjectLayoutInner({ children }: { children: React.ReactNode }) {
         <WizardSteps projectId={projectId} currentStep={currentStep} />
       </div>
       <VariantTabs
+        projectId={projectId}
         variants={project.variants}
         activeVariantId={activeVariantId}
         onVariantChange={handleVariantChange}
