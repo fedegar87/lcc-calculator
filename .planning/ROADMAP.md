@@ -57,8 +57,8 @@
   4. `npm run build` passes with no TypeScript errors
 **Plans**: 2 plans
 Plans:
-- [ ] 16-01-PLAN.md -- Add stakeholderRole dropdown to WLC Boundary Conditions
-- [ ] 16-02-PLAN.md -- Move MaintenanceConfig from Energy form to Construction form
+- [x] 16-01-PLAN.md -- Add stakeholderRole dropdown to WLC Boundary Conditions
+- [x] 16-02-PLAN.md -- Move MaintenanceConfig from Energy form to Construction form
 
 ## Progress
 
@@ -79,7 +79,7 @@ Plans:
 | 13. Database + Smoke Test | v1.1 | 2/2 | Complete | 2026-03-28 |
 | 14. E2E Verification + Tech Debt | v1.1 | 2/2 | Complete | 2026-03-28 |
 | 15. Documentation | v1.1 | 1/1 | Complete | 2026-03-28 |
-| 16. Gap Analysis Fixes | v1.2 | 0/2 | Planned | - |
+| 16. Gap Analysis Fixes | v1.2 | 2/2 | Complete | 2026-03-28 |
 
 ---
-*Last updated: 2026-03-28 after v1.1 milestone complete*
+*Last updated: 2026-03-28 after Phase 16 complete -- v1.2 shipped*
