@@ -29,7 +29,7 @@ if not exist ".env" (
 )
 
 :: Start PostgreSQL
-echo [1/4] Starting PostgreSQL...
+echo [1/5] Starting PostgreSQL...
 docker compose up -d
 if errorlevel 1 (
     echo [ERROR] docker compose up failed. Is Docker Desktop running?
@@ -51,7 +51,7 @@ echo       PostgreSQL is ready.
 echo.
 
 :: Generate Prisma Client
-echo [2/4] Generating Prisma Client...
+echo [2/5] Generating Prisma Client...
 call npx prisma generate
 if errorlevel 1 (
     echo [ERROR] prisma generate failed.
@@ -61,17 +61,27 @@ if errorlevel 1 (
 echo.
 
 :: Run migrations
-echo [3/4] Running database migrations...
-call npx prisma migrate dev
+echo [3/5] Running database migrations...
+call npx prisma migrate deploy
 if errorlevel 1 (
-    echo [ERROR] prisma migrate dev failed.
+    echo [ERROR] prisma migrate deploy failed.
+    pause
+    exit /b 1
+)
+echo.
+
+:: Seed database
+echo [4/5] Seeding database...
+call npx prisma db seed
+if errorlevel 1 (
+    echo [ERROR] prisma db seed failed.
     pause
     exit /b 1
 )
 echo.
 
 :: Start dev server
-echo [4/4] Starting dev server...
+echo [5/5] Starting dev server...
 echo       Open http://localhost:3000 in your browser
 echo.
 call npm run dev
