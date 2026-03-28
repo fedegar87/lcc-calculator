@@ -20,12 +20,6 @@ import {
 import { LCCReport } from "@/server/export/pdf-document";
 import { buildExcelWorkbook } from "@/server/export/excel-workbook";
 
-const VARIANT_LABEL_MAP: Record<string, (typeof PrismaVariantLabel)[keyof typeof PrismaVariantLabel]> = {
-  BASE: PrismaVariantLabel.BASE,
-  VARIANT_1: PrismaVariantLabel.VARIANT_1,
-  VARIANT_2: PrismaVariantLabel.VARIANT_2,
-};
-
 function sanitizeFileName(name: string): string {
   return name
     .replace(/[^a-zA-Z0-9-]/g, "-")
@@ -68,7 +62,7 @@ const VARIANT_INCLUDE = {
 
 const inputSchema = z.object({
   projectId: z.string(),
-  variantLabel: z.string(),
+  variantLabel: z.enum(["BASE", "VARIANT_1", "VARIANT_2"]),
   formulaMode: z
     .enum(["excel_replica", "excel_bugfixed"])
     .default("excel_bugfixed"),
@@ -78,13 +72,7 @@ export const exportRouter = createTRPCRouter({
   generatePdf: protectedProcedure
     .input(inputSchema)
     .mutation(async ({ ctx, input }) => {
-      const prismaLabel = VARIANT_LABEL_MAP[input.variantLabel];
-      if (!prismaLabel) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: `Invalid variant label: ${input.variantLabel}`,
-        });
-      }
+      const prismaLabel = input.variantLabel as PrismaVariantLabel;
 
       const variant = await ctx.db.variant.findFirst({
         where: { projectId: input.projectId, label: prismaLabel },
@@ -190,13 +178,7 @@ export const exportRouter = createTRPCRouter({
   generateExcel: protectedProcedure
     .input(inputSchema)
     .mutation(async ({ ctx, input }) => {
-      const prismaLabel = VARIANT_LABEL_MAP[input.variantLabel];
-      if (!prismaLabel) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: `Invalid variant label: ${input.variantLabel}`,
-        });
-      }
+      const prismaLabel = input.variantLabel as PrismaVariantLabel;
 
       const variant = await ctx.db.variant.findFirst({
         where: { projectId: input.projectId, label: prismaLabel },
