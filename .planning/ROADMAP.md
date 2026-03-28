@@ -35,6 +35,12 @@
 - [x] **Phase 14: E2E Verification + Tech Debt** - Full user flow verification and v1.0 tech debt closure (completed 2026-03-28)
 - [x] **Phase 15: Documentation** - README with complete setup-to-run instructions (completed 2026-03-28)
 
+### v1.2 Gap Analysis Fixes
+
+**Milestone Goal:** Close confirmed gaps found during Excel workbook audit — expose missing UI for existing schema fields and fix misplaced form sections.
+
+- [ ] **Phase 16: Gap Analysis Fixes** - Add stakeholderRole dropdown to WLC form, move MaintenanceConfig from Energy to Construction form
+
 ## Phase Details
 
 ### Phase 12: Docker + Environment Setup
@@ -80,6 +86,20 @@
   3. A developer following only the README can reach a working login page without asking questions
 **Plans**: 15-01 Write README.md (wave 1)
 
+### Phase 16: Gap Analysis Fixes
+**Goal**: All confirmed UX gaps from the Excel workbook audit are closed — stakeholderRole is editable, maintenance config is on the construction page
+**Depends on**: Phase 15 (v1.1 complete)
+**Requirements**: GAP-01, GAP-02
+**Success Criteria** (what must be TRUE):
+  1. WLC form shows a "Stakeholder Role" dropdown (Owner / Tenant / Third Party) in the Boundary Conditions section, and the selection persists after page reload
+  2. MaintenanceConfig slider no longer appears on the Energy form
+  3. MaintenanceConfig slider appears on the Construction form and saves correctly via the existing `upsertMaintenanceConfig` tRPC mutation
+  4. `npm run build` passes with no TypeScript errors
+**Plans**: 2 plans
+Plans:
+- [ ] 16-01-PLAN.md -- Add stakeholderRole dropdown to WLC Boundary Conditions
+- [ ] 16-02-PLAN.md -- Move MaintenanceConfig from Energy form to Construction form
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -99,6 +119,7 @@
 | 13. Database + Smoke Test | 2/2 | Complete    | 2026-03-28 | - |
 | 14. E2E Verification + Tech Debt | v1.1 | 2/2 | Complete | 2026-03-28 |
 | 15. Documentation | v1.1 | 1/1 | Complete | 2026-03-28 |
+| 16. Gap Analysis Fixes | v1.2 | 0/2 | Planned | - |
 
 ---
 *Last updated: 2026-03-28 after Phase 15 complete -- v1.1 shipped*
