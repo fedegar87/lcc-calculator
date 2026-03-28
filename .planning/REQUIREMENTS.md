@@ -66,25 +66,25 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | - | Pending |
-| INFRA-02 | - | Pending |
-| INFRA-03 | - | Pending |
-| DB-01 | - | Pending |
-| DB-02 | - | Pending |
-| DB-03 | - | Pending |
-| E2E-01 | - | Pending |
-| E2E-02 | - | Pending |
-| E2E-03 | - | Pending |
-| E2E-04 | - | Pending |
-| E2E-05 | - | Pending |
-| DEBT-01 | - | Pending |
-| DEBT-02 | - | Pending |
+| INFRA-01 | Phase 12 | Pending |
+| INFRA-02 | Phase 12 | Pending |
+| INFRA-03 | Phase 15 | Pending |
+| DB-01 | Phase 13 | Pending |
+| DB-02 | Phase 13 | Pending |
+| DB-03 | Phase 12 | Pending |
+| E2E-01 | Phase 13 | Pending |
+| E2E-02 | Phase 14 | Pending |
+| E2E-03 | Phase 14 | Pending |
+| E2E-04 | Phase 14 | Pending |
+| E2E-05 | Phase 13 | Pending |
+| DEBT-01 | Phase 14 | Pending |
+| DEBT-02 | Phase 14 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 13 total
-- Mapped to phases: 0
-- Unmapped: 13
+- Mapped to phases: 13
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-28*
-*Last updated: 2026-03-28 after initial definition*
+*Last updated: 2026-03-28 after roadmap creation -- traceability complete*
