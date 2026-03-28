@@ -15,17 +15,17 @@ Requirements for local dev operativo. App must be runnable end-to-end by anyone 
 
 ### Database
 
-- [ ] **DB-01**: Prisma migrations create all tables successfully on a fresh database
-- [ ] **DB-02**: Seed script populates demo user and 3-variant project without errors
+- [x] **DB-01**: Prisma migrations create all tables successfully on a fresh database
+- [x] **DB-02**: Seed script populates demo user and 3-variant project without errors
 - [x] **DB-03**: Prisma Client generates without errors after migration
 
 ### End-to-End Verification
 
-- [ ] **E2E-01**: `npm run dev` starts the application without errors on a fresh setup
+- [x] **E2E-01**: `npm run dev` starts the application without errors on a fresh setup
 - [ ] **E2E-02**: User can register a new account, log in, and log out
 - [ ] **E2E-03**: User can create a project, enter data across all 4 input steps, and view calculated results
 - [ ] **E2E-04**: User can export PDF and Excel reports that download successfully
-- [ ] **E2E-05**: All 152+ engine tests pass (`npm test`)
+- [x] **E2E-05**: All 152+ engine tests pass (`npm test`)
 
 ### Tech Debt
 
@@ -69,14 +69,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-01 | Phase 12 | Complete |
 | INFRA-02 | Phase 12 | Complete |
 | INFRA-03 | Phase 15 | Pending |
-| DB-01 | Phase 13 | Pending |
-| DB-02 | Phase 13 | Pending |
+| DB-01 | Phase 13 | Complete |
+| DB-02 | Phase 13 | Complete |
 | DB-03 | Phase 12 | Complete |
-| E2E-01 | Phase 13 | Pending |
+| E2E-01 | Phase 13 | Complete |
 | E2E-02 | Phase 14 | Pending |
 | E2E-03 | Phase 14 | Pending |
 | E2E-04 | Phase 14 | Pending |
-| E2E-05 | Phase 13 | Pending |
+| E2E-05 | Phase 13 | Complete |
 | DEBT-01 | Phase 14 | Pending |
 | DEBT-02 | Phase 14 | Pending |
 
@@ -87,4 +87,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-28*
-*Last updated: 2026-03-28 after Phase 12 completion -- INFRA-01, INFRA-02, DB-03 complete*
+*Last updated: 2026-03-28 after Phase 13 completion -- DB-01, DB-02, E2E-01, E2E-05 complete*
