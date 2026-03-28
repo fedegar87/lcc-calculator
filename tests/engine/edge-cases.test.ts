@@ -85,9 +85,110 @@ describe('Edge case: no service components', () => {
 describe('Edge case: no income data', () => {
   it('income is null when incomeInput missing', () => {
     const input = baseInput();
-    delete (input as Record<string, unknown>).incomeInput;
+    delete (input as unknown as Record<string, unknown>).incomeInput;
     const result = calculateLCC(input, BUGFIXED_CONFIG);
     expect(result.income).toBeNull();
+  });
+});
+
+describe('Edge case: referencePeriod = 100', () => {
+  const result = calculateLCC(
+    inputWith({ referencePeriod: 100 }),
+    BUGFIXED_CONFIG,
+  );
+
+  it('arrays have length 101', () => {
+    expect(result.heatingCosts.nominal).toHaveLength(101);
+    expect(result.maintenanceElements).toHaveLength(101);
+  });
+
+  it('LCC is non-negative', () => {
+    expect(result.lcc).toBeGreaterThanOrEqual(0);
+  });
+
+  it('all values are finite', () => {
+    expect(Number.isFinite(result.lcc)).toBe(true);
+    expect(Number.isFinite(result.wlc)).toBe(true);
+  });
+});
+
+describe('Edge case: 0% interest rate and inflation rate', () => {
+  const result = calculateLCC(
+    inputWith({ interestRate: 0, inflationRate: 0 }),
+    BUGFIXED_CONFIG,
+  );
+
+  it('does not crash', () => {
+    expect(result.lcc).toBeDefined();
+  });
+
+  it('real interest rate is finite', () => {
+    expect(Number.isFinite(result.realInterestRate)).toBe(true);
+  });
+
+  it('LCC is non-negative', () => {
+    expect(result.lcc).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Edge case: single cost item only', () => {
+  const result = calculateLCC(
+    inputWith({
+      costItems: [
+        { category: 'A1_ROOFS', materialCost: 10000, laborCost: 5000, otherCost: 0 },
+      ],
+      serviceComponents: [],
+      energyInputs: [],
+      designCosts: [],
+    }),
+    BUGFIXED_CONFIG,
+  );
+
+  it('totalConstruction reflects single item', () => {
+    expect(result.totalConstruction).toBeGreaterThan(0);
+  });
+
+  it('LCC is non-negative', () => {
+    expect(result.lcc).toBeGreaterThanOrEqual(0);
+  });
+
+  it('all values are finite', () => {
+    expect(Number.isFinite(result.lcc)).toBe(true);
+    expect(Number.isFinite(result.totalConstruction)).toBe(true);
+  });
+});
+
+describe('Edge case: zero investment cost (KPI division)', () => {
+  const result = calculateLCC(
+    inputWith({
+      costItems: [],
+      serviceComponents: [],
+      designCosts: [],
+      wlcInput: {
+        landCost: 0,
+        enablingCosts: 0,
+        planningFees: 0,
+        userSupportPropMgmt: 0,
+        userSupportCharges: 0,
+        userSupportAdmin: 0,
+        financeCost: 0,
+        designCostsTotal: 0,
+        siteManagementCostsTotal: 0,
+      },
+    }),
+    BUGFIXED_CONFIG,
+  );
+
+  it('KPI ratios are null (no investment cost)', () => {
+    expect(result.kpiDesignOverLCC).toBeNull();
+    expect(result.kpiConstructionOverLCC).toBeNull();
+    expect(result.kpiLaborOverLCC).toBeNull();
+    expect(result.kpiOMOverLCC).toBeNull();
+  });
+
+  it('does not crash', () => {
+    expect(result).toBeDefined();
+    expect(Number.isFinite(result.lcc)).toBe(true);
   });
 });
 
