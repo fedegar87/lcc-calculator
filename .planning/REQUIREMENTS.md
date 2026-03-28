@@ -22,15 +22,15 @@ Requirements for local dev operativo. App must be runnable end-to-end by anyone 
 ### End-to-End Verification
 
 - [x] **E2E-01**: `npm run dev` starts the application without errors on a fresh setup
-- [ ] **E2E-02**: User can register a new account, log in, and log out
-- [ ] **E2E-03**: User can create a project, enter data across all 4 input steps, and view calculated results
-- [ ] **E2E-04**: User can export PDF and Excel reports that download successfully
+- [x] **E2E-02**: User can register a new account, log in, and log out
+- [x] **E2E-03**: User can create a project, enter data across all 4 input steps, and view calculated results
+- [ ] **E2E-04**: User can export PDF and Excel reports that download successfully *(BLOCKED: Recharts/RSC incompatibility)*
 - [x] **E2E-05**: All 152+ engine tests pass (`npm test`)
 
 ### Tech Debt
 
-- [ ] **DEBT-01**: Orphaned tRPC procedures documented as future API surface (project.delete, addMember, removeMember, costItem.delete, batchUpsert)
-- [ ] **DEBT-02**: Export variantLabel input uses z.enum() with compile-time type narrowing
+- [x] **DEBT-01**: Orphaned tRPC procedures documented as future API surface (project.delete, addMember, removeMember, costItem.delete, batchUpsert)
+- [x] **DEBT-02**: Export variantLabel input uses z.enum() with compile-time type narrowing
 
 ## v2 Requirements
 
@@ -73,12 +73,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DB-02 | Phase 13 | Complete |
 | DB-03 | Phase 12 | Complete |
 | E2E-01 | Phase 13 | Complete |
-| E2E-02 | Phase 14 | Pending |
-| E2E-03 | Phase 14 | Pending |
-| E2E-04 | Phase 14 | Pending |
+| E2E-02 | Phase 14 | Complete |
+| E2E-03 | Phase 14 | Complete |
+| E2E-04 | Phase 14 | Blocked (Recharts/RSC) |
 | E2E-05 | Phase 13 | Complete |
-| DEBT-01 | Phase 14 | Pending |
-| DEBT-02 | Phase 14 | Pending |
+| DEBT-01 | Phase 14 | Complete |
+| DEBT-02 | Phase 14 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 13 total
@@ -87,4 +87,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-28*
-*Last updated: 2026-03-28 after Phase 13 completion -- DB-01, DB-02, E2E-01, E2E-05 complete*
+*Last updated: 2026-03-28 after Phase 14 -- E2E-02, E2E-03, DEBT-01, DEBT-02 complete; E2E-04 blocked*

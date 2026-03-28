@@ -32,7 +32,7 @@
 
 - [x] **Phase 12: Docker + Environment Setup** - Docker Compose for PostgreSQL and environment configuration (completed 2026-03-28)
 - [x] **Phase 13: Database + Smoke Test** - Migrations, seed data, dev server startup, engine tests pass (completed 2026-03-28)
-- [ ] **Phase 14: E2E Verification + Tech Debt** - Full user flow verification and v1.0 tech debt closure
+- [x] **Phase 14: E2E Verification + Tech Debt** - Full user flow verification and v1.0 tech debt closure (completed 2026-03-28)
 - [ ] **Phase 15: Documentation** - README with complete setup-to-run instructions
 
 ## Phase Details
@@ -68,7 +68,7 @@
   3. User can download PDF and Excel exports from the Results page
   4. Orphaned tRPC procedures (project.delete, addMember, removeMember, costItem.delete, batchUpsert) are documented as future API surface
   5. Export variantLabel input uses z.enum() with compile-time type narrowing instead of z.string()
-**Plans**: TBD
+**Plans**: 14-01 Tech Debt Closure (wave 1), 14-02 E2E Verification (wave 2)
 
 ### Phase 15: Documentation
 **Goal**: New developer can go from git clone to running app by following README instructions alone
@@ -97,7 +97,7 @@
 | 11. Test & Code Quality Cleanup | v1.0 | 2/2 | Complete | 2026-03-28 |
 | 12. Docker + Environment Setup | 2/2 | Complete    | 2026-03-28 | - |
 | 13. Database + Smoke Test | 2/2 | Complete    | 2026-03-28 | - |
-| 14. E2E Verification + Tech Debt | v1.1 | 0/? | Not started | - |
+| 14. E2E Verification + Tech Debt | v1.1 | 2/2 | Complete | 2026-03-28 |
 | 15. Documentation | v1.1 | 0/? | Not started | - |
 
 ---
