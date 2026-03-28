@@ -91,7 +91,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **UI-02**: Inter font loaded via next/font/google (weights 300-700)
 - [x] **UI-03**: Responsive sidebar with project list and user menu
 - [x] **UI-04**: 5-step wizard navigation (Info, WLC, Construction, Energy, Results)
-- [ ] **UI-05**: Variant tabs (Base, Variant 1, Variant 2) with data indicator
+- [x] **UI-05**: Variant tabs (Base, Variant 1, Variant 2) with data indicator
 - [x] **UI-06**: Custom components: GlassCard, InfoTooltip, SliderInput, KPICard
 - [x] **UI-07**: Framer Motion animations with prefers-reduced-motion respect
 
@@ -217,7 +217,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-02 | Phase 8 | Complete |
 | UI-03 | Phase 8 | Complete |
 | UI-04 | Phase 8 | Complete |
-| UI-05 | Phase 10 | Pending |
+| UI-05 | Phase 10 | Complete |
 | UI-06 | Phase 8 | Complete |
 | UI-07 | Phase 8 | Complete |
 | UI-08 | Phase 8 | Complete |
@@ -239,8 +239,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 - v1 requirements: 62 total
-- Complete: 58
-- Pending (gap closure): 4 (UI-05, TEST-05, API-05, DATA-09)
+- Complete: 59
+- Pending (gap closure): 3 (TEST-05, API-05, DATA-09)
 - Mapped to phases: 62
 - Unmapped: 0
 
