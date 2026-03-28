@@ -116,9 +116,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Export
 
-- [ ] **EXPORT-01**: PDF report with project info, tables, charts, KPIs, engine metadata
-- [ ] **EXPORT-02**: Excel workbook with 5 sheets (values only, no formulas)
-- [ ] **EXPORT-03**: Every export creates immutable ResultSnapshot with engine version and input hash
+- [x] **EXPORT-01**: PDF report with project info, tables, charts, KPIs, engine metadata
+- [x] **EXPORT-02**: Excel workbook with 5 sheets (values only, no formulas)
+- [x] **EXPORT-03**: Every export creates immutable ResultSnapshot with engine version and input hash
 
 ## v2 Requirements
 
@@ -233,9 +233,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-18 | Phase 8 | Complete |
 | UI-19 | Phase 8 | Complete |
 | UI-20 | Phase 8 | Complete |
-| EXPORT-01 | Phase 9 | Pending |
-| EXPORT-02 | Phase 9 | Pending |
-| EXPORT-03 | Phase 9 | Pending |
+| EXPORT-01 | Phase 9 | Complete |
+| EXPORT-02 | Phase 9 | Complete |
+| EXPORT-03 | Phase 9 | Complete |
 
 **Coverage:**
 - v1 requirements: 62 total

@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-27T19:02:36.601Z"
+status: in_progress
+last_updated: "2026-03-28T06:53:41Z"
 progress:
-  total_phases: 8
-  completed_phases: 6
-  total_plans: 21
-  completed_plans: 15
+  total_phases: 9
+  completed_phases: 8
+  total_plans: 23
+  completed_plans: 22
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Accurate, standards-compliant LCC calculations that replicate verified Excel workbook behavior while fixing known bugs and adding residual value + income analysis.
-**Current focus:** Phase 8 - UI Implementation COMPLETE. All 5 wizard steps built. Next: Phase 9 - Export
+**Current focus:** Phase 9 - Export. Plan 01 complete (PDF/Excel pipeline). Plan 02 next (UI export buttons).
 
 ## Current Position
 
-Phase: 8 of 9 (UI Implementation -- COMPLETE)
-Plan: 5 of 5 in current phase (08-01 through 08-05 complete)
-Status: In Progress (Phase 9 next)
-Last activity: 2026-03-27 -- Results dashboard & charts
+Phase: 9 of 9 (Export)
+Plan: 1 of 2 in current phase (09-01 complete)
+Status: In Progress
+Last activity: 2026-03-28 -- Export pipeline (PDF, Excel, snapshots)
 
-Progress: [████████████████████] 100%
+Progress: [████████████████████] 96%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
+- Total plans completed: 22
 - Average duration: 7 min
-- Total execution time: 2.3 hours
+- Total execution time: 2.4 hours
 
 **By Phase:**
 
@@ -48,10 +48,11 @@ Progress: [████████████████████] 100%
 | 06-database-seed | 1 | 5 min | 5 min |
 | 07-trpc-api-authentication | 3/3 | 16 min | 5 min |
 | 08-ui-implementation | 5/5 | 65 min | 13 min |
+| 09-export | 1/2 | 7 min | 7 min |
 
 **Recent Trend:**
-- Last 5 plans: 9 min, 18 min, 9 min, 14 min, 6 min
-- Trend: Phase 8 complete, all UI wizard steps built
+- Last 5 plans: 18 min, 9 min, 14 min, 6 min, 7 min
+- Trend: Phase 9 export pipeline complete, UI buttons next
 
 *Updated after each plan completion*
 
@@ -109,6 +110,10 @@ Recent decisions affecting current work:
 - [Phase 08]: Vertical BarChart layout for single-bar LCC stacked chart (horizontal bars for readability)
 - [Phase 08]: useQueries for parallel variant calculation in comparison view
 - [Phase 08]: Dashboard/Compare toggle buttons (not tabs) for results page view switching
+- [Phase 09]: Hex colors for chart SVG rendering (sharp librsvg may not support oklch)
+- [Phase 09]: buildVariantInput extracted to _shared.ts for reuse between calculation and export routers
+- [Phase 09]: JSON.parse(JSON.stringify()) for Prisma Json field casting (InputJsonValue type workaround)
+- [Phase 09]: any cast for renderToBuffer (react-pdf DocumentProps type mismatch with component wrapper)
 
 ### Pending Todos
 
@@ -120,6 +125,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27
-Stopped at: Completed 08-05 (results dashboard & charts). Phase 08 complete. Next: Phase 09 - Export.
+Last session: 2026-03-28
+Stopped at: Completed 09-01 (PDF/Excel export pipeline). Next: 09-02 (UI export buttons).
 Resume file: None

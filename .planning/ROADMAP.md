@@ -160,10 +160,11 @@ Plans:
   1. PDF report contains project info, result tables, chart representations, KPI summary, and engine metadata (version, formula mode)
   2. Excel workbook contains 5 sheets with computed values (no formulas), structured for offline review
   3. Every export creates an immutable ResultSnapshot record with engine version, formula mode, and input hash for reproducibility
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 09-01: TBD
+- [ ] 09-01-PLAN.md -- Snapshot service, chart renderer, PDF document, Excel workbook, export router mutations
+- [ ] 09-02-PLAN.md -- Export buttons in results page, download utility, loading states, toast feedback
 
 ## Progress
 
@@ -180,4 +181,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 6. Database Seed | 1/1 | Complete | 2026-03-26 |
 | 7. tRPC API & Authentication | 0/? | Not started | - |
 | 8. UI Implementation | 0/? | Complete    | 2026-03-27 |
-| 9. Export | 0/? | Not started | - |
+| 9. Export | 0/2 | Not started | - |
