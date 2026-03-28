@@ -53,6 +53,9 @@ const stagger = {
 export function VariantComparison({ projectId: _projectId, variants }: VariantComparisonProps) {
   const trpc = useTRPC();
 
+  // API-05: Batch calculation uses parallel useQueries instead of a dedicated
+  // calculateAll endpoint. With max 3 variants (BASE + VARIANT_1 + VARIANT_2),
+  // parallel individual queries are simpler and equally performant.
   const results = useQueries({
     queries: variants.map((v) =>
       trpc.calculation.calculate.queryOptions({ variantId: v.id })
