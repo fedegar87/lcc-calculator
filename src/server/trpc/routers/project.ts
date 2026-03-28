@@ -140,7 +140,7 @@ export const projectRouter = createTRPCRouter({
       });
     }),
 
-  // 5. Delete project (creator or EDITOR)
+  /** @future -- Reserved for project deletion UI. Not wired to any client route in v1.0/v1.1. */
   delete: protectedProcedure
     .input(z.object({ projectId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -169,7 +169,7 @@ export const projectRouter = createTRPCRouter({
       return { success: true };
     }),
 
-  // 6. Add member (OWNER only = creator)
+  /** @future -- Reserved for team collaboration UI. Not wired to any client route in v1.0/v1.1. */
   addMember: protectedProcedure
     .input(
       z.object({
@@ -223,7 +223,7 @@ export const projectRouter = createTRPCRouter({
       });
     }),
 
-  // 7. Remove member (OWNER only = creator)
+  /** @future -- Reserved for team collaboration UI. Not wired to any client route in v1.0/v1.1. */
   removeMember: protectedProcedure
     .input(z.object({ projectId: z.string(), memberId: z.string() }))
     .mutation(async ({ ctx, input }) => {

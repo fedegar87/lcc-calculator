@@ -195,7 +195,7 @@ export const costItemRouter = createTRPCRouter({
       });
     }),
 
-  // 3. Delete cost item
+  /** @future -- Reserved for cost item deletion UI. Not wired to any client route in v1.0/v1.1. */
   delete: protectedProcedure
     .input(z.object({ costItemId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -285,7 +285,7 @@ export const costItemRouter = createTRPCRouter({
       return { success: true };
     }),
 
-  // 6. Batch upsert cost items with details
+  /** @future -- Reserved for bulk import/paste UI. Not wired to any client route in v1.0/v1.1. */
   batchUpsert: protectedProcedure
     .input(
       z.object({
