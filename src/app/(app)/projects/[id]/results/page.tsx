@@ -2,12 +2,20 @@
 
 import { useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { ResultsDashboard } from "@/components/results/results-dashboard";
 import { VariantComparison } from "@/components/results/variant-comparison";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart3, GitCompare } from "lucide-react";
+import {
+  BarChart3,
+  GitCompare,
+  FileText,
+  FileSpreadsheet,
+  Loader2,
+} from "lucide-react";
+import { toast } from "sonner";
+import { downloadBase64File } from "@/lib/download";
 
 export default function ResultsPage() {
   const params = useParams<{ id: string }>();
@@ -22,6 +30,33 @@ export default function ResultsPage() {
   );
 
   const variantId = searchParams.get("v") ?? project?.variants[0]?.id ?? "";
+
+  const activeVariant = project?.variants.find((v) => v.id === variantId);
+  const variantLabel = activeVariant?.label ?? "BASE";
+
+  const pdfMutation = useMutation(
+    trpc.export.generatePdf.mutationOptions({
+      onSuccess: (data) => {
+        downloadBase64File(data.data, data.fileName, data.mimeType);
+        toast.success("PDF exported successfully");
+      },
+      onError: (error) => {
+        toast.error(error.message || "Export failed");
+      },
+    })
+  );
+
+  const excelMutation = useMutation(
+    trpc.export.generateExcel.mutationOptions({
+      onSuccess: (data) => {
+        downloadBase64File(data.data, data.fileName, data.mimeType);
+        toast.success("Excel exported successfully");
+      },
+      onError: (error) => {
+        toast.error(error.message || "Export failed");
+      },
+    })
+  );
 
   if (!variantId || !project) {
     return (
@@ -72,6 +107,38 @@ export default function ResultsPage() {
             Compare Variants
           </button>
         )}
+
+        <div className="mx-2 h-5 w-px bg-border" />
+
+        <button
+          onClick={() =>
+            pdfMutation.mutate({ projectId, variantLabel })
+          }
+          disabled={pdfMutation.isPending || !variantId}
+          className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+        >
+          {pdfMutation.isPending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <FileText className="size-4" />
+          )}
+          Export PDF
+        </button>
+
+        <button
+          onClick={() =>
+            excelMutation.mutate({ projectId, variantLabel })
+          }
+          disabled={excelMutation.isPending || !variantId}
+          className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+        >
+          {excelMutation.isPending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <FileSpreadsheet className="size-4" />
+          )}
+          Export Excel
+        </button>
       </div>
 
       {view === "dashboard" ? (
