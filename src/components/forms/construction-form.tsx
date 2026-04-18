@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { useSaveStatus } from "@/hooks/use-save-status";
 import { useAutosave } from "@/hooks/use-autosave";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { GlassCard } from "@/components/shared/glass-card";
 import { InfoTooltip } from "@/components/shared/info-tooltip";
 import { SliderInput } from "@/components/shared/slider-input";
@@ -66,9 +67,6 @@ interface CategoryDef {
   group: string;
 }
 
-// Categories that support service components (B and C groups)
-const SERVICE_COMPONENT_GROUPS = new Set(["Building Services", "Renewable Energy"]);
-
 // -- Maintenance Config Schema --
 
 const maintenanceSchema = z.object({
@@ -93,10 +91,93 @@ interface DetailRowProps {
 }
 
 function DetailRow({ detail, onUpdate, onDelete }: DetailRowProps) {
+  const isMobile = useIsMobile();
   const resolvedCost = Math.max(
     detail.materialCost,
     detail.unitPrice * detail.area
   );
+
+  if (isMobile) {
+    return (
+      <div className="space-y-3 rounded-xl border bg-muted/15 p-4">
+        <Input
+          defaultValue={detail.description ?? ""}
+          placeholder="Description"
+          className="h-9 text-sm"
+          onBlur={(e) => onUpdate("description", e.target.value)}
+        />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <NumericFormat
+            value={detail.area}
+            onValueChange={(v) => onUpdate("area", v.floatValue ?? 0)}
+            decimalScale={2}
+            placeholder="Area (m2)"
+            customInput={Input}
+            className="h-9 text-sm"
+          />
+          <NumericFormat
+            value={detail.unitPrice}
+            onValueChange={(v) => onUpdate("unitPrice", v.floatValue ?? 0)}
+            thousandSeparator=","
+            decimalScale={2}
+            fixedDecimalScale
+            placeholder="Unit price"
+            customInput={Input}
+            className="h-9 text-sm"
+          />
+          <NumericFormat
+            value={detail.materialCost}
+            onValueChange={(v) => onUpdate("materialCost", v.floatValue ?? 0)}
+            thousandSeparator=","
+            decimalScale={2}
+            fixedDecimalScale
+            placeholder="Material"
+            customInput={Input}
+            className="h-9 text-sm"
+          />
+          <NumericFormat
+            value={detail.laborCost}
+            onValueChange={(v) => onUpdate("laborCost", v.floatValue ?? 0)}
+            thousandSeparator=","
+            decimalScale={2}
+            fixedDecimalScale
+            placeholder="Labor"
+            customInput={Input}
+            className="h-9 text-sm"
+          />
+          <NumericFormat
+            value={detail.otherCost}
+            onValueChange={(v) => onUpdate("otherCost", v.floatValue ?? 0)}
+            thousandSeparator=","
+            decimalScale={2}
+            fixedDecimalScale
+            placeholder="Other"
+            customInput={Input}
+            className="h-9 text-sm"
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">
+            Resolved = max(material, unit price x area)
+          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium tabular-nums">
+              {formatCurrency(resolvedCost)}
+            </span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+              onClick={onDelete}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-[1fr_80px_100px_100px_100px_100px_80px_32px] items-center gap-2 py-1.5">
@@ -179,6 +260,56 @@ function ServiceComponentRow({
   onUpdate,
   onDelete,
 }: ServiceComponentRowProps) {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <div className="space-y-3 rounded-xl border border-dashed p-4">
+        <div className="space-y-1">
+          <Label className="text-xs">Name</Label>
+          <Input
+            defaultValue={component.name}
+            placeholder="Component name"
+            className="h-9 text-sm"
+            onBlur={(e) => onUpdate("name", e.target.value)}
+          />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Construction cost</Label>
+          <NumericFormat
+            value={component.constructionCost}
+            onValueChange={(v) =>
+              onUpdate("constructionCost", v.floatValue ?? 0)
+            }
+            thousandSeparator=","
+            decimalScale={2}
+            fixedDecimalScale
+            customInput={Input}
+            className="h-9 text-sm"
+          />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">EN 15459 component</Label>
+          <EN15459Combobox
+            value={component.en15459ComponentIndex}
+            onChange={(idx) => onUpdate("en15459ComponentIndex", idx)}
+          />
+        </div>
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+            onClick={onDelete}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-[1fr_140px_1fr_32px] items-start gap-3 rounded-md border border-dashed p-3">
       <div className="space-y-1">
@@ -229,9 +360,6 @@ function ServiceComponentRow({
 interface CategoryItemProps {
   category: CategoryDef;
   costItem: CostItem | undefined;
-  serviceComponents: ServiceComponent[];
-  showServiceComponents: boolean;
-  variantId: string;
   onDetailUpdate: (
     costItemId: string,
     detailId: string,
@@ -240,27 +368,16 @@ interface CategoryItemProps {
   ) => void;
   onDetailDelete: (costItemId: string, detailId: string) => void;
   onDetailAdd: (category: string) => void;
-  onServiceComponentUpdate: (
-    componentId: string,
-    field: string,
-    value: number | string
-  ) => void;
-  onServiceComponentDelete: (componentId: string) => void;
-  onServiceComponentAdd: (category: string) => void;
 }
 
 function CategoryItem({
   category,
   costItem,
-  serviceComponents,
-  showServiceComponents,
   onDetailUpdate,
   onDetailDelete,
   onDetailAdd,
-  onServiceComponentUpdate,
-  onServiceComponentDelete,
-  onServiceComponentAdd,
 }: CategoryItemProps) {
+  const isMobile = useIsMobile();
   const total = costItem
     ? costItem.materialCostAgg + costItem.laborCostAgg + costItem.otherCostAgg
     : 0;
@@ -279,7 +396,7 @@ function CategoryItem({
       </AccordionTrigger>
       <AccordionContent className="px-2">
         {/* Detail row headers */}
-        {(costItem?.details?.length ?? 0) > 0 && (
+        {!isMobile && (costItem?.details?.length ?? 0) > 0 && (
           <div className="grid grid-cols-[1fr_80px_100px_100px_100px_100px_80px_32px] gap-2 border-b pb-1 text-xs font-medium text-muted-foreground">
             <span>Description</span>
             <span>Area (m2)</span>
@@ -314,36 +431,68 @@ function CategoryItem({
           <Plus className="mr-1.5 h-3.5 w-3.5" />
           Add Detail
         </Button>
-
-        {/* Service components for B/C categories */}
-        {showServiceComponents && (
-          <div className="mt-4 space-y-3 border-t pt-4">
-            <h4 className="text-sm font-medium text-muted-foreground">
-              Service Components
-            </h4>
-            {serviceComponents.map((sc) => (
-              <ServiceComponentRow
-                key={sc.id}
-                component={sc}
-                onUpdate={(field, value) =>
-                  onServiceComponentUpdate(sc.id, field, value)
-                }
-                onDelete={() => onServiceComponentDelete(sc.id)}
-              />
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onServiceComponentAdd(category.value)}
-            >
-              <Plus className="mr-1.5 h-3.5 w-3.5" />
-              Add Service Component
-            </Button>
-          </div>
-        )}
       </AccordionContent>
     </AccordionItem>
+  );
+}
+
+function ServiceComponentsSection({
+  serviceComponents,
+  onServiceComponentUpdate,
+  onServiceComponentDelete,
+  onServiceComponentAdd,
+}: {
+  serviceComponents: ServiceComponent[];
+  onServiceComponentUpdate: (
+    componentId: string,
+    field: string,
+    value: number | string
+  ) => void;
+  onServiceComponentDelete: (componentId: string) => void;
+  onServiceComponentAdd: () => void;
+}) {
+  return (
+    <GlassCard>
+      <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5">
+            <h2 className="text-lg font-semibold">
+              Service components and replacements
+            </h2>
+            <InfoTooltip content="These EN 15459 components are variant-level maintenance and replacement drivers. Add them once per variant, not once per construction category." />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Use this list for plant and renewable systems with lifespans and
+            maintenance percentages from EN 15459.
+          </p>
+        </div>
+        <Button type="button" variant="outline" size="sm" onClick={onServiceComponentAdd}>
+          <Plus className="mr-1.5 h-3.5 w-3.5" />
+          Add Service Component
+        </Button>
+      </div>
+
+      {serviceComponents.length > 0 ? (
+        <div className="space-y-3">
+          {serviceComponents.map((component) => (
+            <ServiceComponentRow
+              key={component.id}
+              component={component}
+              onUpdate={(field, value) =>
+                onServiceComponentUpdate(component.id, field, value)
+              }
+              onDelete={() => onServiceComponentDelete(component.id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-xl border border-dashed bg-muted/20 p-4 text-sm text-muted-foreground">
+          No EN 15459 service components yet. Add boilers, chillers, PV systems,
+          ventilation units, or other replaceable services here so the results
+          include replacement cycles and maintenance.
+        </div>
+      )}
+    </GlassCard>
   );
 }
 
@@ -562,7 +711,7 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
   );
 
   const handleServiceComponentAdd = useCallback(
-    (_category: string) => {
+    () => {
       upsertServiceComponent.mutate({
         variantId,
         name: "New component",
@@ -600,6 +749,23 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
     "Furnishings",
     "Outdoor",
   ];
+  const pricedCategoryCount = costItems.filter((costItem) => {
+    const detailTotal =
+      (costItem.details ?? []).reduce((sum, detail) => {
+        return (
+          sum +
+          Math.max(detail.materialCost, detail.unitPrice * detail.area) +
+          detail.laborCost +
+          detail.otherCost
+        );
+      }, 0) ?? 0;
+
+    return detailTotal > 0;
+  }).length;
+  const detailCount = costItems.reduce(
+    (sum, costItem) => sum + (costItem.details?.length ?? 0),
+    0
+  );
 
   if (costItemsPending) {
     return (
@@ -613,6 +779,60 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
 
   return (
     <div className="space-y-6">
+      <GlassCard>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <div>
+            <h2 className="text-lg font-semibold">Construction cost detail</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Work category by category. Add one or more detail rows where you
+              need an auditable trail, and keep EN 15459 replacement components
+              in the dedicated section below.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-xl border bg-muted/20 p-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Priced categories
+                </div>
+                <div className="mt-1 text-2xl font-semibold tabular-nums">
+                  {pricedCategoryCount}/{categories.length}
+                </div>
+              </div>
+              <div className="rounded-xl border bg-muted/20 p-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Detail rows
+                </div>
+                <div className="mt-1 text-2xl font-semibold tabular-nums">
+                  {detailCount}
+                </div>
+              </div>
+              <div className="rounded-xl border bg-muted/20 p-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                  EN 15459 components
+                </div>
+                <div className="mt-1 text-2xl font-semibold tabular-nums">
+                  {serviceComponents.length}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-xl border bg-muted/25 p-4">
+            <div className="flex items-center gap-1.5">
+              <h3 className="text-sm font-semibold">Cost resolution rule</h3>
+              <InfoTooltip content="The engine uses the larger of material cost or unit price multiplied by area, then adds labor and other costs. This note makes the rule visible while you edit." />
+            </div>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Resolved cost = `max(material, unit price x area) + labor + other`
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              If you only know a lump-sum material value, enter that. If you
+              know area and unit price, the resolved check will flag the higher
+              value automatically.
+            </p>
+          </div>
+        </div>
+      </GlassCard>
+
       {GROUP_ORDER.map((groupName) => {
         const groupCategories = groups[groupName];
         if (!groupCategories?.length) return null;
@@ -625,31 +845,15 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
                 const costItem = costItems.find(
                   (ci) => ci.category === cat.value
                 );
-                const catServiceComponents = serviceComponents.filter(
-                  (_sc) => true // service components are variant-level
-                );
-                const showSC = SERVICE_COMPONENT_GROUPS.has(groupName);
 
                 return (
                   <CategoryItem
                     key={cat.value}
                     category={cat}
                     costItem={costItem}
-                    serviceComponents={
-                      showSC ? catServiceComponents : []
-                    }
-                    showServiceComponents={showSC}
-                    variantId={variantId}
                     onDetailUpdate={handleDetailUpdate}
                     onDetailDelete={handleDetailDelete}
                     onDetailAdd={handleDetailAdd}
-                    onServiceComponentUpdate={
-                      handleServiceComponentUpdate
-                    }
-                    onServiceComponentDelete={
-                      handleServiceComponentDelete
-                    }
-                    onServiceComponentAdd={handleServiceComponentAdd}
                   />
                 );
               })}
@@ -657,6 +861,12 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
           </GlassCard>
         );
       })}
+      <ServiceComponentsSection
+        serviceComponents={serviceComponents}
+        onServiceComponentUpdate={handleServiceComponentUpdate}
+        onServiceComponentDelete={handleServiceComponentDelete}
+        onServiceComponentAdd={handleServiceComponentAdd}
+      />
       {variant && (
         <MaintenanceConfigSection variant={variant} variantId={variantId} />
       )}

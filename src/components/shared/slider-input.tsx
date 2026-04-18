@@ -49,6 +49,7 @@ export function SliderInput<T extends FieldValues>({
             min={min}
             max={max}
             step={step}
+            aria-label={label}
           />
         </div>
       )}

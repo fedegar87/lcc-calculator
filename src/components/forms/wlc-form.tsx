@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,9 @@ import { useAutosave } from "@/hooks/use-autosave";
 import { GlassCard } from "@/components/shared/glass-card";
 import { SliderInput } from "@/components/shared/slider-input";
 import { CurrencyInput } from "@/components/forms/shared/currency-input";
+import { NumberInput } from "@/components/forms/shared/number-input";
 import { PercentInput } from "@/components/forms/shared/percent-input";
+import { InfoTooltip } from "@/components/shared/info-tooltip";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -32,6 +34,7 @@ import {
 } from "@/components/ui/table";
 import { Plus, Trash2 } from "lucide-react";
 import { NumericFormat } from "react-number-format";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // -- Schemas --
 
@@ -88,6 +91,32 @@ const designCostsSchema = z.object({
 });
 
 type DesignCostsValues = z.infer<typeof designCostsSchema>;
+
+const STAKEHOLDER_ROLE_OPTIONS = [
+  {
+    value: "1",
+    label: "Owner",
+    help: "Use when the investor and building owner carry the capital and replacement costs.",
+  },
+  {
+    value: "2",
+    label: "Tenant",
+    help: "Use when recurring charges and rent matter more than initial investment.",
+  },
+  {
+    value: "3",
+    label: "Third Party",
+    help: "Use for ESCO or external operator cases where costs and benefits are split.",
+  },
+] as const;
+
+function formatPercent(value: number) {
+  return `${(value * 100).toFixed(2)}%`;
+}
+
+function computeRealRate(nominalRate: number, inflationRate: number) {
+  return (1 + nominalRate) / (1 + inflationRate) - 1;
+}
 
 // -- Component --
 
@@ -173,54 +202,118 @@ function BoundaryConditionSection({
   );
 
   useAutosave({ control: form.control, onSave });
+  const interestRate = form.watch("interestRate");
+  const inflationRate = form.watch("inflationRate");
+  const stakeholderRole = form.watch("stakeholderRole");
+  const derivedRealRate = useMemo(
+    () => computeRealRate(interestRate ?? 0, inflationRate ?? 0),
+    [inflationRate, interestRate]
+  );
+  const selectedStakeholder = STAKEHOLDER_ROLE_OPTIONS.find(
+    (option) => Number(option.value) === stakeholderRole
+  );
 
   return (
     <GlassCard>
-      <h2 className="mb-4 text-lg font-semibold">Boundary Conditions</h2>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="sm:col-span-2 lg:col-span-3">
-          <SliderInput
-            name="referencePeriod"
+      <div className="mb-4 space-y-1">
+        <h2 className="text-lg font-semibold">Boundary conditions</h2>
+        <p className="text-sm text-muted-foreground">
+          Set the discounting logic first. These values control how costs are
+          escalated, discounted, and compared across the full reference period.
+        </p>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="sm:col-span-2 lg:col-span-3">
+            <SliderInput
+              name="referencePeriod"
+              control={form.control}
+              label="Reference Period"
+              min={1}
+              max={100}
+              step={1}
+              unit="years"
+              tooltip="Study period for the LCC calculation under ISO 15686-5."
+            />
+          </div>
+          <PercentInput
+            name="interestRate"
             control={form.control}
-            label="Reference Period"
-            min={1}
-            max={100}
-            step={1}
-            unit="years"
-            tooltip="Study period for LCC calculation (ISO 15686-5)"
+            label="Nominal Interest Rate"
+            hint="Enter the loan or financing rate before inflation is removed."
           />
+          <PercentInput
+            name="inflationRate"
+            control={form.control}
+            label="Inflation Rate"
+            hint="The app derives the real discount rate used in cost actualization."
+          />
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5">
+              <Label>Stakeholder Role</Label>
+              <InfoTooltip content="Choose the perspective that owns the cash flows in this study. This clarifies which costs and benefits matter when you interpret the result." />
+            </div>
+            <Controller
+              name="stakeholderRole"
+              control={form.control}
+              render={({ field: { value, onChange } }) => (
+                <Select
+                  value={value != null ? String(value) : ""}
+                  onValueChange={(v) => onChange(v ? Number(v) : null)}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select role..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STAKEHOLDER_ROLE_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {selectedStakeholder ? (
+              <p className="text-xs text-muted-foreground">
+                {selectedStakeholder.help}
+              </p>
+            ) : null}
+          </div>
         </div>
-        <PercentInput
-          name="interestRate"
-          control={form.control}
-          label="Nominal Interest Rate"
-        />
-        <PercentInput
-          name="inflationRate"
-          control={form.control}
-          label="Inflation Rate"
-        />
-        <div>
-          <Label>Stakeholder Role</Label>
-          <Controller
-            name="stakeholderRole"
-            control={form.control}
-            render={({ field: { value, onChange } }) => (
-              <Select
-                value={value != null ? String(value) : ""}
-                onValueChange={(v) => onChange(v ? Number(v) : null)}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Select role..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Owner</SelectItem>
-                  <SelectItem value="2">Tenant</SelectItem>
-                  <SelectItem value="3">Third Party</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
+
+        <div className="rounded-2xl border bg-muted/30 p-4">
+          <div className="flex items-center gap-1.5">
+            <h3 className="text-sm font-semibold">Discounting preview</h3>
+            <InfoTooltip content="The calculation engine works with a real discount rate. It is derived from the nominal rate and inflation rate so you do not need to calculate it manually." />
+          </div>
+          <div className="mt-4 space-y-4">
+            <div className="rounded-xl border bg-background p-3">
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                Derived real rate
+              </div>
+              <div className="mt-1 text-2xl font-semibold tabular-nums">
+                {formatPercent(derivedRealRate)}
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Computed as `(1 + nominal) / (1 + inflation) - 1`.
+              </p>
+            </div>
+
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>
+                Nominal rate is what you pay or expect before inflation.
+                Inflation is removed to derive the real rate used for
+                discounting future costs.
+              </p>
+              <p>
+                Energy costs still escalate with their own annual increase. The
+                result here only controls how future values are discounted back
+                to present value.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </GlassCard>
@@ -236,12 +329,17 @@ function EnergyPricesSection({
 }: {
   variant: {
     boundaryCondition: Record<string, unknown> | null;
+    energyInputs: Array<{
+      endUse: string;
+      energySourceIndex: number;
+    }>;
   };
   variantId: string;
   energySources: Array<{ index: number; name: string; category: string }>;
 }) {
   const trpc = useTRPC();
   const upsertBC = useMutation(trpc.variant.upsertBoundaryCondition.mutationOptions());
+  const [showAllSources, setShowAllSources] = useState(false);
 
   // Parse existing energy prices from boundary condition JSON
   const existingPrices = (variant.boundaryCondition?.energyPrices ?? []) as Array<{
@@ -261,6 +359,23 @@ function EnergyPricesSection({
       annualIncrease: existing?.annualIncrease ?? 0,
     };
   });
+  const selectableSources = energySources.filter((source) => source.index !== 1);
+  const activeSourceIndices = new Set(
+    variant.energyInputs
+      .map((input) => input.energySourceIndex)
+      .filter((index) => index > 1)
+  );
+  const prioritizedSources = selectableSources.filter((source) =>
+    activeSourceIndices.has(source.index)
+  );
+  const visibleSources =
+    showAllSources || prioritizedSources.length === 0
+      ? selectableSources
+      : prioritizedSources;
+  const visibleSourceIndexSet = new Set(
+    visibleSources.map((source) => source.index)
+  );
+  const hiddenSourceCount = selectableSources.length - visibleSources.length;
 
   const form = useForm<EnergyPricesValues>({
     resolver: zodResolver(energyPricesSchema),
@@ -282,7 +397,30 @@ function EnergyPricesSection({
 
   return (
     <GlassCard>
-      <h2 className="mb-4 text-lg font-semibold">Energy Prices</h2>
+      <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5">
+            <h2 className="text-lg font-semibold">Energy prices</h2>
+            <InfoTooltip content="Only sources already used in this variant are shown first. Expand the full list when you want to preload alternative price assumptions before changing the energy systems." />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Active sources come from the Energy step. Each row stores the
+            current price and its annual escalation.
+          </p>
+        </div>
+        {hiddenSourceCount > 0 ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAllSources((current) => !current)}
+          >
+            {showAllSources
+              ? "Show active sources only"
+              : `Show all ${selectableSources.length} sources`}
+          </Button>
+        ) : null}
+      </div>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
@@ -293,53 +431,68 @@ function EnergyPricesSection({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {defaultPrices.map((_, i) => (
-              <TableRow key={energySources[i].index}>
-                <TableCell className="font-medium text-sm">
-                  {energySources[i].name}
-                </TableCell>
-                <TableCell>
-                  <Controller
-                    name={`prices.${i}.pricePerKwh`}
-                    control={form.control}
-                    render={({ field: { onChange, value, ref, ...field } }) => (
-                      <NumericFormat
-                        {...field}
-                        getInputRef={ref}
-                        value={value as number}
-                        onValueChange={(vals) => onChange(vals.floatValue ?? 0)}
-                        decimalScale={4}
-                        fixedDecimalScale
-                        thousandSeparator=","
-                        customInput={Input}
-                        className="h-8 w-28"
-                      />
-                    )}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Controller
-                    name={`prices.${i}.annualIncrease`}
-                    control={form.control}
-                    render={({ field: { onChange, value, ref, ...field } }) => (
-                      <NumericFormat
-                        {...field}
-                        getInputRef={ref}
-                        value={typeof value === "number" ? value * 100 : 0}
-                        onValueChange={(vals) => {
-                          const v = vals.floatValue;
-                          onChange(v != null ? v / 100 : 0);
-                        }}
-                        decimalScale={2}
-                        suffix=" %"
-                        customInput={Input}
-                        className="h-8 w-28"
-                      />
-                    )}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
+            {defaultPrices.map((row, i) => {
+              if (!visibleSourceIndexSet.has(row.index)) {
+                return null;
+              }
+
+              const isActive = activeSourceIndices.has(row.index);
+
+              return (
+                <TableRow key={row.index}>
+                  <TableCell className="font-medium text-sm">
+                    <div className="flex items-center gap-2">
+                      <span>{row.name}</span>
+                      {isActive ? (
+                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                          Used in this variant
+                        </span>
+                      ) : null}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Controller
+                      name={`prices.${i}.pricePerKwh`}
+                      control={form.control}
+                      render={({ field: { onChange, value, ref, ...field } }) => (
+                        <NumericFormat
+                          {...field}
+                          getInputRef={ref}
+                          value={value as number}
+                          onValueChange={(vals) => onChange(vals.floatValue ?? 0)}
+                          decimalScale={4}
+                          fixedDecimalScale
+                          thousandSeparator=","
+                          customInput={Input}
+                          className="h-8 w-32"
+                        />
+                      )}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Controller
+                      name={`prices.${i}.annualIncrease`}
+                      control={form.control}
+                      render={({ field: { onChange, value, ref, ...field } }) => (
+                        <NumericFormat
+                          {...field}
+                          getInputRef={ref}
+                          value={typeof value === "number" ? value * 100 : 0}
+                          onValueChange={(vals) => {
+                            const v = vals.floatValue;
+                            onChange(v != null ? v / 100 : 0);
+                          }}
+                          decimalScale={2}
+                          suffix=" %"
+                          customInput={Input}
+                          className="h-8 w-28"
+                        />
+                      )}
+                    />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
@@ -362,6 +515,18 @@ function NonConstructionSection({
   const upsertWLC = useMutation(trpc.variant.upsertWLCInput.mutationOptions());
   const w = variant.wlcInput;
   const n = (key: string) => (w?.[key] as number) ?? 0;
+  const [showOptional, setShowOptional] = useState(
+    Boolean(
+      n("enablingCost1") ||
+        n("enablingCost2") ||
+        n("planningFees1") ||
+        n("planningFees2") ||
+        n("userSupportPropMgmt") ||
+        n("userSupportCharges") ||
+        n("userSupportAdmin") ||
+        n("financeCost")
+    )
+  );
 
   const form = useForm<WLCInputValues>({
     resolver: zodResolver(wlcInputSchema),
@@ -393,16 +558,49 @@ function NonConstructionSection({
 
   return (
     <GlassCard>
-      <h2 className="mb-4 text-lg font-semibold">Non-Construction Costs</h2>
+      <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-1">
+          <h2 className="text-lg font-semibold">Non-construction costs</h2>
+          <p className="text-sm text-muted-foreground">
+            Start with land assumptions. Enable the optional rows only when your
+            study needs enabling, planning, user-support, or finance costs.
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setShowOptional((current) => !current)}
+        >
+          {showOptional ? "Hide optional costs" : "Show optional costs"}
+        </Button>
+      </div>
       <div className="space-y-6">
         <div>
-          <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-            Land
-          </h3>
+          <div className="mb-2 flex items-center gap-1.5">
+            <h3 className="text-sm font-medium text-muted-foreground">Land</h3>
+            <InfoTooltip content="These inputs capture site-related assumptions before design, construction, and operation are combined into WLC." />
+          </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <CurrencyInput name="landArea" control={form.control} label="Land Area (m2)" />
-            <CurrencyInput name="buildingIndex" control={form.control} label="Building Index" />
-            <CurrencyInput name="floorHeight" control={form.control} label="Floor Height (m)" />
+            <NumberInput
+              name="landArea"
+              control={form.control}
+              label="Land Area"
+              suffix=" m2"
+            />
+            <NumberInput
+              name="buildingIndex"
+              control={form.control}
+              label="Building Index"
+              decimalScale={3}
+              hint="Use the site-specific building index or floor area ratio."
+            />
+            <NumberInput
+              name="floorHeight"
+              control={form.control}
+              label="Floor Height"
+              suffix=" m"
+            />
             <CurrencyInput
               name="landPrice"
               control={form.control}
@@ -411,45 +609,86 @@ function NonConstructionSection({
           </div>
         </div>
 
-        <div>
-          <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-            Enabling Costs
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <CurrencyInput name="enablingCost1" control={form.control} label="Enabling Cost 1" />
-            <CurrencyInput name="enablingCost2" control={form.control} label="Enabling Cost 2" />
-          </div>
-        </div>
+        {showOptional ? (
+          <>
+            <div>
+              <h3 className="mb-2 text-sm font-medium text-muted-foreground">
+                Enabling costs
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <CurrencyInput
+                  name="enablingCost1"
+                  control={form.control}
+                  label="Enabling Cost 1"
+                />
+                <CurrencyInput
+                  name="enablingCost2"
+                  control={form.control}
+                  label="Enabling Cost 2"
+                />
+              </div>
+            </div>
 
-        <div>
-          <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-            Planning Fees
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <CurrencyInput name="planningFees1" control={form.control} label="Planning Fees 1" />
-            <CurrencyInput name="planningFees2" control={form.control} label="Planning Fees 2" />
-          </div>
-        </div>
+            <div>
+              <h3 className="mb-2 text-sm font-medium text-muted-foreground">
+                Planning fees
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <CurrencyInput
+                  name="planningFees1"
+                  control={form.control}
+                  label="Planning Fee 1"
+                />
+                <CurrencyInput
+                  name="planningFees2"
+                  control={form.control}
+                  label="Planning Fee 2"
+                />
+              </div>
+            </div>
 
-        <div>
-          <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-            User Support
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <CurrencyInput name="userSupportPropMgmt" control={form.control} label="Property Management" />
-            <CurrencyInput name="userSupportCharges" control={form.control} label="Charges" />
-            <CurrencyInput name="userSupportAdmin" control={form.control} label="Administration" />
-          </div>
-        </div>
+            <div>
+              <h3 className="mb-2 text-sm font-medium text-muted-foreground">
+                User support
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <CurrencyInput
+                  name="userSupportPropMgmt"
+                  control={form.control}
+                  label="Property Management"
+                />
+                <CurrencyInput
+                  name="userSupportCharges"
+                  control={form.control}
+                  label="Charges"
+                />
+                <CurrencyInput
+                  name="userSupportAdmin"
+                  control={form.control}
+                  label="Administration"
+                />
+              </div>
+            </div>
 
-        <div>
-          <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-            Finance
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <CurrencyInput name="financeCost" control={form.control} label="Finance Cost" />
+            <div>
+              <h3 className="mb-2 text-sm font-medium text-muted-foreground">
+                Finance
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <CurrencyInput
+                  name="financeCost"
+                  control={form.control}
+                  label="Finance Cost"
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="rounded-xl border border-dashed bg-muted/20 p-4 text-sm text-muted-foreground">
+            Optional non-construction costs are hidden. Enable them if the study
+            must include planning, administration, or finance assumptions.
           </div>
-        </div>
+        )}
       </div>
     </GlassCard>
   );
@@ -468,6 +707,7 @@ function DesignCostsSection({
 }) {
   const trpc = useTRPC();
   const upsertDesignCosts = useMutation(trpc.variant.upsertDesignCosts.mutationOptions());
+  const isMobile = useIsMobile();
 
   const defaultCosts = variant.designCosts.length > 0
     ? variant.designCosts.map((dc) => ({
@@ -529,39 +769,45 @@ function DesignCostsSection({
   return (
     <GlassCard>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Design Costs</h2>
+        <div>
+          <h2 className="text-lg font-semibold">Design costs</h2>
+          <p className="text-sm text-muted-foreground">
+            Add only the lines that matter for this variant. Leave the rest at
+            zero.
+          </p>
+        </div>
         <Button type="button" variant="outline" size="sm" onClick={addRow}>
           <Plus className="mr-1 h-4 w-4" />
           Add Line
         </Button>
       </div>
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">#</TableHead>
-              <TableHead className="min-w-[160px]">Description</TableHead>
-              <TableHead>Preliminary</TableHead>
-              <TableHead>Definitive</TableHead>
-              <TableHead>Executive</TableHead>
-              <TableHead>Site Mgmt</TableHead>
-              <TableHead className="w-12" />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {fields.map((field, i) => (
-              <TableRow key={field.id}>
-                <TableCell className="text-center text-sm text-muted-foreground">
-                  {form.watch(`costs.${i}.lineNumber`)}
-                </TableCell>
-                <TableCell>
-                  <Input
-                    {...form.register(`costs.${i}.description`)}
-                    className="h-8"
-                    placeholder="Description"
-                  />
-                </TableCell>
-                <TableCell>
+      {isMobile ? (
+        <div className="space-y-3">
+          {fields.map((field, i) => (
+            <div key={field.id} className="rounded-xl border bg-muted/20 p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <div className="text-sm font-medium">
+                  Line {form.watch(`costs.${i}.lineNumber`)}
+                </div>
+                {fields.length > 1 ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    onClick={() => remove(i)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                ) : null}
+              </div>
+              <div className="grid gap-3">
+                <Input
+                  {...form.register(`costs.${i}.description`)}
+                  className="h-9"
+                  placeholder="Description"
+                />
+                <div className="grid gap-3 sm:grid-cols-2">
                   <Controller
                     name={`costs.${i}.preliminaryCost`}
                     control={form.control}
@@ -575,12 +821,10 @@ function DesignCostsSection({
                         decimalScale={2}
                         fixedDecimalScale
                         customInput={Input}
-                        className="h-8 w-28"
+                        placeholder="Preliminary"
                       />
                     )}
                   />
-                </TableCell>
-                <TableCell>
                   <Controller
                     name={`costs.${i}.definitiveCost`}
                     control={form.control}
@@ -594,12 +838,10 @@ function DesignCostsSection({
                         decimalScale={2}
                         fixedDecimalScale
                         customInput={Input}
-                        className="h-8 w-28"
+                        placeholder="Definitive"
                       />
                     )}
                   />
-                </TableCell>
-                <TableCell>
                   <Controller
                     name={`costs.${i}.executiveCost`}
                     control={form.control}
@@ -613,12 +855,10 @@ function DesignCostsSection({
                         decimalScale={2}
                         fixedDecimalScale
                         customInput={Input}
-                        className="h-8 w-28"
+                        placeholder="Executive"
                       />
                     )}
                   />
-                </TableCell>
-                <TableCell>
                   <Controller
                     name={`costs.${i}.siteManagementCost`}
                     control={form.control}
@@ -632,29 +872,137 @@ function DesignCostsSection({
                         decimalScale={2}
                         fixedDecimalScale
                         customInput={Input}
-                        className="h-8 w-28"
+                        placeholder="Site management"
                       />
                     )}
                   />
-                </TableCell>
-                <TableCell>
-                  {fields.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                      onClick={() => remove(i)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </TableCell>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">#</TableHead>
+                <TableHead className="min-w-[160px]">Description</TableHead>
+                <TableHead>Preliminary</TableHead>
+                <TableHead>Definitive</TableHead>
+                <TableHead>Executive</TableHead>
+                <TableHead>Site Mgmt</TableHead>
+                <TableHead className="w-12" />
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {fields.map((field, i) => (
+                <TableRow key={field.id}>
+                  <TableCell className="text-center text-sm text-muted-foreground">
+                    {form.watch(`costs.${i}.lineNumber`)}
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      {...form.register(`costs.${i}.description`)}
+                      className="h-8"
+                      placeholder="Description"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Controller
+                      name={`costs.${i}.preliminaryCost`}
+                      control={form.control}
+                      render={({ field: { onChange, value, ref, ...rest } }) => (
+                        <NumericFormat
+                          {...rest}
+                          getInputRef={ref}
+                          value={value as number}
+                          onValueChange={(vals) => onChange(vals.floatValue ?? 0)}
+                          thousandSeparator=","
+                          decimalScale={2}
+                          fixedDecimalScale
+                          customInput={Input}
+                          className="h-8 w-28"
+                        />
+                      )}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Controller
+                      name={`costs.${i}.definitiveCost`}
+                      control={form.control}
+                      render={({ field: { onChange, value, ref, ...rest } }) => (
+                        <NumericFormat
+                          {...rest}
+                          getInputRef={ref}
+                          value={value as number}
+                          onValueChange={(vals) => onChange(vals.floatValue ?? 0)}
+                          thousandSeparator=","
+                          decimalScale={2}
+                          fixedDecimalScale
+                          customInput={Input}
+                          className="h-8 w-28"
+                        />
+                      )}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Controller
+                      name={`costs.${i}.executiveCost`}
+                      control={form.control}
+                      render={({ field: { onChange, value, ref, ...rest } }) => (
+                        <NumericFormat
+                          {...rest}
+                          getInputRef={ref}
+                          value={value as number}
+                          onValueChange={(vals) => onChange(vals.floatValue ?? 0)}
+                          thousandSeparator=","
+                          decimalScale={2}
+                          fixedDecimalScale
+                          customInput={Input}
+                          className="h-8 w-28"
+                        />
+                      )}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Controller
+                      name={`costs.${i}.siteManagementCost`}
+                      control={form.control}
+                      render={({ field: { onChange, value, ref, ...rest } }) => (
+                        <NumericFormat
+                          {...rest}
+                          getInputRef={ref}
+                          value={value as number}
+                          onValueChange={(vals) => onChange(vals.floatValue ?? 0)}
+                          thousandSeparator=","
+                          decimalScale={2}
+                          fixedDecimalScale
+                          customInput={Input}
+                          className="h-8 w-28"
+                        />
+                      )}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {fields.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        onClick={() => remove(i)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </GlassCard>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Controller, type Control, type FieldValues, type Path } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ interface PercentInputProps<T extends FieldValues> {
   control: Control<T>;
   label: string;
   placeholder?: string;
+  hint?: string;
 }
 
 export function PercentInput<T extends FieldValues>({
@@ -18,7 +20,10 @@ export function PercentInput<T extends FieldValues>({
   control,
   label,
   placeholder,
+  hint,
 }: PercentInputProps<T>) {
+  const [helperText, setHelperText] = useState<string | null>(null);
+
   return (
     <Controller
       name={name}
@@ -30,18 +35,51 @@ export function PercentInput<T extends FieldValues>({
             {...field}
             getInputRef={ref}
             id={name}
-            // Value stored as decimal (e.g. 0.0151), displayed as percentage (1.51%)
             value={typeof value === "number" ? value * 100 : undefined}
             onValueChange={(vals) => {
+              const rawValue = vals.value ?? "";
               const displayVal = vals.floatValue;
-              onChange(displayVal != null ? displayVal / 100 : 0);
+
+              if (displayVal == null) {
+                setHelperText(null);
+                onChange(0);
+                return;
+              }
+
+              let nextValue = displayVal / 100;
+              let nextHelper: string | null = null;
+
+              if (
+                rawValue.includes(".") &&
+                Math.abs(displayVal) <= 1
+              ) {
+                nextValue = displayVal;
+                nextHelper = `Interpreted ${rawValue} as ${(displayVal * 100).toFixed(2)}%.`;
+              } else if (Math.abs(displayVal) > 100) {
+                nextHelper =
+                  "This looks larger than 100%. Review the value before leaving the field.";
+              }
+
+              setHelperText(nextHelper);
+              onChange(nextValue);
             }}
             decimalScale={4}
             suffix=" %"
             placeholder={placeholder}
             customInput={Input}
             className={cn(fieldState.invalid && "border-destructive")}
+            aria-describedby={
+              helperText || hint ? `${name}-help` : undefined
+            }
           />
+          {(helperText || hint) && !fieldState.error && (
+            <p
+              id={`${name}-help`}
+              className="text-xs text-muted-foreground"
+            >
+              {helperText ?? hint}
+            </p>
+          )}
           {fieldState.error && (
             <p className="text-sm text-destructive">{fieldState.error.message}</p>
           )}

@@ -10,10 +10,12 @@ import { CostEvolutionLine } from "@/components/results/charts/cost-evolution-li
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import * as motion from "motion/react-client";
+import type { LCCResult } from "@/engine/types";
 
 interface ResultsDashboardProps {
   variantId: string;
   projectId: string;
+  resultOverride?: LCCResult | null;
 }
 
 function ResultsSkeleton() {
@@ -52,16 +54,22 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 1,
 });
 
-export function ResultsDashboard({ variantId, projectId: _projectId }: ResultsDashboardProps) {
+export function ResultsDashboard({
+  variantId,
+  projectId: _projectId,
+  resultOverride,
+}: ResultsDashboardProps) {
   const trpc = useTRPC();
 
-  const { data: result, isPending, error, refetch } = useQuery(
-    trpc.calculation.calculate.queryOptions({ variantId })
-  );
+  const { data, isPending, error, refetch } = useQuery({
+    ...trpc.calculation.calculate.queryOptions({ variantId }),
+    enabled: !resultOverride,
+  });
+  const result = resultOverride ?? data;
 
-  if (isPending) return <ResultsSkeleton />;
+  if (!resultOverride && isPending) return <ResultsSkeleton />;
 
-  if (error) {
+  if (!resultOverride && error) {
     return (
       <GlassCard className="flex flex-col items-center gap-4 py-12">
         <AlertCircle className="size-10 text-destructive" />

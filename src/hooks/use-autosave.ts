@@ -20,6 +20,7 @@ export function useAutosave<T extends FieldValues>({
 }: UseAutosaveOptions<T>): { status: SaveStatus } {
   const values = useWatch({ control });
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const prevRef = useRef<string>("");
   const statusRef = useRef<SaveStatus>("idle");
   const { setStatus } = useSaveStatus();
@@ -41,6 +42,7 @@ export function useAutosave<T extends FieldValues>({
     prevRef.current = serialized;
 
     clearTimeout(timerRef.current);
+    clearTimeout(resetTimerRef.current);
     timerRef.current = setTimeout(() => {
       statusRef.current = "saving";
       setStatus("saving");
@@ -49,6 +51,10 @@ export function useAutosave<T extends FieldValues>({
         .then(() => {
           statusRef.current = "saved";
           setStatus("saved");
+          resetTimerRef.current = setTimeout(() => {
+            statusRef.current = "idle";
+            setStatus("idle");
+          }, 2000);
         })
         .catch(() => {
           statusRef.current = "failed";
@@ -56,7 +62,10 @@ export function useAutosave<T extends FieldValues>({
         });
     }, debounceMs);
 
-    return () => clearTimeout(timerRef.current);
+    return () => {
+      clearTimeout(timerRef.current);
+      clearTimeout(resetTimerRef.current);
+    };
   }, [values, enabled, debounceMs, onSave, setStatus]);
 
   return { status: statusRef.current };

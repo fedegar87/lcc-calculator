@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { Button } from "@/components/ui/button";
+import { InfoTooltip } from "@/components/shared/info-tooltip";
 import {
   Popover,
   PopoverContent,
@@ -35,6 +36,12 @@ export function EN15459Combobox({ value, onChange }: EN15459ComboboxProps) {
 
   return (
     <div className="space-y-1.5">
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground">
+          Search the EN 15459 reference list
+        </span>
+        <InfoTooltip content="The selected component contributes both a typical lifespan and an annual maintenance percentage. Those values drive replacement cycles and maintenance costs in the LCC result." />
+      </div>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           render={
@@ -80,11 +87,12 @@ export function EN15459Combobox({ value, onChange }: EN15459ComboboxProps) {
       </Popover>
 
       {selected && (
-        <div className="flex gap-3 text-xs text-muted-foreground">
+        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
           <span>Lifespan: {selected.lifespanAvg} yr</span>
           {selected.maintenancePctAvg != null && (
             <span>Maintenance: {selected.maintenancePctAvg}%</span>
           )}
+          <span>Used for replacement and maintenance cost cycles.</span>
         </div>
       )}
     </div>

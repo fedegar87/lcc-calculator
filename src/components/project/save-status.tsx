@@ -36,8 +36,15 @@ export function SaveStatusBadge({ status }: { status: SaveStatus }) {
     STATUS_CONFIG[status];
 
   return (
-    <Badge variant={variant} className={className}>
+    <Badge
+      variant={variant}
+      className={className}
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       <Icon className={cn("mr-1 h-3 w-3", iconClassName)} />
+      <span className="sr-only">Autosave status:</span>
       {label}
     </Badge>
   );

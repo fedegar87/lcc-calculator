@@ -293,4 +293,226 @@ export const projectRouter = createTRPCRouter({
         select: { id: true, label: true, description: true },
       });
     }),
+
+  cloneVariant: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        label: z.enum(VARIANT_LABELS),
+        sourceVariantId: z.string(),
+        description: z.string().optional(),
+      }),
+    )
+    .use(requireProjectRole("OWNER", "EDITOR"))
+    .mutation(async ({ ctx, input }) => {
+      const existing = await ctx.db.variant.findUnique({
+        where: {
+          projectId_label: {
+            projectId: input.projectId,
+            label: input.label,
+          },
+        },
+      });
+      if (existing) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: `Variant ${input.label} already exists for this project`,
+        });
+      }
+
+      const sourceVariant = await ctx.db.variant.findUnique({
+        where: { id: input.sourceVariantId },
+        include: {
+          geometry: true,
+          boundaryCondition: true,
+          energyInputs: true,
+          costItems: {
+            include: {
+              details: {
+                orderBy: { layerOrder: "asc" },
+              },
+            },
+          },
+          serviceComponents: {
+            orderBy: { id: "asc" },
+          },
+          wlcInput: true,
+          designCosts: {
+            orderBy: { lineNumber: "asc" },
+          },
+          incomeInput: true,
+          maintenanceConfig: true,
+        },
+      });
+
+      if (!sourceVariant || sourceVariant.projectId !== input.projectId) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Source variant not found in this project",
+        });
+      }
+
+      return ctx.db.variant.create({
+        data: {
+          projectId: input.projectId,
+          label: input.label,
+          description: input.description,
+          geometry: {
+            create: sourceVariant.geometry
+              ? {
+                  grossFloorArea: sourceVariant.geometry.grossFloorArea,
+                  netFloorArea: sourceVariant.geometry.netFloorArea,
+                  grossVolume: sourceVariant.geometry.grossVolume,
+                  netVolume: sourceVariant.geometry.netVolume,
+                  unheatedGFA: sourceVariant.geometry.unheatedGFA,
+                  unheatedNFA: sourceVariant.geometry.unheatedNFA,
+                  unheatedGrossVol: sourceVariant.geometry.unheatedGrossVol,
+                  unheatedNetVol: sourceVariant.geometry.unheatedNetVol,
+                  balconiesArea: sourceVariant.geometry.balconiesArea,
+                  otherSurfacesArea: sourceVariant.geometry.otherSurfacesArea,
+                  treatedFloorArea: sourceVariant.geometry.treatedFloorArea,
+                  windowArea: sourceVariant.geometry.windowArea,
+                  totalThermalEnvelope: sourceVariant.geometry.totalThermalEnvelope,
+                  avgUvalueOpaque: sourceVariant.geometry.avgUvalueOpaque,
+                  avgUvalueGlazing: sourceVariant.geometry.avgUvalueGlazing,
+                  avgHeatRecovery: sourceVariant.geometry.avgHeatRecovery,
+                  airTightness: sourceVariant.geometry.airTightness,
+                  pvInstalledCapacity: sourceVariant.geometry.pvInstalledCapacity,
+                  manualDesignConstructionCost:
+                    sourceVariant.geometry.manualDesignConstructionCost,
+                }
+              : {},
+          },
+          boundaryCondition: {
+            create:
+              sourceVariant.boundaryCondition
+                ? {
+                    stakeholderRole: sourceVariant.boundaryCondition.stakeholderRole,
+                    referencePeriod: sourceVariant.boundaryCondition.referencePeriod,
+                    interestRate: sourceVariant.boundaryCondition.interestRate,
+                    inflationRate: sourceVariant.boundaryCondition.inflationRate,
+                    energyPrices: Array.isArray(
+                      sourceVariant.boundaryCondition.energyPrices,
+                    )
+                      ? sourceVariant.boundaryCondition.energyPrices
+                      : [],
+                  }
+                : {},
+          },
+          maintenanceConfig: {
+            create:
+              sourceVariant.maintenanceConfig
+                ? {
+                    buildingElementMaintenancePercent:
+                      sourceVariant.maintenanceConfig
+                        .buildingElementMaintenancePercent,
+                  }
+                : {},
+          },
+          energyInputs:
+            sourceVariant.energyInputs.length > 0
+              ? {
+                  create: sourceVariant.energyInputs.map((entry) => ({
+                    endUse: entry.endUse,
+                    energySourceIndex: entry.energySourceIndex,
+                    specificConsumption: entry.specificConsumption,
+                    pvProductionKwh: entry.pvProductionKwh,
+                  })),
+                }
+              : undefined,
+          costItems:
+            sourceVariant.costItems.length > 0
+              ? {
+                  create: sourceVariant.costItems.map((item) => ({
+                    category: item.category,
+                    subcategory: item.subcategory,
+                    description: item.description,
+                    materialCostAgg: item.materialCostAgg,
+                    laborCostAgg: item.laborCostAgg,
+                    otherCostAgg: item.otherCostAgg,
+                    details:
+                      item.details.length > 0
+                        ? {
+                            create: item.details.map((detail) => ({
+                              layerOrder: detail.layerOrder,
+                              description: detail.description,
+                              area: detail.area,
+                              materialCost: detail.materialCost,
+                              unitPrice: detail.unitPrice,
+                              laborCost: detail.laborCost,
+                              otherCost: detail.otherCost,
+                            })),
+                          }
+                        : undefined,
+                  })),
+                }
+              : undefined,
+          serviceComponents:
+            sourceVariant.serviceComponents.length > 0
+              ? {
+                  create: sourceVariant.serviceComponents.map((component) => ({
+                    name: component.name,
+                    constructionCost: component.constructionCost,
+                    en15459ComponentIndex: component.en15459ComponentIndex,
+                  })),
+                }
+              : undefined,
+          wlcInput: sourceVariant.wlcInput
+            ? {
+                create: {
+                  landArea: sourceVariant.wlcInput.landArea,
+                  buildingIndex: sourceVariant.wlcInput.buildingIndex,
+                  floorHeight: sourceVariant.wlcInput.floorHeight,
+                  landPrice: sourceVariant.wlcInput.landPrice,
+                  enablingCost1: sourceVariant.wlcInput.enablingCost1,
+                  enablingCost2: sourceVariant.wlcInput.enablingCost2,
+                  planningFees1: sourceVariant.wlcInput.planningFees1,
+                  planningFees2: sourceVariant.wlcInput.planningFees2,
+                  userSupportPropMgmt:
+                    sourceVariant.wlcInput.userSupportPropMgmt,
+                  userSupportCharges: sourceVariant.wlcInput.userSupportCharges,
+                  userSupportAdmin: sourceVariant.wlcInput.userSupportAdmin,
+                  financeCost: sourceVariant.wlcInput.financeCost,
+                },
+              }
+            : undefined,
+          designCosts:
+            sourceVariant.designCosts.length > 0
+              ? {
+                  create: sourceVariant.designCosts.map((cost) => ({
+                    lineNumber: cost.lineNumber,
+                    description: cost.description,
+                    preliminaryCost: cost.preliminaryCost,
+                    definitiveCost: cost.definitiveCost,
+                    executiveCost: cost.executiveCost,
+                    siteManagementCost: cost.siteManagementCost,
+                  })),
+                }
+              : undefined,
+          incomeInput: sourceVariant.incomeInput
+            ? {
+                create: {
+                  rent1MonthlyPerM2: sourceVariant.incomeInput.rent1MonthlyPerM2,
+                  rent1Area: sourceVariant.incomeInput.rent1Area,
+                  rent1Taxes: sourceVariant.incomeInput.rent1Taxes,
+                  rent2MonthlyPerM2: sourceVariant.incomeInput.rent2MonthlyPerM2,
+                  rent2Area: sourceVariant.incomeInput.rent2Area,
+                  rent2Taxes: sourceVariant.incomeInput.rent2Taxes,
+                  rent3MonthlyPerM2: sourceVariant.incomeInput.rent3MonthlyPerM2,
+                  rent3Area: sourceVariant.incomeInput.rent3Area,
+                  rent3Taxes: sourceVariant.incomeInput.rent3Taxes,
+                  otherIncome1: sourceVariant.incomeInput.otherIncome1,
+                  otherIncome1Taxes: sourceVariant.incomeInput.otherIncome1Taxes,
+                  otherIncome2: sourceVariant.incomeInput.otherIncome2,
+                  otherIncome2Taxes: sourceVariant.incomeInput.otherIncome2Taxes,
+                  otherIncome3: sourceVariant.incomeInput.otherIncome3,
+                  otherIncome3Taxes: sourceVariant.incomeInput.otherIncome3Taxes,
+                  expectedPricePerM2: sourceVariant.incomeInput.expectedPricePerM2,
+                },
+              }
+            : undefined,
+        },
+        select: { id: true, label: true, description: true },
+      });
+    }),
 });

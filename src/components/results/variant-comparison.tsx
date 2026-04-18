@@ -80,13 +80,74 @@ export function VariantComparison({ projectId: _projectId, variants }: VariantCo
     }
   }
 
+  const comparisonWinners = [
+    {
+      metric: "Lowest LCC",
+      winner: successfulVariants.reduce((best, current) =>
+        !best || current.result.lcc < best.result.lcc ? current : best
+      , null as { label: string; result: LCCResult } | null),
+      value: (result: LCCResult) => eurFormatter.format(result.lcc),
+    },
+    {
+      metric: "Lowest WLC",
+      winner: successfulVariants.reduce((best, current) =>
+        !best || current.result.wlc < best.result.wlc ? current : best
+      , null as { label: string; result: LCCResult } | null),
+      value: (result: LCCResult) => eurFormatter.format(result.wlc),
+    },
+    {
+      metric: "Lowest LCC/m2",
+      winner: successfulVariants.reduce((best, current) =>
+        !best ||
+        (current.result.kpiLCCPerM2 ?? Number.POSITIVE_INFINITY) <
+          (best.result.kpiLCCPerM2 ?? Number.POSITIVE_INFINITY)
+          ? current
+          : best
+      , null as { label: string; result: LCCResult } | null),
+      value: (result: LCCResult) =>
+        result.kpiLCCPerM2 != null
+          ? eurFormatter.format(result.kpiLCCPerM2)
+          : "N/A",
+    },
+    {
+      metric: "Fastest payback",
+      winner: successfulVariants.reduce((best, current) => {
+        const currentValue = current.result.income?.simplePaybackYears;
+        const bestValue = best?.result.income?.simplePaybackYears;
+
+        if (currentValue == null) return best;
+        if (bestValue == null || currentValue < bestValue) return current;
+        return best;
+      }, null as { label: string; result: LCCResult } | null),
+      value: (result: LCCResult) =>
+        result.income?.simplePaybackYears != null
+          ? `${result.income.simplePaybackYears.toFixed(1)} years`
+          : "N/A",
+    },
+  ];
+
   return (
     <div className="space-y-6">
+      {successfulVariants.length > 1 ? (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {comparisonWinners.map((item) => (
+            <GlassCard key={item.metric} className="space-y-1">
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                {item.metric}
+              </div>
+              <div className="text-sm font-semibold">
+                {item.winner?.label ?? "No winner"}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {item.winner ? item.value(item.winner.result) : "Not available"}
+              </div>
+            </GlassCard>
+          ))}
+        </div>
+      ) : null}
+
       {/* Per-variant columns */}
-      <div
-        className="grid gap-4"
-        style={{ gridTemplateColumns: `repeat(${variants.length}, minmax(0, 1fr))` }}
-      >
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {variants.map((v, i) => {
           const query = results[i];
 
@@ -142,7 +203,7 @@ export function VariantComparison({ projectId: _projectId, variants }: VariantCo
 
                 {/* Mini stacked bar */}
                 <div className="h-[150px]">
-                  <LCCStackedBar result={result} />
+                  <LCCStackedBar result={result} showTable={false} />
                 </div>
 
                 {/* Key metrics */}
@@ -160,6 +221,17 @@ export function VariantComparison({ projectId: _projectId, variants }: VariantCo
                       </span>
                     </div>
                   ))}
+                </div>
+
+                <div className="rounded-xl border bg-muted/20 p-3 text-sm">
+                  <div className="font-medium">Variant callout</div>
+                  <p className="mt-1 text-muted-foreground">
+                    {successfulVariants.length > 1 &&
+                    result.lcc ===
+                      Math.min(...successfulVariants.map((entry) => entry.result.lcc))
+                      ? "This variant currently has the lowest LCC."
+                      : "Use the grouped chart and winner cards above to compare this option against the others."}
+                  </p>
                 </div>
               </GlassCard>
             </motion.div>

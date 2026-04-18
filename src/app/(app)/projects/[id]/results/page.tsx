@@ -1,27 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { ResultsDashboard } from "@/components/results/results-dashboard";
+import { ResultsAuditView } from "@/components/results/results-audit-view";
 import { VariantComparison } from "@/components/results/variant-comparison";
+import { ValidationSummaryCard } from "@/components/project/validation-summary-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   BarChart3,
   GitCompare,
+  Download,
+  FileJson,
+  ClipboardList,
   FileText,
   FileSpreadsheet,
-  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { downloadBase64File } from "@/lib/download";
+import { computeProjectReadiness } from "@/lib/project-readiness";
+
+function downloadTextFile(content: string, fileName: string, mimeType: string) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadBase64File(data: string, fileName: string, mimeType: string) {
+  const binary = atob(data);
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+  const blob = new Blob([bytes], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function toCsvRows(rows: Array<Record<string, string | number>>) {
+  if (rows.length === 0) return "";
+  const headers = Object.keys(rows[0]);
+  const escapeValue = (value: string | number) =>
+    `"${String(value).replaceAll('"', '""')}"`;
+
+  return [
+    headers.join(","),
+    ...rows.map((row) => headers.map((header) => escapeValue(row[header])).join(",")),
+  ].join("\n");
+}
 
 export default function ResultsPage() {
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const trpc = useTRPC();
-  const [view, setView] = useState<"dashboard" | "compare">("dashboard");
+  const [view, setView] = useState<"dashboard" | "audit" | "compare">(
+    "dashboard"
+  );
 
   const projectId = params.id;
 
@@ -31,32 +71,134 @@ export default function ResultsPage() {
 
   const variantId = searchParams.get("v") ?? project?.variants[0]?.id ?? "";
 
-  const activeVariant = project?.variants.find((v) => v.id === variantId);
-  const variantLabel = activeVariant?.label ?? "BASE";
+  const { data: variant } = useQuery({
+    ...trpc.variant.getById.queryOptions({ variantId }),
+    enabled: Boolean(variantId),
+  });
 
-  const pdfMutation = useMutation(
+  const resultQuery = useQuery({
+    ...trpc.calculation.calculate.queryOptions({ variantId }),
+    enabled: Boolean(variantId),
+  });
+
+  const readiness =
+    project && variant ? computeProjectReadiness(project, variant) : null;
+  const exportBlocked = readiness ? !readiness.previewReady : false;
+  const exportBlockedTitle = exportBlocked
+    ? "Resolve the blocking issues above before exporting"
+    : undefined;
+  const variantLabelForExport =
+    project?.variants.find((variantRecord) => variantRecord.id === variantId)?.label ??
+    "BASE";
+
+  const variants = useMemo(
+    () =>
+      (project?.variants ?? []).map((variantRecord) => ({
+        id: variantRecord.id,
+        label:
+          variantRecord.label === "BASE"
+            ? "Base"
+            : variantRecord.label.replace("_", " "),
+      })),
+    [project?.variants]
+  );
+
+  const activeVariantLabel =
+    variants.find((variantRecord) => variantRecord.id === variantId)?.label ??
+    "Variant";
+  const exportPdf = useMutation(
     trpc.export.generatePdf.mutationOptions({
-      onSuccess: (data) => {
-        downloadBase64File(data.data, data.fileName, data.mimeType);
-        toast.success("PDF exported successfully");
+      onSuccess: (payload) => {
+        downloadBase64File(payload.data, payload.fileName, payload.mimeType);
+        toast.success("PDF export ready.");
       },
       onError: (error) => {
-        toast.error(error.message || "Export failed");
+        toast.error(error.message);
+      },
+    })
+  );
+  const exportExcel = useMutation(
+    trpc.export.generateExcel.mutationOptions({
+      onSuccess: (payload) => {
+        downloadBase64File(payload.data, payload.fileName, payload.mimeType);
+        toast.success("Excel export ready.");
+      },
+      onError: (error) => {
+        toast.error(error.message);
       },
     })
   );
 
-  const excelMutation = useMutation(
-    trpc.export.generateExcel.mutationOptions({
-      onSuccess: (data) => {
-        downloadBase64File(data.data, data.fileName, data.mimeType);
-        toast.success("Excel exported successfully");
-      },
-      onError: (error) => {
-        toast.error(error.message || "Export failed");
-      },
-    })
-  );
+  const exportRows =
+    resultQuery.data == null
+      ? []
+      : [
+          { Metric: "LCC", Amount: resultQuery.data.lcc },
+          { Metric: "WLC", Amount: resultQuery.data.wlc },
+          { Metric: "Design costs", Amount: resultQuery.data.designCosts },
+          {
+            Metric: "Construction",
+            Amount: resultQuery.data.totalConstruction,
+          },
+          {
+            Metric: "Operation and maintenance",
+            Amount: resultQuery.data.operationAndMaintenance,
+          },
+          {
+            Metric: "Non-construction",
+            Amount: resultQuery.data.nonConstructionCosts,
+          },
+          {
+            Metric: "Residual value",
+            Amount: resultQuery.data.residualValue,
+          },
+          {
+            Metric: "LCC net residual",
+            Amount: resultQuery.data.lccNetResidual,
+          },
+        ];
+
+  function handleExportJson() {
+    if (!resultQuery.data) {
+      toast.error("Run a calculation first.");
+      return;
+    }
+
+    downloadTextFile(
+      JSON.stringify(resultQuery.data, null, 2),
+      `${project?.name ?? "project"}-${activeVariantLabel.toLowerCase().replaceAll(" ", "-")}-results.json`,
+      "application/json"
+    );
+  }
+
+  function handleExportCsv() {
+    if (exportRows.length === 0) {
+      toast.error("Run a calculation first.");
+      return;
+    }
+
+    downloadTextFile(
+      toCsvRows(exportRows),
+      `${project?.name ?? "project"}-${activeVariantLabel.toLowerCase().replaceAll(" ", "-")}-results.csv`,
+      "text/csv;charset=utf-8"
+    );
+  }
+
+  function handleExportPdf() {
+    exportPdf.mutate({
+      projectId,
+      variantLabel: variantLabelForExport as "BASE" | "VARIANT_1" | "VARIANT_2",
+      formulaMode: "excel_bugfixed",
+    });
+  }
+
+  function handleExportExcel() {
+    exportExcel.mutate({
+      projectId,
+      variantLabel: variantLabelForExport as "BASE" | "VARIANT_1" | "VARIANT_2",
+      formulaMode: "excel_bugfixed",
+    });
+  }
 
   if (!variantId || !project) {
     return (
@@ -75,14 +217,13 @@ export default function ResultsPage() {
     );
   }
 
-  const variants = project.variants.map((v) => ({
-    id: v.id,
-    label: v.label === "BASE" ? "Base" : v.label.replace("_", " "),
-  }));
-
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
+      {readiness ? (
+        <ValidationSummaryCard projectId={projectId} readiness={readiness} />
+      ) : null}
+
+      <div className="flex flex-wrap items-center gap-2">
         <button
           onClick={() => setView("dashboard")}
           className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -93,6 +234,17 @@ export default function ResultsPage() {
         >
           <BarChart3 className="size-4" />
           Dashboard
+        </button>
+        <button
+          onClick={() => setView("audit")}
+          className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+            view === "audit"
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <ClipboardList className="size-4" />
+          Audit
         </button>
         {variants.length > 1 && (
           <button
@@ -108,41 +260,58 @@ export default function ResultsPage() {
           </button>
         )}
 
-        <div className="mx-2 h-5 w-px bg-border" />
+        <div className="mx-2 hidden h-5 w-px bg-border sm:block" />
 
         <button
-          onClick={() =>
-            pdfMutation.mutate({ projectId, variantLabel })
-          }
-          disabled={pdfMutation.isPending || !variantId}
-          className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+          onClick={handleExportPdf}
+          disabled={exportPdf.isPending || exportBlocked}
+          title={exportBlockedTitle}
+          className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
         >
-          {pdfMutation.isPending ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <FileText className="size-4" />
-          )}
-          Export PDF
+          <FileText className="size-4" />
+          {exportPdf.isPending ? "Exporting PDF..." : "Export PDF"}
         </button>
-
         <button
-          onClick={() =>
-            excelMutation.mutate({ projectId, variantLabel })
-          }
-          disabled={excelMutation.isPending || !variantId}
-          className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+          onClick={handleExportExcel}
+          disabled={exportExcel.isPending || exportBlocked}
+          title={exportBlockedTitle}
+          className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
         >
-          {excelMutation.isPending ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <FileSpreadsheet className="size-4" />
-          )}
-          Export Excel
+          <FileSpreadsheet className="size-4" />
+          {exportExcel.isPending ? "Exporting Excel..." : "Export Excel"}
+        </button>
+        <button
+          onClick={handleExportCsv}
+          disabled={!resultQuery.data || exportBlocked}
+          title={exportBlockedTitle}
+          className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+        >
+          <Download className="size-4" />
+          Export CSV
+        </button>
+        <button
+          onClick={handleExportJson}
+          disabled={!resultQuery.data || exportBlocked}
+          title={exportBlockedTitle}
+          className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+        >
+          <FileJson className="size-4" />
+          Export JSON
         </button>
       </div>
 
       {view === "dashboard" ? (
-        <ResultsDashboard variantId={variantId} projectId={projectId} />
+        <ResultsDashboard
+          variantId={variantId}
+          projectId={projectId}
+          resultOverride={resultQuery.data}
+        />
+      ) : view === "audit" ? (
+        resultQuery.data ? (
+          <ResultsAuditView result={resultQuery.data} />
+        ) : (
+          <ResultsDashboard variantId={variantId} projectId={projectId} />
+        )
       ) : (
         <VariantComparison projectId={projectId} variants={variants} />
       )}
