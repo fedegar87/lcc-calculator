@@ -11,6 +11,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { LCCResult } from "@/engine/types";
+import { ChartDataTable } from "@/components/results/chart-data-table";
+import { chartTheme, domainColor } from "@/lib/chart-theme";
 
 const eurFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -19,10 +21,11 @@ const eurFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+// Line colors follow the frozen domain mapping (see docs/visual-identity.md).
 const COLORS = {
-  energy: "oklch(0.62 0.14 250)",       // chart-1 blue
-  maintenance: "oklch(0.70 0.14 80)",   // chart-3 amber
-  total: "oklch(0.48 0.18 27.5)",       // chart-5 eurac red
+  energy: domainColor("nrg"),
+  maintenance: domainColor("mnt"),
+  total: "#C8102E",
 };
 
 interface CostEvolutionLineProps {
@@ -55,52 +58,74 @@ export function CostEvolutionLine({ result }: CostEvolutionLineProps) {
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data} margin={{ left: 20, right: 20, top: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="year"
-          label={{ value: "Year", position: "insideBottomRight", offset: -5 }}
-          fontSize={12}
-        />
-        <YAxis
-          tickFormatter={(v: number) => eurFormatter.format(v)}
-          fontSize={12}
-        />
-        <Tooltip
-          formatter={(value) => eurFormatter.format(Number(value ?? 0))}
-          contentStyle={{
-            borderRadius: "8px",
-            border: "1px solid hsl(var(--border))",
-            backgroundColor: "hsl(var(--card))",
-          }}
-        />
-        <Legend />
-        <Line
-          type="monotone"
-          dataKey="Energy"
-          stroke={COLORS.energy}
-          dot={false}
-          strokeWidth={2}
-          isAnimationActive={!prefersReduced}
-        />
-        <Line
-          type="monotone"
-          dataKey="Maintenance"
-          stroke={COLORS.maintenance}
-          dot={false}
-          strokeWidth={2}
-          isAnimationActive={!prefersReduced}
-        />
-        <Line
-          type="monotone"
-          dataKey="Total O&M"
-          stroke={COLORS.total}
-          dot={false}
-          strokeWidth={2.5}
-          isAnimationActive={!prefersReduced}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div>
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={data} margin={{ left: 20, right: 20, top: 5 }}>
+          <CartesianGrid
+            strokeDasharray={chartTheme.strokeDasharray}
+            stroke={chartTheme.gridStroke}
+          />
+          <XAxis
+            dataKey="year"
+            label={{
+              value: "Year",
+              position: "insideBottomRight",
+              offset: -5,
+              fontSize: 11,
+              fill: "#64748b",
+            }}
+            tick={chartTheme.axisTick}
+            axisLine={chartTheme.axisLine}
+          />
+          <YAxis
+            tickFormatter={(v: number) => eurFormatter.format(v)}
+            tick={chartTheme.axisTick}
+            axisLine={chartTheme.axisLine}
+          />
+          <Tooltip
+            formatter={(value) => eurFormatter.format(Number(value ?? 0))}
+            contentStyle={chartTheme.tooltipContentStyle}
+            labelStyle={chartTheme.tooltipLabelStyle}
+            itemStyle={chartTheme.tooltipItemStyle}
+          />
+          <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+          <Line
+            type="monotone"
+            dataKey="Energy"
+            stroke={COLORS.energy}
+            dot={false}
+            strokeWidth={2}
+            isAnimationActive={!prefersReduced}
+          />
+          <Line
+            type="monotone"
+            dataKey="Maintenance"
+            stroke={COLORS.maintenance}
+            dot={false}
+            strokeWidth={2}
+            isAnimationActive={!prefersReduced}
+          />
+          <Line
+            type="monotone"
+            dataKey="Total O&M"
+            stroke={COLORS.total}
+            dot={false}
+            strokeWidth={2.5}
+            isAnimationActive={!prefersReduced}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+
+      <ChartDataTable
+        caption="Cost evolution data"
+        columns={["Year", "Energy", "Maintenance", "Total O&M"]}
+        rows={data.map((row) => ({
+          Year: row.year,
+          Energy: eurFormatter.format(row.Energy),
+          Maintenance: eurFormatter.format(row.Maintenance),
+          "Total O&M": eurFormatter.format(row["Total O&M"]),
+        }))}
+      />
+    </div>
   );
 }

@@ -11,6 +11,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { LCCResult } from "@/engine/types";
+import { ChartDataTable } from "@/components/results/chart-data-table";
+import { chartTheme, domainColor } from "@/lib/chart-theme";
 
 const eurFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -19,10 +21,14 @@ const eurFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+// Each variant column is painted with a distinct domain tint so the
+// comparison reads without cross-referencing the legend. Base = finance
+// (baseline), Variant 1 = construction (intervention), Variant 2 =
+// eurac-red (brand-emphasized alternative).
 const VARIANT_COLORS = [
-  "oklch(0.62 0.14 250)",   // chart-1 blue (Base)
-  "oklch(0.70 0.14 80)",    // chart-3 amber (V1)
-  "oklch(0.48 0.18 27.5)",  // chart-5 eurac red (V2)
+  domainColor("fin"),
+  domainColor("construction"),
+  "#C8102E",
 ];
 
 interface VariantGroupedBarProps {
@@ -56,33 +62,55 @@ export function VariantGroupedBar({ variants }: VariantGroupedBarProps) {
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   return (
-    <ResponsiveContainer width="100%" height={350}>
-      <BarChart data={data} margin={{ left: 20, right: 20 }}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="category" fontSize={12} />
-        <YAxis
-          tickFormatter={(v: number) => eurFormatter.format(v)}
-          fontSize={12}
-        />
-        <Tooltip
-          formatter={(value) => eurFormatter.format(Number(value ?? 0))}
-          contentStyle={{
-            borderRadius: "8px",
-            border: "1px solid hsl(var(--border))",
-            backgroundColor: "hsl(var(--card))",
-          }}
-        />
-        <Legend />
-        {variants.map((v, i) => (
-          <Bar
-            key={v.label}
-            dataKey={v.label}
-            fill={VARIANT_COLORS[i % VARIANT_COLORS.length]}
-            isAnimationActive={!prefersReduced}
-            radius={[4, 4, 0, 0]}
+    <div>
+      <ResponsiveContainer width="100%" height={350}>
+        <BarChart data={data} margin={{ left: 20, right: 20 }}>
+          <CartesianGrid
+            strokeDasharray={chartTheme.strokeDasharray}
+            stroke={chartTheme.gridStroke}
           />
-        ))}
-      </BarChart>
-    </ResponsiveContainer>
+          <XAxis
+            dataKey="category"
+            tick={chartTheme.axisTick}
+            axisLine={chartTheme.axisLine}
+          />
+          <YAxis
+            tickFormatter={(v: number) => eurFormatter.format(v)}
+            tick={chartTheme.axisTick}
+            axisLine={chartTheme.axisLine}
+          />
+          <Tooltip
+            formatter={(value) => eurFormatter.format(Number(value ?? 0))}
+            contentStyle={chartTheme.tooltipContentStyle}
+            labelStyle={chartTheme.tooltipLabelStyle}
+            itemStyle={chartTheme.tooltipItemStyle}
+          />
+          <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+          {variants.map((v, i) => (
+            <Bar
+              key={v.label}
+              dataKey={v.label}
+              fill={VARIANT_COLORS[i % VARIANT_COLORS.length]}
+              barSize={chartTheme.barSize}
+              isAnimationActive={!prefersReduced}
+              radius={chartTheme.barRadius}
+            />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
+
+      <ChartDataTable
+        caption="Variant comparison data"
+        columns={["Metric", ...variants.map((variant) => variant.label)]}
+        rows={data.map((row) =>
+          Object.fromEntries(
+            Object.entries(row).map(([key, value]) => [
+              key === "category" ? "Metric" : key,
+              key === "category" ? value : eurFormatter.format(Number(value)),
+            ])
+          ) as Record<string, string | number>
+        )}
+      />
+    </div>
   );
 }

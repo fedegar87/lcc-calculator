@@ -3,13 +3,15 @@
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { ProjectSidebar } from "@/components/project/project-sidebar";
 import { Separator } from "@/components/ui/separator";
+import { AmbientBackground } from "@/components/shared/ambient-background";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <ProjectSidebar />
-      <SidebarInset>
-        <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
+      <SidebarInset className="relative isolate">
+        <AmbientBackground />
+        <header className="flex h-12 shrink-0 items-center gap-2 border-b bg-white/60 px-4 backdrop-blur-md dark:bg-slate-950/50">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />
           {/* Save status badge slot -- filled by child pages via portal or context */}

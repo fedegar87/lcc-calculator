@@ -18,11 +18,6 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -48,12 +43,66 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* EURAC custom color palette (static tokens) */
+/* EURAC brand + frozen LCC domain palette.
+ * Domain mapping (see docs/visual-identity.md):
+ *   fin          -> blue     (finance / boundary conditions)
+ *   construction -> amber    (building fabric costs)
+ *   nrg          -> cyan     (energy consumption)
+ *   pv           -> yellow   (photovoltaic production)
+ *   mnt          -> teal     (maintenance / EN 15459)
+ *   res          -> violet   (residual value, ISO 15686-5)
+ *   inc          -> emerald  (income / NPV)
+ * Charts, icon badges, left borders, and reference buttons
+ * must always source their color from this mapping.
+ */
 @theme {
   --color-eurac-red: oklch(0.48 0.18 27.5);
+  --color-eurac-red-hex: #C8102E;
   --color-eurac-dark: oklch(0.33 0.01 240);
   --color-eurac-gray: oklch(0.47 0.01 240);
   --color-eurac-light: oklch(0.74 0.01 240);
+
+  --color-fin-50: #eff6ff;
+  --color-fin-100: #dbeafe;
+  --color-fin-500: #3b82f6;
+  --color-fin-600: #2563eb;
+  --color-fin-700: #1d4ed8;
+
+  --color-construction-50: #fffbeb;
+  --color-construction-100: #fef3c7;
+  --color-construction-500: #f59e0b;
+  --color-construction-600: #d97706;
+  --color-construction-700: #b45309;
+
+  --color-nrg-50: #ecfeff;
+  --color-nrg-100: #cffafe;
+  --color-nrg-500: #06b6d4;
+  --color-nrg-600: #0891b2;
+  --color-nrg-700: #0e7490;
+
+  --color-pv-50: #fefce8;
+  --color-pv-100: #fef9c3;
+  --color-pv-500: #eab308;
+  --color-pv-600: #ca8a04;
+  --color-pv-700: #a16207;
+
+  --color-mnt-50: #f0fdfa;
+  --color-mnt-100: #ccfbf1;
+  --color-mnt-500: #14b8a6;
+  --color-mnt-600: #0d9488;
+  --color-mnt-700: #0f766e;
+
+  --color-res-50: #f5f3ff;
+  --color-res-100: #ede9fe;
+  --color-res-500: #8b5cf6;
+  --color-res-600: #7c3aed;
+  --color-res-700: #6d28d9;
+
+  --color-inc-50: #ecfdf5;
+  --color-inc-100: #d1fae5;
+  --color-inc-500: #10b981;
+  --color-inc-600: #059669;
+  --color-inc-700: #047857;
 }
 
 :root {
@@ -75,11 +124,6 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.48 0.18 27.5);
-  --chart-1: oklch(0.65 0.15 250);
-  --chart-2: oklch(0.65 0.15 160);
-  --chart-3: oklch(0.70 0.15 55);
-  --chart-4: oklch(0.60 0.12 300);
-  --chart-5: oklch(0.55 0.18 27.5);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -110,11 +154,6 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.60 0.15 250);
-  --chart-2: oklch(0.60 0.15 160);
-  --chart-3: oklch(0.65 0.15 55);
-  --chart-4: oklch(0.55 0.12 300);
-  --chart-5: oklch(0.50 0.18 27.5);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -137,8 +176,24 @@
   }
 }
 
-/* Glass morphism utilities */
+/* Identity keyframes: short, ease-out, never bouncy. */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 @layer utilities {
+  /* Legacy glass utilities, kept for backwards compatibility. New code
+   * should use the GlassCard component or the identity-aligned classes
+   * described in docs/visual-identity.md. */
   .glass {
     background: oklch(1 0 0 / 0.1);
     backdrop-filter: blur(12px);
@@ -148,5 +203,48 @@
     background: oklch(0 0 0 / 0.2);
     backdrop-filter: blur(12px);
     border: 1px solid oklch(1 0 0 / 0.1);
+  }
+
+  /* Subtle SVG dot texture overlay for primary hero cards (opacity ~3%). */
+  .pattern-dots {
+    background-image:
+      url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='%230f172a' fill-opacity='0.03'%3E%3Ccircle cx='4' cy='4' r='1.2'/%3E%3Ccircle cx='16' cy='12' r='1.2'/%3E%3Ccircle cx='8' cy='20' r='1.2'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 24px 24px;
+  }
+
+  /* Ambient blurred blobs used by the AmbientBackground component. */
+  .ambient-blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(64px);
+    pointer-events: none;
+  }
+  .ambient-blob-red {
+    background: color-mix(in oklab, #c8102e 10%, transparent);
+  }
+  .ambient-blob-blue {
+    background: color-mix(in oklab, #3b82f6 10%, transparent);
+  }
+  .ambient-blob-emerald {
+    background: color-mix(in oklab, #10b981 10%, transparent);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
