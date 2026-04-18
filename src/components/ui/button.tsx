@@ -50,11 +50,21 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  render,
+  nativeButton,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+  // When a `render` prop is used (e.g. to wrap a Next <Link> so navigation
+  // is client-side), the underlying element is usually an <a>, not a
+  // <button>. Base UI warns unless we opt out of native-button semantics.
+  const resolvedNativeButton =
+    nativeButton ?? (render !== undefined ? false : undefined);
+
   return (
     <ButtonPrimitive
       data-slot="button"
+      render={render}
+      nativeButton={resolvedNativeButton}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
