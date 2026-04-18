@@ -21,6 +21,22 @@ describe('Edge case: treatedFloorArea = 0', () => {
   it('does not crash', () => {
     expect(result.lcc).toBeDefined();
   });
+
+  it('handles explicit PV production without NaN propagation', () => {
+    const pvResult = calculateLCC(
+      inputWith({
+        treatedFloorArea: 0,
+        energyInputs: [
+          { endUse: 'PV_PRODUCTION', energySourceIndex: 13, specificConsumption: 0, pvProductionKwh: 14000 },
+        ],
+      }),
+      BUGFIXED_CONFIG,
+    );
+
+    expect(Number.isFinite(pvResult.energyProduced)).toBe(true);
+    expect(Number.isFinite(pvResult.lcc)).toBe(true);
+    expect(pvResult.energyProduced).toBeGreaterThan(0);
+  });
 });
 
 describe('Edge case: referencePeriod = 1', () => {
@@ -180,10 +196,10 @@ describe('Edge case: zero investment cost (KPI division)', () => {
   );
 
   it('KPI ratios are null (no investment cost)', () => {
-    expect(result.kpiDesignOverLCC).toBeNull();
-    expect(result.kpiConstructionOverLCC).toBeNull();
-    expect(result.kpiLaborOverLCC).toBeNull();
-    expect(result.kpiOMOverLCC).toBeNull();
+    expect(result.kpiDesignOverInvestmentCost).toBeNull();
+    expect(result.kpiConstructionOverInvestmentCost).toBeNull();
+    expect(result.kpiLaborOverInvestmentCost).toBeNull();
+    expect(result.kpiOMOverInvestmentCost).toBeNull();
   });
 
   it('does not crash', () => {
@@ -228,9 +244,9 @@ describe('Edge case: all-zero costs', () => {
   });
 
   it('KPI ratios are null (investmentCost = 0)', () => {
-    expect(result.kpiDesignOverLCC).toBeNull();
-    expect(result.kpiConstructionOverLCC).toBeNull();
-    expect(result.kpiLaborOverLCC).toBeNull();
-    expect(result.kpiOMOverLCC).toBeNull();
+    expect(result.kpiDesignOverInvestmentCost).toBeNull();
+    expect(result.kpiConstructionOverInvestmentCost).toBeNull();
+    expect(result.kpiLaborOverInvestmentCost).toBeNull();
+    expect(result.kpiOMOverInvestmentCost).toBeNull();
   });
 });

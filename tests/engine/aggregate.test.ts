@@ -121,20 +121,32 @@ describe('AGG-014: KPIs', () => {
     expect(expKpi.investmentCost).toBe(467000);
   });
 
-  it('kpiDesignOverLCC', () => {
-    expectRate(agg.kpiDesignOverLCC!, expKpi.kpiDesignOverLCC);
+  it('kpiDesignOverInvestmentCost', () => {
+    expectRate(
+      agg.kpiDesignOverInvestmentCost!,
+      expKpi.kpiDesignOverInvestmentCost,
+    );
   });
 
-  it('kpiConstructionOverLCC (materials only)', () => {
-    expectRate(agg.kpiConstructionOverLCC!, expKpi.kpiConstructionOverLCC);
+  it('kpiConstructionOverInvestmentCost (materials only)', () => {
+    expectRate(
+      agg.kpiConstructionOverInvestmentCost!,
+      expKpi.kpiConstructionOverInvestmentCost,
+    );
   });
 
-  it('kpiLaborOverLCC', () => {
-    expectRate(agg.kpiLaborOverLCC!, expKpi.kpiLaborOverLCC);
+  it('kpiLaborOverInvestmentCost', () => {
+    expectRate(
+      agg.kpiLaborOverInvestmentCost!,
+      expKpi.kpiLaborOverInvestmentCost,
+    );
   });
 
-  it('kpiOMOverLCC', () => {
-    expectRate(agg.kpiOMOverLCC!, expKpi.kpiOMOverLCC);
+  it('kpiOMOverInvestmentCost', () => {
+    expectRate(
+      agg.kpiOMOverInvestmentCost!,
+      expKpi.kpiOMOverInvestmentCost,
+    );
   });
 
   it('kpiLCCPerM2', () => {

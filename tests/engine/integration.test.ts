@@ -127,20 +127,32 @@ describe('Integration: income analysis', () => {
 describe('Integration: KPIs', () => {
   const expKpi = exp.kpis;
 
-  it('kpiDesignOverLCC', () => {
-    expectRate(result.kpiDesignOverLCC!, expKpi.kpiDesignOverLCC);
+  it('kpiDesignOverInvestmentCost', () => {
+    expectRate(
+      result.kpiDesignOverInvestmentCost!,
+      expKpi.kpiDesignOverInvestmentCost,
+    );
   });
 
-  it('kpiConstructionOverLCC', () => {
-    expectRate(result.kpiConstructionOverLCC!, expKpi.kpiConstructionOverLCC);
+  it('kpiConstructionOverInvestmentCost', () => {
+    expectRate(
+      result.kpiConstructionOverInvestmentCost!,
+      expKpi.kpiConstructionOverInvestmentCost,
+    );
   });
 
-  it('kpiLaborOverLCC', () => {
-    expectRate(result.kpiLaborOverLCC!, expKpi.kpiLaborOverLCC);
+  it('kpiLaborOverInvestmentCost', () => {
+    expectRate(
+      result.kpiLaborOverInvestmentCost!,
+      expKpi.kpiLaborOverInvestmentCost,
+    );
   });
 
-  it('kpiOMOverLCC', () => {
-    expectRate(result.kpiOMOverLCC!, expKpi.kpiOMOverLCC);
+  it('kpiOMOverInvestmentCost', () => {
+    expectRate(
+      result.kpiOMOverInvestmentCost!,
+      expKpi.kpiOMOverInvestmentCost,
+    );
   });
 
   it('kpiLCCPerM2', () => {

@@ -1,8 +1,12 @@
 // AGG-001 through AGG-014, CAL-001..004: Cost aggregation and KPIs
 
-import type { CostItemInput, WLCInputData } from './types';
+import type { CostItemInput, WLCInputData, FormulaMode } from './types';
 import type { EnergyCostResult } from './energy';
 import type { MaintenanceCostResult } from './maintenance';
+import {
+  getConstructionByCategory,
+  getTotalConstructionCost,
+} from './construction';
 
 export interface AggregateResult {
   // AGG-001..003: construction totals
@@ -30,10 +34,10 @@ export interface AggregateResult {
   wlc: number;
 
   // AGG-014: KPIs — divisor is investmentCost (construction + design + site mgmt), NOT LCC
-  kpiDesignOverLCC: number | null;
-  kpiConstructionOverLCC: number | null;
-  kpiLaborOverLCC: number | null;
-  kpiOMOverLCC: number | null;
+  kpiDesignOverInvestmentCost: number | null;
+  kpiConstructionOverInvestmentCost: number | null;
+  kpiLaborOverInvestmentCost: number | null;
+  kpiOMOverInvestmentCost: number | null;
   kpiLCCPerM2: number | null;
   kpiWLCPerM2: number | null;
 }
@@ -49,6 +53,7 @@ export function aggregateResults(
   maintenance: MaintenanceCostResult,
   referencePeriod: number,
   treatedFloorArea: number,
+  formulaMode: FormulaMode = 'excel_bugfixed',
 ): AggregateResult {
   // AGG-001..003: Construction costs
   const totalMaterials = costItems.reduce(
@@ -56,16 +61,13 @@ export function aggregateResults(
     0,
   );
   const totalLabor = costItems.reduce((sum, ci) => sum + ci.laborCost, 0);
-  const totalOther = costItems.reduce((sum, ci) => sum + ci.otherCost, 0);
-  const totalConstruction = totalMaterials + totalLabor + totalOther;
+  const totalConstruction = getTotalConstructionCost(costItems, formulaMode);
 
   // AGG-004: Construction by category
-  const constructionByCategory: Record<string, number> = {};
-  for (const ci of costItems) {
-    const existing = constructionByCategory[ci.category] ?? 0;
-    constructionByCategory[ci.category] =
-      existing + ci.materialCost + ci.laborCost + ci.otherCost;
-  }
+  const constructionByCategory = getConstructionByCategory(
+    costItems,
+    formulaMode,
+  );
 
   // AGG-005: Non-construction costs
   const nonConstructionCosts =
@@ -109,13 +111,19 @@ export function aggregateResults(
   // Verified from Excel: Results!B63 = B65 + B57 + B61 (construction + design + site mgmt)
   const investmentCost = totalConstruction + designCosts + buildingSiteManagement;
 
-  const kpiDesignOverLCC = safeRatio(designCosts, investmentCost);
+  const kpiDesignOverInvestmentCost = safeRatio(designCosts, investmentCost);
   // Excel B83 = B66/B63 (materials / investmentCost)
-  const kpiConstructionOverLCC = safeRatio(totalMaterials, investmentCost);
+  const kpiConstructionOverInvestmentCost = safeRatio(
+    totalMaterials,
+    investmentCost,
+  );
   // Excel B84 = B71/B63 (labor / investmentCost)
-  const kpiLaborOverLCC = safeRatio(totalLabor, investmentCost);
+  const kpiLaborOverInvestmentCost = safeRatio(totalLabor, investmentCost);
   // Excel B85 = B76/B63 (O&M / investmentCost)
-  const kpiOMOverLCC = safeRatio(operationAndMaintenance, investmentCost);
+  const kpiOMOverInvestmentCost = safeRatio(
+    operationAndMaintenance,
+    investmentCost,
+  );
   // Per m2 KPIs use treatedFloorArea as divisor
   const kpiLCCPerM2 = safeRatio(lcc, treatedFloorArea);
   const kpiWLCPerM2 = safeRatio(wlc, treatedFloorArea);
@@ -133,10 +141,10 @@ export function aggregateResults(
     operationAndMaintenance,
     lcc,
     wlc,
-    kpiDesignOverLCC,
-    kpiConstructionOverLCC,
-    kpiLaborOverLCC,
-    kpiOMOverLCC,
+    kpiDesignOverInvestmentCost,
+    kpiConstructionOverInvestmentCost,
+    kpiLaborOverInvestmentCost,
+    kpiOMOverInvestmentCost,
     kpiLCCPerM2,
     kpiWLCPerM2,
   };

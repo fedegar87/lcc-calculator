@@ -178,10 +178,22 @@ export function ResultsDashboard({ variantId, projectId: _projectId }: ResultsDa
             </h3>
             <div className="space-y-3">
               {[
-                { label: "Design / LCC", value: result.kpiDesignOverLCC },
-                { label: "Construction / LCC", value: result.kpiConstructionOverLCC },
-                { label: "Labor / LCC", value: result.kpiLaborOverLCC },
-                { label: "O&M / LCC", value: result.kpiOMOverLCC },
+                {
+                  label: "Design / Investment Cost",
+                  value: result.kpiDesignOverInvestmentCost,
+                },
+                {
+                  label: "Construction / Investment Cost",
+                  value: result.kpiConstructionOverInvestmentCost,
+                },
+                {
+                  label: "Labor / Investment Cost",
+                  value: result.kpiLaborOverInvestmentCost,
+                },
+                {
+                  label: "O&M / Investment Cost",
+                  value: result.kpiOMOverInvestmentCost,
+                },
               ].map((kpi) => (
                 <div key={kpi.label} className="flex items-center justify-between">
                   <span className="text-sm">{kpi.label}</span>

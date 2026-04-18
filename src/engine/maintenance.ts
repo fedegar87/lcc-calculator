@@ -1,8 +1,9 @@
 // MNT-001 through MNT-004, MNT-BUG-001, CAL-005..008: Maintenance cost calculations
 
 import type { VariantInput, EngineConfig } from './types';
-import { CATEGORY_MAINTENANCE_MAP } from './types';
 import { getEN15459Component } from './constants';
+import { getBuildingElementConstructionBase } from './construction';
+import { computeDiscountFactors } from './discount';
 
 export interface MaintenanceCostResult {
   elements: number[]; // MNT-001: building element maintenance per year
@@ -28,13 +29,16 @@ export function computeMaintenanceCosts(
 ): MaintenanceCostResult {
   const { referencePeriod, interestRate, treatedFloorArea } = input;
   const n = referencePeriod;
+  const interestDiscountFactors = computeDiscountFactors(
+    interestRate,
+    Math.max(n, 9),
+  );
 
   // --- MNT-001, MNT-002: Building element maintenance ---
-  const elementConstruction = input.costItems
-    .filter(
-      (ci) => CATEGORY_MAINTENANCE_MAP[ci.category] === 'building_element',
-    )
-    .reduce((sum, ci) => sum + ci.materialCost + ci.laborCost + ci.otherCost, 0);
+  const elementConstruction = getBuildingElementConstructionBase(
+    input.costItems,
+    config.formulaMode,
+  );
 
   const elements = new Array<number>(n + 1);
   const elementsCumulated = new Array<number>(n + 1);
@@ -44,8 +48,9 @@ export function computeMaintenanceCosts(
   for (let year = 1; year <= n; year++) {
     // MNT-001: totalConstruction * maintenancePercent / (1 + Rint)^year
     elements[year] =
-      (elementConstruction * input.buildingElementMaintenancePercent) /
-      Math.pow(1 + interestRate, year);
+      elementConstruction *
+      input.buildingElementMaintenancePercent *
+      interestDiscountFactors[year];
     // MNT-002: running sum
     elementsCumulated[year] = elementsCumulated[year - 1] + elements[year];
   }
@@ -55,8 +60,27 @@ export function computeMaintenanceCosts(
   const servicesCumulated = new Array<number>(n + 1);
   servicesCumulated[0] = 0;
 
-  for (let scIdx = 0; scIdx < input.serviceComponents.length; scIdx++) {
-    const sc = input.serviceComponents[scIdx];
+  const serviceComponents = [...input.serviceComponents].sort((a, b) => {
+    if (a.replicaOrder != null || b.replicaOrder != null) {
+      return (a.replicaOrder ?? Number.MAX_SAFE_INTEGER) -
+        (b.replicaOrder ?? Number.MAX_SAFE_INTEGER);
+    }
+
+    const nameCompare = a.name.localeCompare(b.name);
+    if (nameCompare !== 0) return nameCompare;
+
+    if (a.en15459ComponentIndex !== b.en15459ComponentIndex) {
+      return a.en15459ComponentIndex - b.en15459ComponentIndex;
+    }
+
+    return a.constructionCost - b.constructionCost;
+  });
+  const replicaBuggedComponent =
+    serviceComponents.length > 0
+      ? serviceComponents[serviceComponents.length - 1]
+      : null;
+
+  for (const sc of serviceComponents) {
     const component = getEN15459Component(sc.en15459ComponentIndex);
     const lifespan = component ? component.lifespanAvg : 0;
     const maintenancePct =
@@ -80,19 +104,17 @@ export function computeMaintenanceCosts(
         // Excel bug: Maintenance!I62 uses column I header (year 9) instead of actual year
         if (
           config.formulaMode === 'excel_replica' &&
-          scIdx === input.serviceComponents.length - 1
+          replicaBuggedComponent === sc
         ) {
           exponent = 9;
         }
 
-        services[year] +=
-          sc.constructionCost / Math.pow(1 + interestRate, exponent);
+        services[year] += sc.constructionCost * interestDiscountFactors[exponent];
         replacementsUsed++;
       } else {
         // MNT-003: Annual maintenance
         services[year] +=
-          (sc.constructionCost * maintenancePct) /
-          Math.pow(1 + interestRate, year);
+          sc.constructionCost * maintenancePct * interestDiscountFactors[year];
       }
     }
   }

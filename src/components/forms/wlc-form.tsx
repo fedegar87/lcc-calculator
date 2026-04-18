@@ -403,7 +403,11 @@ function NonConstructionSection({
             <CurrencyInput name="landArea" control={form.control} label="Land Area (m2)" />
             <CurrencyInput name="buildingIndex" control={form.control} label="Building Index" />
             <CurrencyInput name="floorHeight" control={form.control} label="Floor Height (m)" />
-            <CurrencyInput name="landPrice" control={form.control} label="Land Price" />
+            <CurrencyInput
+              name="landPrice"
+              control={form.control}
+              label="Land Price (EUR/m2)"
+            />
           </div>
         </div>
 

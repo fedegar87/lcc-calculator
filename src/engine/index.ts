@@ -10,7 +10,7 @@ import type {
 } from './types';
 import { DEFAULT_ENGINE_CONFIG, ENGINE_VERSION } from './types';
 import { validateVariantInput } from './validation';
-import { computeRealInterestRate, computeDiscountFactors } from './discount';
+import { computeRealInterestRate } from './discount';
 import { computeEnergyCosts } from './energy';
 import { computeMaintenanceCosts } from './maintenance';
 import { computeResidualValue } from './residual';
@@ -51,12 +51,14 @@ export function calculateLCC(
   }
 
   // 2. DISCOUNT (FIN-001, FIN-002)
-  const rr = computeRealInterestRate(input.interestRate, input.inflationRate);
-  // Discount factors computed for completeness; modules use rr or interestRate directly
-  computeDiscountFactors(rr, input.referencePeriod);
+  const rr = computeRealInterestRate(
+    input.interestRate,
+    input.inflationRate,
+    config.formulaMode,
+  );
 
   // 3. ENERGY (NRG-001..007)
-  const energy = computeEnergyCosts(input, rr);
+  const energy = computeEnergyCosts(input, rr, config.formulaMode);
 
   // 4. MAINTENANCE (MNT-001..004, CAL-005..008)
   const maintenance = computeMaintenanceCosts(input, config);
@@ -69,6 +71,7 @@ export function calculateLCC(
     maintenance,
     input.referencePeriod,
     input.treatedFloorArea,
+    config.formulaMode,
   );
 
   // 6. RESIDUAL VALUE (RES-001)
@@ -141,16 +144,22 @@ export function calculateLCC(
         }
       : null,
 
-    kpiDesignOverLCC:
-      agg.kpiDesignOverLCC !== null ? roundRate(agg.kpiDesignOverLCC) : null,
-    kpiConstructionOverLCC:
-      agg.kpiConstructionOverLCC !== null
-        ? roundRate(agg.kpiConstructionOverLCC)
+    kpiDesignOverInvestmentCost:
+      agg.kpiDesignOverInvestmentCost !== null
+        ? roundRate(agg.kpiDesignOverInvestmentCost)
         : null,
-    kpiLaborOverLCC:
-      agg.kpiLaborOverLCC !== null ? roundRate(agg.kpiLaborOverLCC) : null,
-    kpiOMOverLCC:
-      agg.kpiOMOverLCC !== null ? roundRate(agg.kpiOMOverLCC) : null,
+    kpiConstructionOverInvestmentCost:
+      agg.kpiConstructionOverInvestmentCost !== null
+        ? roundRate(agg.kpiConstructionOverInvestmentCost)
+        : null,
+    kpiLaborOverInvestmentCost:
+      agg.kpiLaborOverInvestmentCost !== null
+        ? roundRate(agg.kpiLaborOverInvestmentCost)
+        : null,
+    kpiOMOverInvestmentCost:
+      agg.kpiOMOverInvestmentCost !== null
+        ? roundRate(agg.kpiOMOverInvestmentCost)
+        : null,
     kpiLCCPerM2:
       agg.kpiLCCPerM2 !== null ? roundCurrency(agg.kpiLCCPerM2) : null,
     kpiWLCPerM2:

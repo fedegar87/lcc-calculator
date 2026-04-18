@@ -2,6 +2,7 @@
 
 import type { ServiceComponentInput } from './types';
 import { getEN15459Component } from './constants';
+import { computeDiscountFactors } from './discount';
 
 export interface ResidualValueResult {
   totalResidualValue: number;
@@ -23,6 +24,9 @@ export function computeResidualValue(
 ): ResidualValueResult {
   const componentResiduals: { name: string; residual: number }[] = [];
   let totalResidualValue = 0;
+  const discountFactor = computeDiscountFactors(realRate, referencePeriod)[
+    referencePeriod
+  ];
 
   for (const sc of serviceComponents) {
     const component = getEN15459Component(sc.en15459ComponentIndex);
@@ -35,9 +39,7 @@ export function computeResidualValue(
 
     const remainingLife = lifespan - (referencePeriod % lifespan);
     const fraction = Math.max(0, remainingLife / lifespan);
-    const residual =
-      (sc.constructionCost * fraction) /
-      Math.pow(1 + realRate, referencePeriod);
+    const residual = sc.constructionCost * fraction * discountFactor;
 
     componentResiduals.push({ name: sc.name, residual });
     totalResidualValue += residual;

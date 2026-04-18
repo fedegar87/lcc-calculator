@@ -62,6 +62,29 @@ describe('NRG: Household electricity', () => {
       exp.household.cumulatedYear40,
     );
   });
+
+  it('uses the DHW-1 growth rate in excel_replica mode', () => {
+    const replica = computeEnergyCosts(
+      {
+        ...GOLDEN_INPUT,
+        referencePeriod: 2,
+        treatedFloorArea: 100,
+        energyPrices: [
+          { index: 3, name: 'Natural Gas', pricePerKwh: 0.065, annualIncrease: 0.1 },
+          { index: 12, name: 'National Electricity-Mix', pricePerKwh: 0.22, annualIncrease: 0.02 },
+          { index: 13, name: 'Electricity from Photovoltaics', pricePerKwh: 0.12, annualIncrease: 0.015 },
+        ],
+        energyInputs: [
+          { endUse: 'DHW_1', energySourceIndex: 3, specificConsumption: 0 },
+          { endUse: 'HOUSEHOLD_ELECTRICITY', energySourceIndex: 12, specificConsumption: 1 },
+        ],
+      },
+      rr,
+      'excel_replica',
+    );
+
+    expect(replica.household.nominal[1]).toBeCloseTo(24.2, 10);
+  });
 });
 
 describe('NRG-007: PV production', () => {

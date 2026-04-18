@@ -7,6 +7,7 @@ import type {
   EnergyEndUseInput,
   EnergySourcePrice,
   ServiceComponentInput,
+  FormulaMode,
 } from "@/engine/types";
 
 /** Safely convert Prisma Decimal|null|undefined to plain number */
@@ -17,30 +18,138 @@ export function d(val: unknown): number {
 
 /** Resolve detail material cost: MAX(materialCost, unitPrice * area) per architecture decision */
 export function resolveDetailCost(detail: {
-  materialCost: unknown;
-  unitPrice: unknown;
-  area: unknown;
+  materialCost?: unknown;
+  unitPrice?: unknown;
+  area?: unknown;
 }): number {
   const mat = d(detail.materialCost);
   const unitTimesArea = d(detail.unitPrice) * d(detail.area);
   return Math.max(mat, unitTimesArea);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function buildVariantInput(variant: any): VariantInput {
+export function parseEnergySourcePrices(
+  value: unknown,
+): EnergySourcePrice[] | undefined {
+  return Array.isArray(value) ? (value as unknown as EnergySourcePrice[]) : undefined;
+}
+
+interface BuildVariantInputOptions {
+  formulaMode?: FormulaMode;
+  replicaVariant1EnergyPrices?: EnergySourcePrice[];
+}
+
+type DetailLike = {
+  materialCost?: unknown;
+  unitPrice?: unknown;
+  area?: unknown;
+  laborCost?: unknown;
+  otherCost?: unknown;
+};
+
+type VariantLike = {
+  label?: string;
+  boundaryCondition: {
+    referencePeriod: number;
+    interestRate?: unknown;
+    inflationRate?: unknown;
+    energyPrices?: unknown;
+  } | null;
+  geometry?: {
+    treatedFloorArea?: unknown;
+  } | null;
+  maintenanceConfig?: {
+    buildingElementMaintenancePercent?: unknown;
+  } | null;
+  energyInputs: Array<{
+    endUse: string;
+    energySourceIndex: number;
+    specificConsumption?: unknown;
+    pvProductionKwh?: unknown;
+  }>;
+  costItems: Array<{
+    category: string;
+    details: DetailLike[];
+  }>;
+  serviceComponents: Array<{
+    id?: string;
+    name: string;
+    constructionCost?: unknown;
+    en15459ComponentIndex: number;
+  }>;
+  designCosts: Array<{
+    lineNumber: number;
+    description: string;
+    preliminaryCost?: unknown;
+    definitiveCost?: unknown;
+    executiveCost?: unknown;
+    siteManagementCost?: unknown;
+  }>;
+  wlcInput?: {
+    landArea?: unknown;
+    landPrice?: unknown;
+    enablingCost1?: unknown;
+    enablingCost2?: unknown;
+    planningFees1?: unknown;
+    planningFees2?: unknown;
+    userSupportPropMgmt?: unknown;
+    userSupportCharges?: unknown;
+    userSupportAdmin?: unknown;
+    financeCost?: unknown;
+  } | null;
+  incomeInput?: {
+    rent1MonthlyPerM2?: unknown;
+    rent1Area?: unknown;
+    rent1Taxes?: unknown;
+    rent2MonthlyPerM2?: unknown;
+    rent2Area?: unknown;
+    rent2Taxes?: unknown;
+    rent3MonthlyPerM2?: unknown;
+    rent3Area?: unknown;
+    rent3Taxes?: unknown;
+    otherIncome1?: unknown;
+    otherIncome1Taxes?: unknown;
+    otherIncome2?: unknown;
+    otherIncome2Taxes?: unknown;
+    otherIncome3?: unknown;
+    otherIncome3Taxes?: unknown;
+    expectedPricePerM2?: unknown;
+  } | null;
+};
+
+export function buildVariantInput(
+  variant: VariantLike,
+  options: BuildVariantInputOptions = {},
+): VariantInput {
+  if (!variant.boundaryCondition) {
+    throw new Error("Missing boundaryCondition");
+  }
+
   const bc = variant.boundaryCondition;
   const geo = variant.geometry;
   const mc = variant.maintenanceConfig;
 
   // Energy prices stored as JSON, already array of objects
-  const energyPrices: EnergySourcePrice[] = Array.isArray(bc.energyPrices)
-    ? (bc.energyPrices as EnergySourcePrice[])
-    : [];
+  const rawEnergyPrices = parseEnergySourcePrices(bc.energyPrices) ?? [];
+  const energyPrices: EnergySourcePrice[] =
+    options.formulaMode === "excel_replica" &&
+    variant.label === "VARIANT_2" &&
+    options.replicaVariant1EnergyPrices
+      ? rawEnergyPrices.map((price) => {
+          const variant1Price = options.replicaVariant1EnergyPrices?.find(
+            (candidate) => candidate.index === price.index,
+          );
+          return variant1Price
+            ? {
+                ...price,
+                pricePerKwh: variant1Price.pricePerKwh,
+              }
+            : price;
+        })
+      : rawEnergyPrices;
 
   // Energy inputs
   const energyInputs: EnergyEndUseInput[] = variant.energyInputs.map(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (row: any) => ({
+    (row) => ({
       endUse: row.endUse as string,
       energySourceIndex: row.energySourceIndex as number,
       specificConsumption: d(row.specificConsumption),
@@ -50,21 +159,17 @@ export function buildVariantInput(variant: any): VariantInput {
   );
 
   // Cost items: aggregate from details using resolveDetailCost
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const costItems: CostItemInput[] = variant.costItems.map((ci: any) => {
+  const costItems: CostItemInput[] = variant.costItems.map((ci) => {
     const materialCost = ci.details.reduce(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (sum: number, det: any) => sum + resolveDetailCost(det),
+      (sum: number, det) => sum + resolveDetailCost(det),
       0,
     );
     const laborCost = ci.details.reduce(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (sum: number, det: any) => sum + d(det.laborCost),
+      (sum: number, det) => sum + d(det.laborCost),
       0,
     );
     const otherCost = ci.details.reduce(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (sum: number, det: any) => sum + d(det.otherCost),
+      (sum: number, det) => sum + d(det.otherCost),
       0,
     );
     return {
@@ -76,17 +181,19 @@ export function buildVariantInput(variant: any): VariantInput {
   });
 
   // Service components
+  const orderedServiceComponents = [...variant.serviceComponents].sort(
+    (a, b) => String(a.id ?? "").localeCompare(String(b.id ?? "")),
+  );
   const serviceComponents: ServiceComponentInput[] =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    variant.serviceComponents.map((sc: any) => ({
+    orderedServiceComponents.map((sc, index: number) => ({
       name: sc.name as string,
       constructionCost: d(sc.constructionCost),
       en15459ComponentIndex: sc.en15459ComponentIndex as number,
+      replicaOrder: index,
     }));
 
   // Design costs
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const designCosts: DesignCostInput[] = variant.designCosts.map((dc: any) => ({
+  const designCosts: DesignCostInput[] = variant.designCosts.map((dc) => ({
     lineNumber: dc.lineNumber as number,
     description: dc.description as string,
     preliminaryCost: d(dc.preliminaryCost),
@@ -107,7 +214,7 @@ export function buildVariantInput(variant: any): VariantInput {
   );
 
   const wlcInput: WLCInputData = {
-    landCost: wlc ? d(wlc.landPrice) : 0,
+    landCost: wlc ? d(wlc.landArea) * d(wlc.landPrice) : 0,
     enablingCosts: wlc ? d(wlc.enablingCost1) + d(wlc.enablingCost2) : 0,
     planningFees: wlc ? d(wlc.planningFees1) + d(wlc.planningFees2) : 0,
     userSupportPropMgmt: wlc ? d(wlc.userSupportPropMgmt) : 0,

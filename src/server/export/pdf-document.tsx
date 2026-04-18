@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React from "react";
 import { Document, Page, View, Text, Image } from "@react-pdf/renderer";
 import type { LCCResult } from "@/engine/types";
@@ -233,20 +234,22 @@ export function LCCReport({
           </Text>
         </View>
         <View style={styles.kpiRow}>
-          <Text style={styles.kpiLabel}>Design / LCC</Text>
+          <Text style={styles.kpiLabel}>Design / Investment Cost</Text>
           <Text style={styles.kpiValue}>
-            {pctFmt(result.kpiDesignOverLCC)}
+            {pctFmt(result.kpiDesignOverInvestmentCost)}
           </Text>
         </View>
         <View style={styles.kpiRow}>
-          <Text style={styles.kpiLabel}>Construction / LCC</Text>
+          <Text style={styles.kpiLabel}>Construction / Investment Cost</Text>
           <Text style={styles.kpiValue}>
-            {pctFmt(result.kpiConstructionOverLCC)}
+            {pctFmt(result.kpiConstructionOverInvestmentCost)}
           </Text>
         </View>
         <View style={styles.kpiRow}>
-          <Text style={styles.kpiLabel}>O&M / LCC</Text>
-          <Text style={styles.kpiValue}>{pctFmt(result.kpiOMOverLCC)}</Text>
+          <Text style={styles.kpiLabel}>O&M / Investment Cost</Text>
+          <Text style={styles.kpiValue}>
+            {pctFmt(result.kpiOMOverInvestmentCost)}
+          </Text>
         </View>
         {result.income && (
           <View style={styles.kpiRow}>

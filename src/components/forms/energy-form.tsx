@@ -143,7 +143,7 @@ function EnergyConsumptionSection({
     const existing = getExistingInput(ei, endUse);
     return {
       endUse,
-      energySourceIndex: existing?.energySourceIndex ?? 2,
+      energySourceIndex: existing?.energySourceIndex ?? 1,
       specificConsumption: existing?.specificConsumption ?? 0,
     };
   };
@@ -205,8 +205,9 @@ function EnergyConsumptionSection({
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[180px]">End Use</TableHead>
-                <TableHead className="w-[200px]">Energy Source</TableHead>
+                <TableHead className="w-[200px]">Source 1</TableHead>
                 <TableHead>System 1 (kWh/m2/yr)</TableHead>
+                <TableHead className="w-[200px]">Source 2</TableHead>
                 <TableHead>System 2 (kWh/m2/yr)</TableHead>
               </TableRow>
             </TableHeader>
@@ -236,6 +237,7 @@ function EnergyConsumptionSection({
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
+                              <SelectItem value="1">Not selected</SelectItem>
                               {energySources.map((src) => (
                                 <SelectItem key={src.index} value={String(src.index)}>
                                   {src.name}
@@ -263,6 +265,34 @@ function EnergyConsumptionSection({
                           />
                         )}
                       />
+                    </TableCell>
+                    <TableCell>
+                      {fields.sys2 ? (
+                        <Controller
+                          name={`${fields.sys2}.energySourceIndex`}
+                          control={form.control}
+                          render={({ field }) => (
+                            <Select
+                              value={String(field.value)}
+                              onValueChange={(v) => field.onChange(parseInt(v ?? "0", 10))}
+                            >
+                              <SelectTrigger className="h-8 w-full text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="1">Not selected</SelectItem>
+                                {energySources.map((src) => (
+                                  <SelectItem key={src.index} value={String(src.index)}>
+                                    {src.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">--</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       {fields.sys2 ? (

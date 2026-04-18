@@ -1,7 +1,7 @@
 # Architecture Decisions
 
 Decisions derived from the CRAVEzero Excel workbook audit.
-Each decision is numbered DEC-001 through DEC-010.
+Each decision is numbered DEC-001 through DEC-014.
 
 **Source documents:**
 - `CRAVEzero/200512_LCC_tool_beta_v2.xlsm` (workbook)
@@ -230,9 +230,89 @@ Applied only to building services (categories B*, C*) that have a defined EN 154
 
 ---
 
+## DEC-011: FIN-001 Mode Split
+
+**Status:** Accepted
+
+**Context:** The workbook computes `Project Information!D125 = (D121-D123)/(1+(D123/100))`, which is the replica target, but that denominator is not the textbook Fisher equation when the app already stores `Ri` as a decimal.
+
+**Decision:** `excel_replica` reproduces the workbook denominator `1 + Ri/100`. `excel_bugfixed` uses the mathematically correct Fisher form `1 + Ri`.
+
+**Rationale:**
+- Workbook parity matters for forensic comparison and migration confidence.
+- The web app's bugfixed mode is meant to preserve intent, not spreadsheet quirks.
+- This keeps replica outputs aligned with cached workbook values while letting bugfixed mode use economically correct discounting.
+
+**Consequences:**
+- `computeRealInterestRate()` branches on `formulaMode`
+- Energy, residual, and income calculations inherit the replica-vs-bugfixed RR difference
+- Tests must cover both mode paths explicitly
+
+---
+
+## DEC-012: `otherCost` Mode Semantics
+
+**Status:** Accepted
+
+**Context:** The web app schema intentionally tracks `otherCost` per construction detail row, but the workbook Results sheet aggregates only material + labor. Including `otherCost` unconditionally breaks replica parity.
+
+**Decision:** `excel_replica` excludes `otherCost` from workbook-derived construction, maintenance, KPI, LCC, and WLC totals. `excel_bugfixed` includes `otherCost` as a web-app extension.
+
+**Rationale:**
+- Replica mode must match workbook semantics exactly.
+- Bugfixed mode is allowed to extend the data model as long as the behavior is explicit.
+- This avoids silently dropping information from the web app while preserving a true workbook-comparison path.
+
+**Consequences:**
+- Construction aggregation helpers branch on `formulaMode`
+- Building-element maintenance uses the mode-correct construction base
+- KPI denominators and downstream totals remain internally consistent per mode
+
+---
+
+## DEC-013: `excel_replica` Maintenance Bug Targeting via `replicaOrder`
+
+**Status:** Accepted
+
+**Context:** The workbook bug MNT-BUG-001 lives on a physical cell (`Maintenance!I62`), not on a specific component identity. The engine has to decide which logical service component inherits the bug in `excel_replica` mode. An earlier implementation used array-position (last element), which made replica output depend on whichever order Prisma happened to return.
+
+**Decision:** Service components expose an optional `replicaOrder` field. The engine sorts on `replicaOrder` first, then falls back to a deterministic key (`name` -> `en15459ComponentIndex` -> `constructionCost`). The bug is applied to the last component after sorting. The tRPC layer populates `replicaOrder` with the DB query index so that replica output is stable for a given persistent state.
+
+**Rationale:**
+- Workbook row 62 is a physical position, so tying the bug to a stable user-facing order is semantically honest.
+- The deterministic fallback keeps tests and fixtures reproducible even when `replicaOrder` is absent.
+- Pushing ordering into a dedicated field avoids brittle reliance on input-array position.
+
+**Consequences:**
+- Replica output is stable as long as the persisted `replicaOrder` is stable.
+- If the UI later exposes drag-reorder of service components, the component inheriting the bug can change — this is acceptable because it mirrors the "physical row" semantics of the workbook, but UX should make the effect explicit.
+- Fixtures that omit `replicaOrder` rely on the deterministic fallback and must keep the fallback keys unique.
+
+---
+
+## DEC-014: Workbook Parity Fixture Coverage
+
+**Status:** Accepted (with documented follow-up)
+
+**Context:** The prior audit flagged that `tests/fixtures/excel-reference.json` was auto-generated from the engine itself, making every "pass" meaningless as a parity test. The fix re-derives the fixture directly from workbook cached values via `scripts/generate-excel-reference-fixture.py`, and the regression-only fixture moves to `tests/fixtures/formula-regression.json`.
+
+**Decision:** The workbook-backed fixture currently covers only the CRAVEzero base template (empty inputs), which yields exact parity on the real interest rate and the full discount-factor series at 12-decimal precision, plus all-zero aggregates as a sanity check. Filled case-study workbooks (Väla Gård, Héliades, Aspern, Solallen) exist in `CRAVEzero/` and are already used as seed data (`prisma/seed-data/cravezero-*.ts`), but are not yet wired into the parity fixture.
+
+**Rationale:**
+- The narrow fixture is already sufficient to lock in FIN-001 mode semantics and kill the self-referential regression.
+- Extending parity to a filled case study is substantial work (input mapping + cached-output extraction) and should land as its own phase rather than delay closing the audit.
+
+**Consequences:**
+- Workbook parity is **proven** for FIN-001 / FIN-002 only.
+- Aggregate-level parity (LCC, WLC, O&M on non-empty data) is covered by the regression fixture and unit tests, not by direct workbook comparison.
+- Future work: extend `scripts/generate-excel-reference-fixture.py` (or add a sibling script) to emit a filled-case-study fixture from one of the CRAVEzero reference workbooks, and add matching parity tests in `tests/engine/workbook-reference.test.ts`.
+
+---
+
 ## References
 
 - **Workbook:** `CRAVEzero/200512_LCC_tool_beta_v2.xlsm`
 - **Implementation Plan:** `llc-implementation-plan.md` (v4, lines 583-645)
 - **Research:** `.planning/phases/02-excel-workbook-audit/02-RESEARCH.md`
 - **Formula Map:** `docs/formula-map.md` (39 formula IDs with cell references)
+- **Audit reports:** `docs/backend-calculation-verification-report.md`, `docs/backend-calculation-followup-verification-report.md`

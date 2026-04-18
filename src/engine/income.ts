@@ -1,6 +1,7 @@
 // INC-001 through INC-003: Income analysis (METHOD_IMPROVEMENT)
 
 import type { IncomeInputData } from './types';
+import { computeDiscountFactors } from './discount';
 
 export interface IncomeResult {
   netAnnualIncome: number;
@@ -38,8 +39,9 @@ export function computeIncome(
 
   // INC-003: NPV of income stream discounted by real rate
   let npvIncomeStream = 0;
+  const discountFactors = computeDiscountFactors(realRate, referencePeriod);
   for (let year = 1; year <= referencePeriod; year++) {
-    npvIncomeStream += netAnnualIncome / Math.pow(1 + realRate, year);
+    npvIncomeStream += netAnnualIncome * discountFactors[year];
   }
   const netPresentValue = npvIncomeStream - lcc;
 

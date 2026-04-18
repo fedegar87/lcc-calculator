@@ -8,10 +8,10 @@ import {
   DEFAULT_ENGINE_CONFIG,
 } from "@/engine/index";
 import { ENGINE_VERSION } from "@/engine/types";
-import type { FormulaMode } from "@/engine/types";
+import type { FormulaMode, EnergySourcePrice } from "@/engine/types";
 import { validateVariantInput } from "@/engine/validation";
 import { VariantLabel as PrismaVariantLabel } from "@/generated/prisma/enums";
-import { buildVariantInput } from "./_shared";
+import { buildVariantInput, parseEnergySourcePrices } from "./_shared";
 import { getOrCreateSnapshot } from "@/server/export/snapshot";
 import {
   renderLCCStackedBarPng,
@@ -52,7 +52,7 @@ const VARIANT_INCLUDE = {
   boundaryCondition: true,
   energyInputs: true,
   costItems: { include: { details: true } },
-  serviceComponents: true,
+  serviceComponents: { orderBy: { id: "asc" } },
   wlcInput: true,
   designCosts: true,
   incomeInput: true,
@@ -102,7 +102,32 @@ export const exportRouter = createTRPCRouter({
       }
 
       const formulaMode: FormulaMode = input.formulaMode;
-      const variantInput = buildVariantInput(variant);
+      let replicaVariant1EnergyPrices: EnergySourcePrice[] | undefined;
+      if (
+        formulaMode === "excel_replica" &&
+        variant.label === "VARIANT_2"
+      ) {
+        const variant1 = await ctx.db.variant.findFirst({
+          where: {
+            projectId: input.projectId,
+            label: PrismaVariantLabel.VARIANT_1,
+          },
+          select: {
+            boundaryCondition: {
+              select: { energyPrices: true },
+            },
+          },
+        });
+
+        replicaVariant1EnergyPrices = parseEnergySourcePrices(
+          variant1?.boundaryCondition?.energyPrices,
+        );
+      }
+
+      const variantInput = buildVariantInput(variant, {
+        formulaMode,
+        replicaVariant1EnergyPrices,
+      });
 
       // Validate at API boundary before engine invocation
       const validationErrors = validateVariantInput(variantInput);
@@ -207,7 +232,32 @@ export const exportRouter = createTRPCRouter({
       }
 
       const formulaMode: FormulaMode = input.formulaMode;
-      const variantInput = buildVariantInput(variant);
+      let replicaVariant1EnergyPrices: EnergySourcePrice[] | undefined;
+      if (
+        formulaMode === "excel_replica" &&
+        variant.label === "VARIANT_2"
+      ) {
+        const variant1 = await ctx.db.variant.findFirst({
+          where: {
+            projectId: input.projectId,
+            label: PrismaVariantLabel.VARIANT_1,
+          },
+          select: {
+            boundaryCondition: {
+              select: { energyPrices: true },
+            },
+          },
+        });
+
+        replicaVariant1EnergyPrices = parseEnergySourcePrices(
+          variant1?.boundaryCondition?.energyPrices,
+        );
+      }
+
+      const variantInput = buildVariantInput(variant, {
+        formulaMode,
+        replicaVariant1EnergyPrices,
+      });
 
       // Validate at API boundary before engine invocation
       const excelValidationErrors = validateVariantInput(variantInput);

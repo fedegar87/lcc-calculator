@@ -195,7 +195,7 @@ export const variantRouter = createTRPCRouter({
           boundaryCondition: true,
           energyInputs: true,
           costItems: { include: { details: { orderBy: { layerOrder: "asc" } } } },
-          serviceComponents: true,
+          serviceComponents: { orderBy: { id: "asc" } },
           wlcInput: true,
           designCosts: { orderBy: { lineNumber: "asc" } },
           incomeInput: true,

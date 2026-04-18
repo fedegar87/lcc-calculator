@@ -13,19 +13,19 @@
 
 | ID | Name | Sheet | Cell(s) | Formula | Inputs | Output | Classification | Notes |
 |----|------|-------|---------|---------|--------|--------|----------------|-------|
-| FIN-001 | Real interest rate | PI | D125 | `=(D121-D123)/(1+(D123/100))` | Rint (nominal), Ri (inflation) | RR (real rate) | EXCEL_REPLICA | Simplified Fisher equation. Rint and Ri stored as basis points in Calc (e.g., 151 = 1.51%), converted via D121=Calc!C3/10000 |
+| FIN-001 | Real interest rate | Project Information | D125 | `=(D121-D123)/(1+(D123/100))` | Rint (nominal), Ri (inflation) | RR (real rate) | EXCEL_REPLICA | Workbook formula for replica mode. Rint and Ri are stored as decimals in Project Information after `Calc!/10000`; bugfixed mode uses the textbook Fisher denominator `1 + Ri`. |
 | FIN-002 | Discount factor | Calc | D8 | `=(1/(1+'Project Information'!$D$125))^D7` | RR, year | Present value factor | EXCEL_REPLICA | PV = 1/(1+RR)^year. Year 0 yields factor = 1.0 |
 
 ### NRG -- Energy
 
 | ID | Name | Sheet | Cell(s) | Formula | Inputs | Output | Classification | Notes |
 |----|------|-------|---------|---------|--------|--------|----------------|-------|
-| NRG-001 | Energy price escalation | Calc | E9 | `=D9+(INDEX('PI'!$G$131:$G$149,'PI'!$D$160)*D9)` | prev_price, annual_increase_rate | new_price | EXCEL_REPLICA | Compound growth: `price * (1 + rate)`. Applied per-year starting year 1. Initial price from PI energy table |
-| NRG-002 | Annual nominal energy cost | Calc | D11 | `=(D9*'PI'!$G$160)+(D10*'PI'!$G$161)` | price x consumption (2 systems) | nominal_cost | EXCEL_REPLICA | Heating/Cooling/DHW each have 2 systems summed. Household has 1 system (NRG-005) |
+| NRG-001 | Energy price escalation | Calc | E9 | `=D9+(INDEX('Project Information'!$G$131:$G$149,'Project Information'!$D$160)*D9)` | prev_price, annual_increase_rate | new_price | EXCEL_REPLICA | Compound growth: `price * (1 + rate)`. Applied per-year starting year 1. Initial price from the Project Information energy table |
+| NRG-002 | Annual nominal energy cost | Calc | D11 | `=(D9*'Project Information'!$G$160)+(D10*'Project Information'!$G$161)` | price x consumption (2 systems) | nominal_cost | EXCEL_REPLICA | Heating/Cooling/DHW each have 2 systems summed. Household has 1 system (NRG-005) |
 | NRG-003 | Actualized energy cost | Calc | D12 | `=D11*D8` | nominal_cost x discount_factor | actualized_cost | EXCEL_REPLICA | Discounted by RR (real rate), not Rint |
 | NRG-004 | Cumulated energy cost | Calc | D13 | Year 1: `=D12` / Year N: `=C13+D12` | running sum of actualized | cumulated_cost | EXCEL_REPLICA | Running sum. See Open Question 1 for Cooling year 1 inconsistency |
-| NRG-005 | Household electricity cost | Calc | D26 | `=D24*'PI'!$G$169` | price x consumption | nominal_cost | EXCEL_REPLICA | Single system only (no system 2). Uses dedicated household row in PI |
-| NRG-006 | PV production value | Calc | D30 | `=D28*'PI'!$G$171` | PV_price x production_kWh | nominal_PV_value | EXCEL_REPLICA | Single system. Price escalation uses PI!G143 directly, not INDEX lookup |
+| NRG-005 | Household electricity cost | Calc | D26 | `=D24*'Project Information'!$G$169` | price x consumption | nominal_cost | EXCEL_REPLICA | Single system only (no system 2). Uses the dedicated household row in Project Information |
+| NRG-006 | PV production value | Calc | D29 / D30 | `D29 = D28*'Project Information'!$G$171`; `D30 = D29*D8` | PV_price x production_kWh, then discount factor | nominal_PV_value, actualized_PV_value | EXCEL_REPLICA | Single system. Price escalation uses the fixed PV source row directly, not an INDEX lookup |
 | NRG-007 | Total consumption (kWh) | PI | G160 | `=F160*$D$52` | specific_consumption (kWh/m2) x treated_floor_area (m2) | total_kWh | EXCEL_REPLICA | Converts specific to absolute consumption |
 
 ### MNT -- Maintenance
@@ -33,7 +33,7 @@
 | ID | Name | Sheet | Cell(s) | Formula | Inputs | Output | Classification | Notes |
 |----|------|-------|---------|---------|--------|--------|----------------|-------|
 | MNT-001 | Building element maintenance | Maintenance | I7 | `=$G$7/((1+$D$5)^(I5))` | annual_maint_cost, Rint, year | discounted_maint | EXCEL_REPLICA | Uses Rint (nominal), NOT RR (real). See DEC-005 |
-| MNT-002 | Building element annual cost | Maintenance | G7 | `=construction_cost * maintenance_%` | construction_cost, PI!D175 | annual_maint | EXCEL_REPLICA | Flat percentage of construction cost |
+| MNT-002 | Building element annual cost | Maintenance | G7 | `=construction_cost * maintenance_%` | construction_cost, Project Information!D175 | annual_maint | EXCEL_REPLICA | Flat percentage of construction cost |
 | MNT-003 | Service component lookup | Maintenance | F37/H37 | `=INDEX(Calc!$H$404:$H$483,D37)` / `=INDEX(Calc!$E$404:$E$483,D37)` | EN15459_index | maintenance_%, lifespan | EXCEL_REPLICA | Looks up EN 15459 table. Index from column D |
 | MNT-004 | Building service maintenance | Maintenance | I37 | `=IF(OR(I5=$H$37,I5=($H$37*2),I5=($H$37*3)),($E$37/((1+$D$5)^(I5))),($G$37/((1+$D$5)^(I5))))` | year, lifespan, construction_cost, annual_maint | discounted_cost | EXCEL_REPLICA | Replacement if year = N x lifespan (N=1,2,3). Replacement uses construction cost; non-replacement uses annual maintenance cost. Both discounted by Rint |
 
@@ -62,9 +62,9 @@
 | AGG-006 | Design costs total | Results | B57 | `=SUM(B58:B60)` | preliminary + definitive + executive design fees | total_design | EXCEL_REPLICA | From WLC rows 33-72 |
 | AGG-007 | Building site management | Results | B61 | `=WLC!J84` | site management costs | total_site_mgmt | EXCEL_REPLICA | Separate from design in LCC formula (DEC-010) |
 | AGG-008 | O&M costs | Results | B76 | `=B77-B78+B80` | energy_consumed - energy_produced + maintenance | total_O_and_M | EXCEL_REPLICA | |
-| AGG-009 | Energy consumed at ref period | Results | B77 | `=INDEX(Calc!C91:AQ91,'PI'!D119+1)` | cumulated energy consumed at year N | energy_consumed_total | EXCEL_REPLICA | INDEX offset +1 because range starts at col C (year 0) |
-| AGG-010 | Energy produced at ref period | Results | B78 | `=INDEX(Calc!C92:AQ92,'PI'!D119+1)` | cumulated PV at year N | energy_produced_total | EXCEL_REPLICA | |
-| AGG-011 | Maintenance at ref period | Results | B80 | `=INDEX(Calc!C94:AQ94,'PI'!D119+1)` | cumulated maintenance at year N | maintenance_total | EXCEL_REPLICA | |
+| AGG-009 | Energy consumed at ref period | Results | B77 | `=INDEX(Calc!C91:AQ91,'Project Information'!D119+1)` | cumulated energy consumed at year N | energy_consumed_total | EXCEL_REPLICA | INDEX offset +1 because the range starts at col C (year 0) |
+| AGG-010 | Energy produced at ref period | Results | B78 | `=INDEX(Calc!C92:AQ92,'Project Information'!D119+1)` | cumulated PV at year N | energy_produced_total | EXCEL_REPLICA | |
+| AGG-011 | Maintenance at ref period | Results | B80 | `=INDEX(Calc!C94:AQ94,'Project Information'!D119+1)` | cumulated maintenance at year N | maintenance_total | EXCEL_REPLICA | |
 | AGG-012 | LCC | Results | B62 | `=B57+B65+B76+B61` | design + construction + O&M + site_mgmt | LCC | EXCEL_REPLICA | 4 components. Site management is NOT part of design |
 | AGG-013 | WLC | Results | B55 | `=B62+B56` | LCC + non_construction | WLC | EXCEL_REPLICA | |
 | AGG-014 | KPI ratios | Results | B82-B85 | `=(B58+B59+B60)/B63`, `=B66/B63`, `=B71/B63`, `=B76/B63` | component / investment_cost | ratio | EXCEL_REPLICA | **Divisor is B63 (investment cost = construction + design + site_mgmt), NOT B62 (LCC)**. See Open Question 3 |
@@ -186,9 +186,9 @@
 
 ### 2. Energy source index = 1 maps to header row
 
-- **What we know:** Default energy source index is 1, which maps to PI row 131 (the "Fuel Source" header). `INDEX($F$131:$F$149, 1)` returns the header cell's value (no price data), yielding a price of 0.
+- **What we know:** Default energy source index is 1, which maps to Project Information row 131 (the "Fuel Source" header). `INDEX($F$131:$F$149, 1)` returns the header cell's value (no price data), yielding a price of 0.
 - **Practical impact:** Selecting index 1 effectively means "no source selected" with zero cost.
-- **Recommendation:** Web app form validation requires indices 2-19 (valid sources). Engine treats index 1 as zero-price sentinel.
+- **Recommendation:** Web app validation allows index 1 explicitly as the zero-price sentinel, matching the workbook's effective behavior.
 
 ### 3. KPI divisor: B63 (Investment cost) vs B62 (LCC)
 

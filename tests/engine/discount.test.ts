@@ -19,6 +19,15 @@ describe('FIN-001: Real interest rate', () => {
     const rr = computeRealInterestRate(0.03, 0);
     expect(rr).toBeCloseTo(0.03, 10);
   });
+
+  it('replicates the workbook formula in excel_replica mode', () => {
+    const rr = computeRealInterestRate(
+      GOLDEN_INPUT.interestRate,
+      GOLDEN_INPUT.inflationRate,
+      'excel_replica',
+    );
+    expect(rr).toBeCloseTo(0.009499468029790332, 10);
+  });
 });
 
 describe('FIN-002: Discount factors', () => {

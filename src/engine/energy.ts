@@ -5,8 +5,10 @@ import type {
   YearlyEnergyCosts,
   EnergySourcePrice,
   EnergyEndUseInput,
+  FormulaMode,
 } from './types';
 import { END_USE_PAIRS } from './types';
+import { computeDiscountFactors } from './discount';
 
 export interface EnergyCostResult {
   heating: YearlyEnergyCosts;
@@ -34,10 +36,8 @@ function escalatePrice(
   return prices;
 }
 
-/** NRG-002..006: Compute yearly energy costs for a single end-use system. */
-function computeEndUseCosts(
-  consumption: number,
-  treatedFloorArea: number,
+function computeCostsFromTotalConsumption(
+  totalConsumptionKwh: number,
   prices: number[],
   realRate: number,
   referencePeriod: number,
@@ -45,16 +45,15 @@ function computeEndUseCosts(
   const nominal = new Array<number>(referencePeriod + 1);
   const actualized = new Array<number>(referencePeriod + 1);
   const cumulated = new Array<number>(referencePeriod + 1);
+  const discountFactors = computeDiscountFactors(realRate, referencePeriod);
 
   nominal[0] = 0;
   actualized[0] = 0;
   cumulated[0] = 0;
 
-  const totalConsumption = consumption * treatedFloorArea; // kWh/m2 * m2 = kWh
-
   for (let year = 1; year <= referencePeriod; year++) {
-    nominal[year] = totalConsumption * prices[year];
-    actualized[year] = nominal[year] / Math.pow(1 + realRate, year);
+    nominal[year] = totalConsumptionKwh * prices[year];
+    actualized[year] = nominal[year] * discountFactors[year];
     cumulated[year] = cumulated[year - 1] + actualized[year];
   }
 
@@ -66,7 +65,6 @@ function addYearlyCosts(
   a: YearlyEnergyCosts,
   b: YearlyEnergyCosts,
 ): YearlyEnergyCosts {
-  const len = a.nominal.length;
   return {
     nominal: a.nominal.map((v, i) => v + b.nominal[i]),
     actualized: a.actualized.map((v, i) => v + b.actualized[i]),
@@ -88,6 +86,25 @@ function findEnergySource(
   return prices.find((p) => p.index === index) ?? null;
 }
 
+function buildEscalatedPriceSeries(
+  energyPrices: EnergySourcePrice[],
+  initialPriceSourceIndex: number,
+  annualIncreaseSourceIndex: number,
+  referencePeriod: number,
+): number[] | null {
+  const initialSource = findEnergySource(energyPrices, initialPriceSourceIndex);
+  if (!initialSource) return null;
+
+  const annualIncreaseSource =
+    findEnergySource(energyPrices, annualIncreaseSourceIndex) ?? initialSource;
+
+  return escalatePrice(
+    initialSource.pricePerKwh,
+    annualIncreaseSource.annualIncrease,
+    referencePeriod,
+  );
+}
+
 /** Find an energy end-use input by endUse name. */
 function findEndUseInput(
   inputs: EnergyEndUseInput[],
@@ -103,21 +120,28 @@ function computeSingleSystemCosts(
   treatedFloorArea: number,
   realRate: number,
   referencePeriod: number,
+  options?: {
+    initialPriceSourceIndex?: number;
+    annualIncreaseSourceIndex?: number;
+    totalConsumptionKwh?: number;
+  },
 ): YearlyEnergyCosts {
   if (!endUseInput) return zeroYearlyCosts(referencePeriod);
 
-  const source = findEnergySource(energyPrices, endUseInput.energySourceIndex);
-  if (!source) return zeroYearlyCosts(referencePeriod);
-
-  const prices = escalatePrice(
-    source.pricePerKwh,
-    source.annualIncrease,
+  const prices = buildEscalatedPriceSeries(
+    energyPrices,
+    options?.initialPriceSourceIndex ?? endUseInput.energySourceIndex,
+    options?.annualIncreaseSourceIndex ?? endUseInput.energySourceIndex,
     referencePeriod,
   );
+  if (!prices) return zeroYearlyCosts(referencePeriod);
 
-  return computeEndUseCosts(
-    endUseInput.specificConsumption,
-    treatedFloorArea,
+  const totalConsumptionKwh =
+    options?.totalConsumptionKwh ??
+    endUseInput.specificConsumption * treatedFloorArea;
+
+  return computeCostsFromTotalConsumption(
+    totalConsumptionKwh,
     prices,
     realRate,
     referencePeriod,
@@ -133,12 +157,13 @@ function computeSingleSystemCosts(
 export function computeEnergyCosts(
   input: VariantInput,
   realRate: number,
+  formulaMode: FormulaMode = 'excel_bugfixed',
 ): EnergyCostResult {
   const { energyPrices, energyInputs, treatedFloorArea, referencePeriod } =
     input;
 
   // Process dual-system pairs: heating, cooling, DHW
-  const pairResults: YearlyEnergyCosts[] = END_USE_PAIRS.map(
+  const pairResults: YearlyEnergyCosts[] = END_USE_PAIRS.slice(0, 3).map(
     ([primary, secondary]) => {
       const sys1 = computeSingleSystemCosts(
         findEndUseInput(energyInputs, primary),
@@ -162,40 +187,51 @@ export function computeEnergyCosts(
     },
   );
 
-  // NRG-007: PV production — uses fixed source index 13
+  const householdInput = findEndUseInput(energyInputs, 'HOUSEHOLD_ELECTRICITY');
+  const dhwPrimaryInput = findEndUseInput(energyInputs, 'DHW_1');
+  const household = computeSingleSystemCosts(
+    householdInput,
+    energyPrices,
+    treatedFloorArea,
+    realRate,
+    referencePeriod,
+    householdInput
+      ? {
+          annualIncreaseSourceIndex:
+            formulaMode === 'excel_replica'
+              ? (dhwPrimaryInput?.energySourceIndex ??
+                householdInput.energySourceIndex)
+              : householdInput.energySourceIndex,
+        }
+      : undefined,
+  );
+
   const pvInput = findEndUseInput(energyInputs, 'PV_PRODUCTION');
-  let pv: YearlyEnergyCosts;
-  if (pvInput) {
-    const pvSource = findEnergySource(energyPrices, PV_SOURCE_INDEX);
-    if (pvSource) {
-      const pvPrices = escalatePrice(
-        pvSource.pricePerKwh,
-        pvSource.annualIncrease,
-        referencePeriod,
-      );
-      // PV consumption: use pvProductionKwh if available, else specificConsumption * area
-      const pvConsumption = pvInput.pvProductionKwh
-        ? pvInput.pvProductionKwh / treatedFloorArea // normalize back to kWh/m2 for computeEndUseCosts
-        : pvInput.specificConsumption;
-      pv = computeEndUseCosts(
-        pvConsumption,
+  const pv = pvInput
+    ? computeSingleSystemCosts(
+        pvInput,
+        energyPrices,
         treatedFloorArea,
-        pvPrices,
         realRate,
         referencePeriod,
-      );
-    } else {
-      pv = zeroYearlyCosts(referencePeriod);
-    }
-  } else {
-    pv = zeroYearlyCosts(referencePeriod);
-  }
+        pvInput.pvProductionKwh
+          ? {
+              initialPriceSourceIndex: PV_SOURCE_INDEX,
+              annualIncreaseSourceIndex: PV_SOURCE_INDEX,
+              totalConsumptionKwh: pvInput.pvProductionKwh,
+            }
+          : {
+              initialPriceSourceIndex: PV_SOURCE_INDEX,
+              annualIncreaseSourceIndex: PV_SOURCE_INDEX,
+            },
+      )
+    : zeroYearlyCosts(referencePeriod);
 
   return {
     heating: pairResults[0],
     cooling: pairResults[1],
     dhw: pairResults[2],
-    household: pairResults[3],
+    household,
     pv,
   };
 }

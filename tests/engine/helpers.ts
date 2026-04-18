@@ -1,5 +1,5 @@
 import { expect } from 'vitest';
-import fixture from '../fixtures/excel-reference.json';
+import fixture from '../fixtures/formula-regression.json';
 import type { VariantInput, EngineConfig } from '@/engine/types';
 
 export const GOLDEN_INPUT: VariantInput = fixture.input as unknown as VariantInput;

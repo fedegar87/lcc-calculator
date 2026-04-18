@@ -73,6 +73,8 @@ export interface ServiceComponentInput {
   name: string;
   constructionCost: number;
   en15459ComponentIndex: number;
+  // Stable ordering hint propagated from the data layer for replica-mode bugs.
+  replicaOrder?: number;
 }
 
 export interface CostItemInput {
@@ -191,10 +193,10 @@ export interface LCCResult {
   } | null;
 
   // KPI-001 through KPI-006: key performance indicators (null if TFA=0)
-  kpiDesignOverLCC: number | null;
-  kpiConstructionOverLCC: number | null;
-  kpiLaborOverLCC: number | null;
-  kpiOMOverLCC: number | null;
+  kpiDesignOverInvestmentCost: number | null;
+  kpiConstructionOverInvestmentCost: number | null;
+  kpiLaborOverInvestmentCost: number | null;
+  kpiOMOverInvestmentCost: number | null;
   kpiLCCPerM2: number | null;
   kpiWLCPerM2: number | null;
 }

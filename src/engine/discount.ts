@@ -1,14 +1,21 @@
 // FIN-001, FIN-002: Financial discount calculations
 
+import type { FormulaMode } from './types';
+
 /**
- * FIN-001: Simplified Fisher formula for real interest rate.
- * RR = (Rint - Rinf) / (1 + Rinf)
- * Excel: PI!D125 = (D121-D123)/(1+(D123/100)) (basis points in Excel, decimals here per DEC-009)
+ * FIN-001: Real interest rate.
+ * excel_replica follows the workbook denominator `1 + Ri/100`.
+ * excel_bugfixed uses the textbook Fisher denominator `1 + Ri`.
  */
 export function computeRealInterestRate(
   nominalRate: number,
   inflationRate: number,
+  formulaMode: FormulaMode = 'excel_bugfixed',
 ): number {
+  if (formulaMode === 'excel_replica') {
+    return (nominalRate - inflationRate) / (1 + inflationRate / 100);
+  }
+
   return (nominalRate - inflationRate) / (1 + inflationRate);
 }
 

@@ -5,8 +5,9 @@ import {
   calculateLCC,
   DEFAULT_ENGINE_CONFIG,
 } from "@/engine/index";
+import type { EnergySourcePrice } from "@/engine/types";
 import { validateVariantInput } from "@/engine/validation";
-import { buildVariantInput } from "./_shared";
+import { buildVariantInput, parseEnergySourcePrices } from "./_shared";
 
 export const calculationRouter = createTRPCRouter({
   calculate: protectedProcedure
@@ -34,7 +35,7 @@ export const calculationRouter = createTRPCRouter({
           boundaryCondition: true,
           energyInputs: true,
           costItems: { include: { details: true } },
-          serviceComponents: true,
+          serviceComponents: { orderBy: { id: "asc" } },
           wlcInput: true,
           designCosts: true,
           incomeInput: true,
@@ -66,8 +67,33 @@ export const calculationRouter = createTRPCRouter({
         });
       }
 
+      let replicaVariant1EnergyPrices: EnergySourcePrice[] | undefined;
+      if (
+        input.formulaMode === "excel_replica" &&
+        variant.label === "VARIANT_2"
+      ) {
+        const variant1 = await ctx.db.variant.findFirst({
+          where: {
+            projectId: variant.project.id,
+            label: "VARIANT_1",
+          },
+          select: {
+            boundaryCondition: {
+              select: { energyPrices: true },
+            },
+          },
+        });
+
+        replicaVariant1EnergyPrices = parseEnergySourcePrices(
+          variant1?.boundaryCondition?.energyPrices,
+        );
+      }
+
       // Build engine input from DB data
-      const variantInput = buildVariantInput(variant);
+      const variantInput = buildVariantInput(variant, {
+        formulaMode: input.formulaMode,
+        replicaVariant1EnergyPrices,
+      });
 
       // Validate at API boundary before engine invocation
       const validationErrors = validateVariantInput(variantInput);
