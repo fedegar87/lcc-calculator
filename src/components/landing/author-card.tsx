@@ -64,7 +64,7 @@ const PUBLICATIONS = [
 export function AuthorCard() {
   return (
     <section
-      id="about"
+      id="author"
       className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/80 p-8 shadow-xl ring-1 ring-white/40 backdrop-blur-lg lg:p-12 dark:border-white/10 dark:bg-slate-900/70"
     >
       <div className="pattern-dots absolute inset-0 -z-0" aria-hidden="true" />

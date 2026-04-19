@@ -32,7 +32,7 @@ const STATS = [
 
 export function FindingsStats() {
   return (
-    <section className="space-y-4">
+    <section id="findings" className="space-y-4">
       <header className="text-center">
         <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
           Findings · 13 frontrunner buildings (D2.2)

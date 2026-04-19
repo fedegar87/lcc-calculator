@@ -37,7 +37,7 @@ const STEPS: Array<{ title: string; body: string }> = [
 
 export function MethodologySteps() {
   return (
-    <GlassCard id="methodology-steps" className="space-y-5">
+    <GlassCard id="methodology" className="space-y-5">
       <header>
         <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
           The CRAVEzero way

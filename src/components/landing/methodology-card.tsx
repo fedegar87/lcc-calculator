@@ -35,7 +35,7 @@ const ROWS = [
 
 export function MethodologyCard() {
   return (
-    <GlassCard id="methodology" className="space-y-5">
+    <GlassCard id="methodology-standards" className="space-y-5">
       <header className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
