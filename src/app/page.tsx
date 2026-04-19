@@ -49,17 +49,6 @@ export default function Home() {
             <AuthorCard />
 
             <footer className="space-y-4 pb-8 pt-6 text-xs text-slate-500">
-              <p className="text-center">
-                Funded under H2020 Grant Agreement No. 741223 Â·{" "}
-                <a
-                  href="https://www.cravezero.eu"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-eurac-red hover:underline"
-                >
-                  cravezero.eu
-                </a>
-              </p>
               <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
                 <a
                   href="http://www.cravezero.eu/pinboard/Downloads/LCCTool.html"
@@ -70,7 +59,7 @@ export default function Home() {
                   Original CRAVEzero LCC tool
                   <ExternalLink className="h-3 w-3" />
                 </a>
-                <span className="text-slate-300">Â·</span>
+                <span className="text-slate-300">·</span>
                 <a
                   href="https://www.cravezero.eu/pboard/PinboardMain/PinboardMain/"
                   target="_blank"
@@ -80,7 +69,7 @@ export default function Home() {
                   CRAVEzero Pinboard
                   <ExternalLink className="h-3 w-3" />
                 </a>
-                <span className="text-slate-300">Â·</span>
+                <span className="text-slate-300">·</span>
                 <a
                   href="https://www.cravezero.eu/reports/"
                   target="_blank"

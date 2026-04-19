@@ -26,7 +26,7 @@ const VALUES: ValueCard[] = [
     icon: FileSpreadsheet,
     iconTile: "bg-construction-100 text-construction-600",
     title: "Built on real cases",
-    body: "Methodology validated on 11 nZEBs across France, Italy, Sweden, Austria and Germany within the H2020 CRAVEzero programme.",
+    body: "Methodology validated on 11 nZEB case studies (Pernetti et al., 2021) across France, Italy, Sweden, Austria and Germany.",
   },
 ];
 

@@ -35,14 +35,14 @@ export function FindingsStats() {
     <section id="findings" className="space-y-4">
       <header className="text-center">
         <p className="text-[10px] font-bold uppercase tracking-widest text-eurac-red">
-          Findings · 13 frontrunner buildings (D2.2)
+          Findings · 13 frontrunner buildings, CRAVEzero D2.2
         </p>
         <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
           Where the money actually goes in nZEBs
         </h2>
         <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
-          Across the CRAVEzero case studies, the LCC structure is consistent
-          enough to plan against — and surprising enough to disprove the
+          Across the 13-building CRAVEzero D2.2 sample, the LCC structure is
+          consistent enough to plan against — and surprising enough to disprove the
           &ldquo;nZEBs are just expensive&rdquo; objection.
         </p>
       </header>

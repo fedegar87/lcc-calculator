@@ -107,11 +107,10 @@ export function AuthorCard() {
           </div>
 
           <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-            My research at Eurac Research focuses on life-cycle cost and
-            life-cycle assessment of nearly zero-energy buildings. LCCzero
-            grows out of CRAVEzero (H2020), where my colleagues and I
-            developed the LCC methodology and the underlying spreadsheet that
-            this web app now turns into a collaborative tool.
+            At Eurac Research, I focus on life-cycle cost and life-cycle
+            assessment for nearly zero-energy buildings. LCCzero turns that
+            research into a collaborative web workflow for repeatable cost
+            analysis, shared assumptions, and reusable case knowledge.
           </p>
 
           <div>

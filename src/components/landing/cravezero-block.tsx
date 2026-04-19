@@ -34,13 +34,12 @@ export function CRAVEzeroBlock() {
       <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
         <strong className="text-slate-900 dark:text-slate-100">CRAVEzero</strong>{" "}
         — <em>Cost Reduction and market Acceleration for Viable nearly
-        zero-Energy buildings</em> — was a Horizon 2020 research project
-        (2017–2020) that tackled the single biggest objection to nZEBs:
-        they cost too much. Across nine partners from five countries, the
-        consortium dissected 13 frontrunner buildings and produced open
-        tools — a life-cycle cost spreadsheet, an interactive case-study
-        dashboard, a business-model canvas and a process map — so planners
-        can hit EPBD targets without blowing the budget.
+        zero-Energy buildings</em> — ran from 2017 to 2020 as Horizon 2020
+        Grant Agreement 741223, led by AEE INTEC with nine partners across five
+        countries. The project documented 13 frontrunner buildings (D2.2) and
+        turned that work into open deliverables: the Pinboard, the full Excel
+        LCC tool, the case-study dashboard, the business-model canvas, and the
+        process map.
       </p>
 
       <div className="grid gap-3 sm:grid-cols-3">
