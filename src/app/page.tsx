@@ -26,7 +26,7 @@ export default function Home() {
           </Link>
           <div className="flex items-center gap-3">
             <LandingNav mode="mobile" />
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:bg-slate-800 dark:text-slate-400">
               v1.0 preview
             </span>
           </div>
@@ -52,33 +52,33 @@ export default function Home() {
             </div>
             <AuthorCard />
 
-            <footer className="space-y-4 pb-8 pt-6 text-xs text-slate-500">
+            <footer className="space-y-4 pb-8 pt-6 text-xs text-slate-500 dark:text-slate-400">
               <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
                 <a
                   href="http://www.cravezero.eu/pinboard/Downloads/LCCTool.html"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 hover:text-eurac-red"
+                  className="inline-flex items-center gap-1 transition hover:text-eurac-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2"
                 >
                   Original CRAVEzero LCC tool
                   <ExternalLink className="h-3 w-3" />
                 </a>
-                <span className="text-slate-300">·</span>
+                <span className="text-slate-300 dark:text-slate-600">·</span>
                 <a
                   href="https://www.cravezero.eu/pboard/PinboardMain/PinboardMain/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 hover:text-eurac-red"
+                  className="inline-flex items-center gap-1 transition hover:text-eurac-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2"
                 >
                   CRAVEzero Pinboard
                   <ExternalLink className="h-3 w-3" />
                 </a>
-                <span className="text-slate-300">·</span>
+                <span className="text-slate-300 dark:text-slate-600">·</span>
                 <a
                   href="https://www.cravezero.eu/reports/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 hover:text-eurac-red"
+                  className="inline-flex items-center gap-1 transition hover:text-eurac-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2"
                 >
                   Public deliverables
                   <ExternalLink className="h-3 w-3" />

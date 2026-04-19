@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { BookOpen, GraduationCap, X, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -87,6 +87,9 @@ interface ReferenceModalProps {
   assumptions?: Assumption[];
 }
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 function isDoi(link: string) {
   return /^https?:\/\/(dx\.)?doi\.org\//i.test(link);
 }
@@ -100,14 +103,65 @@ export function ReferenceModal({
   assumptions,
 }: ReferenceModalProps) {
   const accent = ACCENT_THEMES[domain];
+  const modalRef = useRef<HTMLDivElement>(null);
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+
+    restoreFocusRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+    const getFocusable = () =>
+      Array.from(
+        modalRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? [],
+      ).filter((element) => !element.hasAttribute("disabled"));
+
+    const focusFirst = () => {
+      getFocusable()[0]?.focus();
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (e.key !== "Tab") return;
+
+      const focusable = getFocusable();
+      if (!focusable.length) {
+        e.preventDefault();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+
+      if (e.shiftKey) {
+        if (active === first || active === modalRef.current) {
+          e.preventDefault();
+          last.focus();
+        }
+        return;
+      }
+
+      if (active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    const raf = window.requestAnimationFrame(focusFirst);
+    document.addEventListener("keydown", onKey);
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      document.removeEventListener("keydown", onKey);
+      restoreFocusRef.current?.focus();
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen || typeof document === "undefined") return null;
@@ -121,8 +175,10 @@ export function ReferenceModal({
       aria-labelledby="reference-modal-title"
     >
       <div
+        ref={modalRef}
         className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-slate-200 animate-scale-in dark:bg-slate-900 dark:ring-slate-800"
         onClick={(e) => e.stopPropagation()}
+        tabIndex={-1}
       >
         <header className="flex items-start justify-between gap-4 border-b border-slate-100 p-6 dark:border-slate-800">
           <div className="flex items-start gap-3">
@@ -141,7 +197,7 @@ export function ReferenceModal({
               >
                 {title}
               </h2>
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                 {citations.length} peer-reviewed source
                 {citations.length === 1 ? "" : "s"}
                 {assumptions?.length
@@ -154,7 +210,7 @@ export function ReferenceModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
+            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           >
             <X className="h-4 w-4" />
           </button>
@@ -163,7 +219,7 @@ export function ReferenceModal({
         <div className="flex-1 overflow-y-auto p-6">
           {assumptions?.length ? (
             <section className="mb-6">
-              <h3 className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+              <h3 className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                 Engine assumptions
               </h3>
               <ul className="space-y-2">
@@ -182,7 +238,7 @@ export function ReferenceModal({
                       {a.rationale}
                     </p>
                     {a.citationId ? (
-                      <p className="mt-1 text-[11px] text-slate-500">
+                      <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
                         Source key: <code>{a.citationId}</code>
                       </p>
                     ) : null}
@@ -194,7 +250,7 @@ export function ReferenceModal({
 
           <section>
             {assumptions?.length ? (
-              <h3 className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+              <h3 className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                 References
               </h3>
             ) : null}
@@ -226,7 +282,9 @@ export function ReferenceModal({
                     <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
                       {c.authors}
                       <span className="mx-1.5 text-slate-300">·</span>
-                      <em className="text-slate-500">{c.publication}</em>
+                      <em className="text-slate-500 dark:text-slate-400">
+                        {c.publication}
+                      </em>
                     </p>
                     <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
                       {c.description}
@@ -261,7 +319,7 @@ export function ReferenceModal({
           </section>
         </div>
 
-        <footer className="flex items-center gap-2 border-t border-slate-100 px-6 py-3 text-[11px] text-slate-500 dark:border-slate-800">
+        <footer className="flex items-center gap-2 border-t border-slate-100 px-6 py-3 text-[11px] text-slate-500 dark:border-slate-800 dark:text-slate-400">
           <GraduationCap className="h-3.5 w-3.5" />
           <span>
             All models implemented from peer-reviewed literature and EU

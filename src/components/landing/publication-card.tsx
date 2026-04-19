@@ -35,7 +35,7 @@ export function PublicationCard({
         >
           {type}
           <span className="text-slate-400">·</span>
-          <span className="font-semibold normal-case tracking-normal text-slate-600">
+          <span className="font-semibold normal-case tracking-normal text-slate-600 dark:text-slate-300">
             {journal}
           </span>
         </span>
@@ -53,7 +53,7 @@ export function PublicationCard({
   );
 
   const className =
-    "group block rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900";
+    "group block rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2 dark:border-slate-800 dark:bg-slate-900";
 
   return link ? (
     <a

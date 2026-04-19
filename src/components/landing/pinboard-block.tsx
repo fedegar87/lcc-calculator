@@ -90,7 +90,7 @@ export function PinboardBlock() {
             href={PINBOARD_MAIN}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-eurac-red hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-eurac-red hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2"
           >
             Open the Pinboard
             <ExternalLink className="h-3 w-3" />
@@ -101,7 +101,7 @@ export function PinboardBlock() {
           href={PINBOARD_MAIN}
           target="_blank"
           rel="noopener noreferrer"
-          className="block overflow-hidden rounded-2xl ring-1 ring-slate-200 transition hover:ring-eurac-red/40 dark:ring-slate-800"
+          className="block overflow-hidden rounded-2xl ring-1 ring-slate-200 transition hover:ring-eurac-red/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2 dark:ring-slate-800"
           aria-label="CRAVEzero Pinboard interface preview"
         >
           <Image
@@ -134,7 +134,7 @@ export function PinboardBlock() {
                     isSuccessor
                       ? "border-eurac-red/40 bg-eurac-red/5 ring-1 ring-eurac-red/20"
                       : isSibling
-                        ? "border-fin-200 bg-fin-50/40"
+                        ? "border-fin-200 bg-fin-50/40 dark:border-fin-500/20 dark:bg-fin-500/10"
                         : "border-slate-100 bg-white/60 dark:border-slate-800 dark:bg-slate-900/40",
                   )}
                 >
@@ -156,7 +156,7 @@ export function PinboardBlock() {
                   <p className="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
                     {t.desc}
                   </p>
-                  <p className="mt-auto pt-1 text-[10px] font-semibold text-slate-500">
+                  <p className="mt-auto pt-1 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
                     Source ↗
                   </p>
                 </article>

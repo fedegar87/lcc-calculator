@@ -71,10 +71,11 @@ const CASES: CaseStudy[] = [
 ];
 
 const TONE_TILE: Record<CaseStudy["tone"], string> = {
-  construction: "bg-construction-50 ring-construction-100",
-  fin: "bg-fin-50 ring-fin-100",
-  nrg: "bg-nrg-50 ring-nrg-100",
-  mnt: "bg-mnt-50 ring-mnt-100",
+  construction:
+    "border-construction-100 bg-construction-50 ring-construction-100 dark:border-construction-500/20 dark:bg-construction-500/10 dark:ring-construction-500/20",
+  fin: "border-fin-100 bg-fin-50 ring-fin-100 dark:border-fin-500/20 dark:bg-fin-500/10 dark:ring-fin-500/20",
+  nrg: "border-nrg-100 bg-nrg-50 ring-nrg-100 dark:border-nrg-500/20 dark:bg-nrg-500/10 dark:ring-nrg-500/20",
+  mnt: "border-mnt-100 bg-mnt-50 ring-mnt-100 dark:border-mnt-500/20 dark:bg-mnt-500/10 dark:ring-mnt-500/20",
 };
 
 const TONE_BADGE: Record<CaseStudy["tone"], string> = {
@@ -88,7 +89,7 @@ export function CaseStudies() {
   return (
     <section className="space-y-4">
       <header>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
           Case studies
         </p>
         <h3 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
@@ -106,7 +107,7 @@ export function CaseStudies() {
           const card = (
             <article
               className={cn(
-                "group flex h-full flex-col gap-3 rounded-2xl p-4 ring-1 transition hover:-translate-y-0.5 hover:shadow-md",
+                "group flex h-full flex-col gap-3 rounded-2xl border p-4 ring-1 transition hover:-translate-y-0.5 hover:shadow-md",
                 TONE_TILE[c.tone],
               )}
             >
@@ -116,7 +117,7 @@ export function CaseStudies() {
                     <span className="mr-1.5">{c.flag}</span>
                     {c.name}
                   </h4>
-                  <p className="mt-0.5 flex items-center gap-1 text-[11px] text-slate-500">
+                  <p className="mt-0.5 flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
                     <MapPin className="h-3 w-3" />
                     {c.location}, {c.country} · {c.year}
                   </p>
@@ -133,15 +134,13 @@ export function CaseStudies() {
 
               <dl className="space-y-1.5 text-xs">
                 <div>
-                  <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                  <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                     GFA
                   </dt>
-                  <dd className="text-slate-700 dark:text-slate-200">
-                    {c.gfa}
-                  </dd>
+                  <dd className="text-slate-700 dark:text-slate-200">{c.gfa}</dd>
                 </div>
                 <div>
-                  <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                  <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                     Systems
                   </dt>
                   <dd className="text-slate-700 dark:text-slate-200">
@@ -149,7 +148,7 @@ export function CaseStudies() {
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                  <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                     LCC
                   </dt>
                   <dd className="text-sm font-bold tabular-nums text-slate-900 dark:text-slate-50">
@@ -159,7 +158,7 @@ export function CaseStudies() {
               </dl>
 
               {c.link ? (
-                <p className="mt-auto inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 transition group-hover:text-eurac-red">
+                <p className="mt-auto inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 transition group-hover:text-eurac-red dark:text-slate-300">
                   Fact sheet
                   <ExternalLink className="h-3 w-3" />
                 </p>

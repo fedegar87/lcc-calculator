@@ -5,7 +5,7 @@ const STATS = [
     value: "60%",
     label: "Investment",
     sub: "Design, materials, labour",
-    tile: "bg-construction-50/60 ring-construction-100",
+    tile: "border-construction-100 bg-construction-50/60 ring-construction-100 dark:border-construction-500/20 dark:bg-construction-500/10 dark:ring-construction-500/20",
     accent: "text-construction-700",
     bar: "bg-construction-500",
     pct: "w-[60%]",
@@ -14,7 +14,7 @@ const STATS = [
     value: "40%",
     label: "Operation",
     sub: "Energy + maintenance over 40y",
-    tile: "bg-nrg-50/60 ring-nrg-100",
+    tile: "border-nrg-100 bg-nrg-50/60 ring-nrg-100 dark:border-nrg-500/20 dark:bg-nrg-500/10 dark:ring-nrg-500/20",
     accent: "text-nrg-700",
     bar: "bg-nrg-500",
     pct: "w-[40%]",
@@ -23,7 +23,7 @@ const STATS = [
     value: "≈15%",
     label: "Energy alone",
     sub: "Of total LCC, after on-site RES",
-    tile: "bg-pv-50/60 ring-pv-100",
+    tile: "border-pv-100 bg-pv-50/60 ring-pv-100 dark:border-pv-500/20 dark:bg-pv-500/10 dark:ring-pv-500/20",
     accent: "text-pv-700",
     bar: "bg-pv-500",
     pct: "w-[15%]",
@@ -42,14 +42,17 @@ export function FindingsStats() {
         </h2>
         <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
           Across the 13-building CRAVEzero D2.2 sample, the LCC structure is
-          consistent enough to plan against — and surprising enough to disprove the
-          &ldquo;nZEBs are just expensive&rdquo; objection.
+          consistent enough to plan against — and surprising enough to disprove
+          the &ldquo;nZEBs are just expensive&rdquo; objection.
         </p>
       </header>
 
       <div className="grid gap-4 md:grid-cols-3">
         {STATS.map((s) => (
-          <article key={s.label} className={cn("rounded-2xl p-5 ring-1", s.tile)}>
+          <article
+            key={s.label}
+            className={cn("rounded-2xl border p-5 ring-1", s.tile)}
+          >
             <p className={cn("text-3xl font-bold tabular-nums", s.accent)}>
               {s.value}
             </p>
@@ -66,7 +69,7 @@ export function FindingsStats() {
         ))}
       </div>
 
-      <p className="text-center text-xs text-slate-500">
+      <p className="text-center text-xs text-slate-500 dark:text-slate-400">
         Plus-energy buildings (e.g.{" "}
         <span className="font-semibold">Green Home Nanterre</span>) flip the
         sign: exported energy &gt; consumed, so the energy line becomes a net

@@ -69,7 +69,6 @@ export function AuthorCard() {
     >
       <div className="pattern-dots absolute inset-0 -z-0" aria-hidden="true" />
       <div className="relative grid gap-10 lg:grid-cols-2">
-        {/* Left: bio + socials + affiliations */}
         <div className="space-y-5">
           <p className="text-[10px] font-bold uppercase tracking-widest text-eurac-red">
             Developed by
@@ -78,14 +77,14 @@ export function AuthorCard() {
             <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
               Federico Garzia
             </h2>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               Researcher · Institute for Renewable Energy
             </p>
           </div>
 
           <a
             href="mailto:federico.garzia@eurac.edu"
-            className="inline-flex items-center gap-2 text-sm text-slate-700 transition hover:text-eurac-red dark:text-slate-200"
+            className="inline-flex items-center gap-2 text-sm text-slate-700 transition hover:text-eurac-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2 dark:text-slate-200"
           >
             <Mail className="h-4 w-4" />
             federico.garzia@eurac.edu
@@ -98,7 +97,7 @@ export function AuthorCard() {
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition ${s.pill}`}
+                className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2 ${s.pill}`}
               >
                 {s.label}
                 <ExternalLink className="h-3 w-3" />
@@ -114,7 +113,7 @@ export function AuthorCard() {
           </p>
 
           <div>
-            <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
               Affiliation
             </p>
             <div className="inline-flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -125,7 +124,7 @@ export function AuthorCard() {
                 <p className="font-bold text-slate-900 dark:text-slate-100">
                   Eurac Research
                 </p>
-                <p className="text-slate-500">
+                <p className="text-slate-500 dark:text-slate-400">
                   Institute for Renewable Energy · Bolzano, Italy
                 </p>
               </div>
@@ -133,7 +132,6 @@ export function AuthorCard() {
           </div>
         </div>
 
-        {/* Right: publications */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-eurac-red" />

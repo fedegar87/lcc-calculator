@@ -77,7 +77,7 @@ export function LandingNav({ mode }: { mode: LandingNavMode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "block rounded-lg px-3 py-2 text-sm font-semibold transition",
+                  "block rounded-lg px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2",
                   isActive
                     ? "bg-eurac-red/10 text-eurac-red"
                     : "text-slate-600 hover:text-eurac-red dark:text-slate-300 dark:hover:text-eurac-red",
@@ -104,7 +104,7 @@ export function LandingNav({ mode }: { mode: LandingNavMode }) {
             key={item.href}
             href={item.href}
             className={cn(
-              "font-semibold transition",
+              "rounded-md font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2",
               isActive
                 ? "text-eurac-red"
                 : "text-slate-600 hover:text-eurac-red dark:text-slate-300 dark:hover:text-eurac-red",

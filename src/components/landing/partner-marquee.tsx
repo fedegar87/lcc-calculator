@@ -83,7 +83,7 @@ function PartnerCard({ partner }: { partner: Partner }) {
         <p className="truncate text-xs font-bold text-slate-900 dark:text-slate-50">
           {partner.name}
         </p>
-        <p className="truncate text-[10px] text-slate-500">
+        <p className="truncate text-[10px] text-slate-500 dark:text-slate-400">
           {partner.role ? `${partner.role} · ` : ""}
           {partner.country}
         </p>
@@ -97,7 +97,7 @@ function PartnerCard({ partner }: { partner: Partner }) {
         href={partner.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2 rounded-xl"
+        className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2"
         aria-label={`${partner.name} — ${partner.country}${partner.role ? `, ${partner.role}` : ""}`}
       >
         {inner}
@@ -108,7 +108,6 @@ function PartnerCard({ partner }: { partner: Partner }) {
 }
 
 export function PartnerMarquee() {
-  // Duplicate the list so the keyframe can translate -50% without a visible seam.
   const loop = [...PARTNERS, ...PARTNERS];
   return (
     <div

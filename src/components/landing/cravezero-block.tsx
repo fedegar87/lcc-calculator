@@ -54,14 +54,16 @@ export function CRAVEzeroBlock() {
               <p className="text-xs font-bold text-slate-900 dark:text-slate-50">
                 {f.label}
               </p>
-              <p className="text-[11px] text-slate-500">{f.sub}</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                {f.sub}
+              </p>
             </div>
           );
         })}
       </div>
 
       <div>
-        <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+        <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
           Consortium · 9 partners across 5 countries
         </p>
         <PartnerMarquee />
@@ -71,7 +73,7 @@ export function CRAVEzeroBlock() {
         href="https://www.cravezero.eu"
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-eurac-red hover:underline"
+        className="inline-flex items-center gap-1.5 text-xs font-semibold text-eurac-red hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2"
       >
         Visit cravezero.eu
         <ExternalLink className="h-3 w-3" />

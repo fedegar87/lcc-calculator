@@ -44,7 +44,7 @@ export function MethodologyCard() {
           <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
             Standards, models and provenance
           </h2>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Every number in LCCzero traces back to a public standard or a
             peer-reviewed paper. Open the references to see where each
             assumption comes from.
@@ -75,7 +75,7 @@ export function MethodologyCard() {
       <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
         {ROWS.map((r) => (
           <div key={r.label} className="flex flex-col">
-            <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+            <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
               {r.label}
             </dt>
             <dd className="mt-0.5 text-slate-800 dark:text-slate-200">

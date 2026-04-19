@@ -50,13 +50,14 @@ const TILES: Tile[] = [
 ];
 
 const TILE_SURFACE: Record<LCCDomain, string> = {
-  fin: "bg-fin-50/60 ring-fin-100",
-  construction: "bg-construction-50/60 ring-construction-100",
-  nrg: "bg-nrg-50/60 ring-nrg-100",
-  pv: "bg-pv-50/60 ring-pv-100",
-  mnt: "bg-mnt-50/60 ring-mnt-100",
-  res: "bg-res-50/60 ring-res-100",
-  inc: "bg-inc-50/60 ring-inc-100",
+  fin: "border-fin-100 bg-fin-50/60 ring-fin-100 dark:border-fin-500/20 dark:bg-fin-500/10 dark:ring-fin-500/20",
+  construction:
+    "border-construction-100 bg-construction-50/60 ring-construction-100 dark:border-construction-500/20 dark:bg-construction-500/10 dark:ring-construction-500/20",
+  nrg: "border-nrg-100 bg-nrg-50/60 ring-nrg-100 dark:border-nrg-500/20 dark:bg-nrg-500/10 dark:ring-nrg-500/20",
+  pv: "border-pv-100 bg-pv-50/60 ring-pv-100 dark:border-pv-500/20 dark:bg-pv-500/10 dark:ring-pv-500/20",
+  mnt: "border-mnt-100 bg-mnt-50/60 ring-mnt-100 dark:border-mnt-500/20 dark:bg-mnt-500/10 dark:ring-mnt-500/20",
+  res: "border-res-100 bg-res-50/60 ring-res-100 dark:border-res-500/20 dark:bg-res-500/10 dark:ring-res-500/20",
+  inc: "border-inc-100 bg-inc-50/60 ring-inc-100 dark:border-inc-500/20 dark:bg-inc-500/10 dark:ring-inc-500/20",
 };
 
 const TILE_ICON_TILE: Record<LCCDomain, string> = {
@@ -88,7 +89,7 @@ export function DomainTiles() {
           <article
             key={t.domain}
             className={cn(
-              "group rounded-2xl p-5 ring-1 transition hover:-translate-y-1 hover:shadow-lg",
+              "group rounded-2xl border p-5 ring-1 transition hover:-translate-y-1 hover:shadow-lg",
               TILE_SURFACE[t.domain],
             )}
           >
@@ -102,7 +103,7 @@ export function DomainTiles() {
                 <Icon className="h-5 w-5" aria-hidden="true" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                   {t.label}
                 </p>
                 <p className="text-sm font-bold text-slate-900 dark:text-slate-50">
