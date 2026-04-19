@@ -5,6 +5,7 @@ import { AuthorCard } from "@/components/landing/author-card";
 import { CRAVEzeroBlock } from "@/components/landing/cravezero-block";
 import { FindingsStats } from "@/components/landing/findings-stats";
 import { Hero } from "@/components/landing/hero";
+import { LandingCTA } from "@/components/landing/landing-cta";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { MethodologyCard } from "@/components/landing/methodology-card";
 import { MethodologySteps } from "@/components/landing/methodology-steps";
@@ -46,6 +47,9 @@ export default function Home() {
             <MethodologySteps />
             <MethodologyCard />
             <FindingsStats />
+            <div className="flex justify-center pt-2">
+              <LandingCTA />
+            </div>
             <AuthorCard />
 
             <footer className="space-y-4 pb-8 pt-6 text-xs text-slate-500">
