@@ -1,7 +1,7 @@
 import { LandingCTA } from "./landing-cta";
 
 /**
- * Hero card — title cluster + auth-aware CTA pair.
+ * Hero card â€” title cluster + auth-aware CTA pair.
  * Visual hook for the landing page (top of overview).
  */
 export function Hero() {
@@ -19,11 +19,14 @@ export function Hero() {
             to <span className="text-eurac-red">life-cycle cost</span>
           </h1>
           <p className="mx-auto max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            LCCzero is the successor of the CRAVEzero Life Cycle Cost
-            workbook — an H2020 research output that benchmarked nearly
-            zero-energy buildings across Europe. Rebuilt for the web,
-            preserving the ISO 15686-5 methodology and extending it with
-            modern UX, collaboration and up-to-date data.
+            LCCzero is the modern web successor of the CRAVEzero{" "}
+            <strong className="text-slate-900 dark:text-slate-50">
+              full Excel LCC workbook
+            </strong>{" "}
+            — not the reduced web calculator that also lives on the Pinboard.
+            Rebuilt on the same ISO 15686-5 methodology that benchmarked nearly
+            zero-energy buildings across Europe, extended with collaboration,
+            shared case libraries, and current data.
           </p>
         </div>
 
