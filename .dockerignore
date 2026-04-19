@@ -16,7 +16,7 @@ docs
 plans
 tests
 CRAVEzero
-scripts
+scripts/**/*.py
 **/*.tsbuildinfo
 .env
 .env.*
