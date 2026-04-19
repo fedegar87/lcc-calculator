@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 import { AmbientBackground } from "@/components/shared/ambient-background";
 import { Hero } from "@/components/landing/hero";
@@ -9,7 +8,6 @@ import { CRAVEzeroBlock } from "@/components/landing/cravezero-block";
 import { PinboardBlock } from "@/components/landing/pinboard-block";
 import { MethodologySteps } from "@/components/landing/methodology-steps";
 import { FindingsStats } from "@/components/landing/findings-stats";
-import { CaseStudies } from "@/components/landing/case-studies";
 import { MethodologyCard } from "@/components/landing/methodology-card";
 import { AuthorCard } from "@/components/landing/author-card";
 
@@ -39,12 +37,6 @@ export default function Home() {
               Pinboard
             </a>
             <a
-              href="#case-studies"
-              className="hidden font-semibold text-slate-600 hover:text-eurac-red sm:inline"
-            >
-              Case studies
-            </a>
-            <a
               href="#about"
               className="hidden font-semibold text-slate-600 hover:text-eurac-red sm:inline"
             >
@@ -64,40 +56,10 @@ export default function Home() {
           <PinboardBlock />
           <MethodologySteps />
           <FindingsStats />
-          <section id="case-studies">
-            <CaseStudies />
-          </section>
           <MethodologyCard />
           <AuthorCard />
 
           <footer className="space-y-4 pb-8 pt-6 text-xs text-slate-500">
-            <div className="flex flex-col items-center gap-4 rounded-2xl border border-slate-100 bg-white/60 p-5 ring-1 ring-white/40 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/40 sm:flex-row sm:justify-between">
-              <a
-                href="https://www.cravezero.eu"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block max-w-[280px]"
-                aria-label="CRAVEzero project home"
-              >
-                <Image
-                  src="/cravezero/cravezero-banner.gif"
-                  alt="CRAVEzero — Cost Reduction and market Acceleration for Viable nearly zero-Energy buildings"
-                  width={1140}
-                  height={60}
-                  className="h-auto w-full rounded-md bg-slate-900 p-2"
-                  unoptimized
-                />
-              </a>
-              <Image
-                src="/cravezero/eu-funding.png"
-                alt="Funded by the European Union — Horizon 2020 Research and Innovation Programme"
-                width={300}
-                height={80}
-                className="h-12 w-auto"
-                unoptimized
-              />
-            </div>
-
             <p className="text-center">
               Funded under H2020 Grant Agreement No. 741223 ·{" "}
               <a

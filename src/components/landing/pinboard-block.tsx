@@ -24,14 +24,11 @@ const TOOLS: Tool[] = [
   {
     name: "Life Cycle Cost Calculator",
     desc: "Reduced web version — preliminary LCC on aggregated inputs.",
-    highlight: "sibling",
-    href: "http://www.cravezero.eu/pinboard/Downloads/LCCTool.html",
   },
   {
     name: "LCC Tool — full Excel workbook",
     desc: "Complete version with all functionalities. LCCzero is the web successor of this tool.",
     highlight: "successor",
-    href: "https://www.cravezero.eu/pinboard/Downloads/CRAVEzero_LCC_tool_beta.zip",
   },
   { name: "nZEB Life Cycle Tracker Tool", desc: "Downloadable Excel tracker." },
 ];

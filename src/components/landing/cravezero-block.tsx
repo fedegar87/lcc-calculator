@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { GlassCard } from "@/components/shared/glass-card";
 import { ExternalLink, Users, Calendar, Award } from "lucide-react";
 import { PartnerMarquee } from "./partner-marquee";
@@ -11,13 +12,23 @@ const FACTS = [
 export function CRAVEzeroBlock() {
   return (
     <GlassCard id="about-cravezero" className="space-y-6">
-      <header className="space-y-2">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-eurac-red">
-          About the parent project
-        </p>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-          CRAVEzero — closing the cost gap of nZEBs
-        </h2>
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-2">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-eurac-red">
+            About the parent project
+          </p>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+            CRAVEzero — closing the cost gap of nZEBs
+          </h2>
+        </div>
+        <Image
+          src="/cravezero/eu-funding.png"
+          alt="Funded by the European Union — Horizon 2020 Research and Innovation Programme"
+          width={300}
+          height={80}
+          className="h-12 w-auto shrink-0"
+          unoptimized
+        />
       </header>
 
       <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
