@@ -11,6 +11,61 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import * as motion from "motion/react-client";
 import type { LCCResult } from "@/engine/types";
+import { ReferenceButton } from "@/components/shared/reference-button";
+import {
+  FOUNDATIONAL_CITATIONS,
+  METHODOLOGY_CITATIONS,
+  BOUNDARY_CITATIONS,
+} from "@/lib/citations";
+
+const LCC_BREAKDOWN_ASSUMPTIONS = [
+  {
+    rule: "NPV computed over a 40-year analysis period",
+    rationale:
+      "Pernetti et al. 2021 — balances life-cycle perspective and forecast reliability for nZEBs.",
+    citationId: "pernetti-2021-scs",
+  },
+  {
+    rule: "End-of-life costs excluded by default",
+    rationale:
+      "EU-wide demolition/disposal data is fragmented; included as an opt-in via Vázquez-López et al. 2020 method.",
+    citationId: "vazquez-lopez-2020",
+  },
+  {
+    rule: "Maintenance uses nominal rate (Rint), energy uses real (RR)",
+    rationale:
+      "Asymmetry inherited from the CRAVEzero spreadsheet — maintenance contracts are quoted nominally, energy-price escalators are typically real.",
+  },
+];
+
+const COST_EVOLUTION_ASSUMPTIONS = [
+  {
+    rule: "Real discount rate = 1.51% baseline",
+    rationale:
+      "Euro-area average 2009–2016 (FRED INTDSREZQ193N) — the same baseline used in the foundational paper.",
+    citationId: "fred-eurodiscount",
+  },
+  {
+    rule: "Energy price escalation independent of general inflation",
+    rationale:
+      "Bounds taken from Eurostat per-country ranges; Pernetti 2021 shows escalation × interest rate is the strongest non-linear driver of LCC.",
+    citationId: "eurostat-electricity",
+  },
+];
+
+const CONSTRUCTION_ASSUMPTIONS = [
+  {
+    rule: "Element breakdown follows the European Code of Measurement (CEEC)",
+    rationale:
+      "Standardised structure for cross-country LCC comparability; same breakdown used for the 11 CRAVEzero case studies.",
+    citationId: "ceec-2004",
+  },
+  {
+    rule: "Detail cost = MAX(material, unit × area)",
+    rationale:
+      "Resolved in the tRPC layer before the engine runs — the engine sees pre-aggregated costs.",
+  },
+];
 
 interface ResultsDashboardProps {
   variantId: string;
@@ -125,9 +180,17 @@ export function ResultsDashboard({
           variants={stagger}
         >
           <GlassCard>
-            <h3 className="mb-4 text-sm font-medium text-muted-foreground">
-              LCC Breakdown
-            </h3>
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <h3 className="text-sm font-medium text-muted-foreground">
+                LCC Breakdown
+              </h3>
+              <ReferenceButton
+                domain="construction"
+                title="LCC breakdown — methodology"
+                citations={FOUNDATIONAL_CITATIONS}
+                assumptions={LCC_BREAKDOWN_ASSUMPTIONS}
+              />
+            </div>
             <LCCStackedBar result={result} />
           </GlassCard>
         </motion.div>
@@ -157,9 +220,17 @@ export function ResultsDashboard({
       {/* Row 3: Cost evolution line chart (full width) */}
       <motion.div custom={6} initial="hidden" animate="visible" variants={stagger}>
         <GlassCard>
-          <h3 className="mb-4 text-sm font-medium text-muted-foreground">
-            Cost Evolution over Reference Period
-          </h3>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <h3 className="text-sm font-medium text-muted-foreground">
+              Cost Evolution over Reference Period
+            </h3>
+            <ReferenceButton
+              domain="fin"
+              title="Cost evolution — boundary conditions"
+              citations={BOUNDARY_CITATIONS}
+              assumptions={COST_EVOLUTION_ASSUMPTIONS}
+            />
+          </div>
           <CostEvolutionLine result={result} />
         </GlassCard>
       </motion.div>
@@ -168,9 +239,17 @@ export function ResultsDashboard({
       <div className="grid gap-4 md:grid-cols-2">
         <motion.div custom={7} initial="hidden" animate="visible" variants={stagger}>
           <GlassCard>
-            <h3 className="mb-4 text-sm font-medium text-muted-foreground">
-              Construction Cost Breakdown
-            </h3>
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Construction Cost Breakdown
+              </h3>
+              <ReferenceButton
+                domain="construction"
+                title="Construction breakdown — CEEC structure"
+                citations={METHODOLOGY_CITATIONS}
+                assumptions={CONSTRUCTION_ASSUMPTIONS}
+              />
+            </div>
             <ConstructionBreakdownTable
               constructionByCategory={result.constructionByCategory}
               totalMaterials={result.totalMaterials}
