@@ -38,12 +38,12 @@ export function MethodologyCard() {
     <GlassCard id="methodology-standards" className="space-y-5">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-eurac-red">
             Methodology
           </p>
-          <h3 className="mt-1 text-base font-bold tracking-tight text-slate-900 dark:text-slate-50">
+          <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
             Standards, models and provenance
-          </h3>
+          </h2>
           <p className="mt-1 text-xs text-slate-500">
             Every number in LCCzero traces back to a public standard or a
             peer-reviewed paper. Open the references to see where each

@@ -71,7 +71,7 @@ export function AuthorCard() {
       <div className="relative grid gap-10 lg:grid-cols-2">
         {/* Left: bio + socials + affiliations */}
         <div className="space-y-5">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-eurac-red">
             Developed by
           </p>
           <div>

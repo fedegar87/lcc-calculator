@@ -34,12 +34,12 @@ export function FindingsStats() {
   return (
     <section id="findings" className="space-y-4">
       <header className="text-center">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-eurac-red">
           Findings · 13 frontrunner buildings (D2.2)
         </p>
-        <h3 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+        <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
           Where the money actually goes in nZEBs
-        </h3>
+        </h2>
         <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
           Across the CRAVEzero case studies, the LCC structure is consistent
           enough to plan against — and surprising enough to disprove the
@@ -49,10 +49,7 @@ export function FindingsStats() {
 
       <div className="grid gap-4 md:grid-cols-3">
         {STATS.map((s) => (
-          <article
-            key={s.label}
-            className={cn("rounded-2xl p-5 ring-1", s.tile)}
-          >
+          <article key={s.label} className={cn("rounded-2xl p-5 ring-1", s.tile)}>
             <p className={cn("text-3xl font-bold tabular-nums", s.accent)}>
               {s.value}
             </p>
@@ -72,8 +69,8 @@ export function FindingsStats() {
       <p className="text-center text-xs text-slate-500">
         Plus-energy buildings (e.g.{" "}
         <span className="font-semibold">Green Home Nanterre</span>) flip the
-        sign: exported energy &gt; consumed, so the energy line becomes a
-        net credit over the life cycle.
+        sign: exported energy &gt; consumed, so the energy line becomes a net
+        credit over the life cycle.
       </p>
     </section>
   );

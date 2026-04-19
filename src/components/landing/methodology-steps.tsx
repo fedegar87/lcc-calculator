@@ -39,12 +39,12 @@ export function MethodologySteps() {
   return (
     <GlassCard id="methodology" className="space-y-5">
       <header>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-eurac-red">
           The CRAVEzero way
         </p>
-        <h3 className="mt-1 text-base font-bold tracking-tight text-slate-900 dark:text-slate-50">
+        <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
           An 8-step framework from design to operation
-        </h3>
+        </h2>
         <p className="mt-1 text-xs text-slate-500">
           The methodology that frames every project in LCCzero.
         </p>
