@@ -14,7 +14,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-# Prisma client must be generated before next build (imports from src/generated/prisma)
+# Dummy DATABASE_URL: prisma.config.ts validates env() at load time, even for `generate`.
+# Real URL is injected by Render at runtime.
+ENV DATABASE_URL="postgresql://build:build@localhost:5432/build?schema=public"
+ENV BETTER_AUTH_SECRET="build-time-dummy-not-used-at-runtime"
+ENV BETTER_AUTH_URL="http://localhost:3000"
 RUN npx prisma generate
 RUN npm run build
 
