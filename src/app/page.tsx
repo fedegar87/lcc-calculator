@@ -52,13 +52,17 @@ export default function Home() {
             </div>
             <AuthorCard />
 
-            <footer className="space-y-4 pb-8 pt-6 text-xs text-slate-500 dark:text-slate-400">
+            <footer className="space-y-4 border-t border-slate-200 pb-8 pt-6 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+              <p className="text-center">
+                CRAVEzero was funded by the European Union&rsquo;s Horizon 2020
+                programme under Grant Agreement No. 741223.
+              </p>
               <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
                 <a
                   href="http://www.cravezero.eu/pinboard/Downloads/LCCTool.html"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 transition hover:text-eurac-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2"
+                  className="inline-flex items-center gap-1 transition hover:text-eurac-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2 dark:hover:text-eurac-red"
                 >
                   Original CRAVEzero LCC tool
                   <ExternalLink className="h-3 w-3" />
@@ -68,7 +72,7 @@ export default function Home() {
                   href="https://www.cravezero.eu/pboard/PinboardMain/PinboardMain/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 transition hover:text-eurac-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2"
+                  className="inline-flex items-center gap-1 transition hover:text-eurac-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2 dark:hover:text-eurac-red"
                 >
                   CRAVEzero Pinboard
                   <ExternalLink className="h-3 w-3" />
@@ -78,7 +82,7 @@ export default function Home() {
                   href="https://www.cravezero.eu/reports/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 transition hover:text-eurac-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2"
+                  className="inline-flex items-center gap-1 transition hover:text-eurac-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eurac-red/40 focus-visible:ring-offset-2 dark:hover:text-eurac-red"
                 >
                   Public deliverables
                   <ExternalLink className="h-3 w-3" />
