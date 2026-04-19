@@ -21,6 +21,9 @@ ENV BETTER_AUTH_SECRET="build-time-dummy-not-used-at-runtime"
 ENV BETTER_AUTH_URL="http://localhost:3000"
 RUN npx prisma generate
 RUN npm run build
+# Drop dev-only deps (eslint, vitest, typescript, etc.) before the runner copy.
+# Prisma CLI is in dependencies so it survives prune and is available for migrate deploy.
+RUN npm prune --omit=dev
 
 # ---- runner -------------------------------------------------------------
 FROM node:20-alpine AS runner
