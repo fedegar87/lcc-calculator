@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { GlassCard } from "@/components/shared/glass-card";
 import { ExternalLink, Users, Calendar, Award } from "lucide-react";
+import { PartnerMarquee } from "./partner-marquee";
 
 const FACTS = [
   { icon: Calendar, label: "Sept 2017 – Aug 2020", sub: "36 months · H2020 RIA" },
@@ -54,17 +54,7 @@ export function CRAVEzeroBlock() {
         <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">
           Consortium · 9 partners across 5 countries
         </p>
-        <div className="overflow-hidden rounded-2xl bg-white p-4 ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
-          <Image
-            src="/cravezero/partners.gif"
-            alt="CRAVEzero consortium logos: AEE INTEC (coordinator), Fraunhofer ISE, EURAC, 3i group, SKANSKA, Bouygues Construction, Köhler & Meinzer, ATP sustain, Moretti"
-            width={650}
-            height={400}
-            className="mx-auto h-auto w-full max-w-xl"
-            sizes="(min-width: 1024px) 600px, 90vw"
-            unoptimized
-          />
-        </div>
+        <PartnerMarquee />
       </div>
 
       <a

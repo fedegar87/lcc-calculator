@@ -238,6 +238,15 @@
   .animate-scale-in {
     animation: scaleIn 0.2s ease-out;
   }
+
+  /* Partner marquee: translate -50% so the duplicated list loops seamlessly. */
+  @keyframes marqueeSlide {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .animate-marquee-slow {
+    animation: marqueeSlide 40s linear infinite;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
