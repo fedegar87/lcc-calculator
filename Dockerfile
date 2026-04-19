@@ -41,8 +41,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 # Prisma assets needed at runtime for `migrate deploy`
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+# Full node_modules: Prisma 7's @prisma/dev pulls in transitive deps (valibot, etc.)
+# that aren't reachable via cherry-picked package copies. Disk is cheaper than
+# tracking the closure manually.
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
 USER nextjs
 EXPOSE 3000
