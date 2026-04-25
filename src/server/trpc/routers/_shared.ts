@@ -8,6 +8,7 @@ import type {
   EnergySourcePrice,
   ServiceComponentInput,
   FormulaMode,
+  LandCostMode,
 } from "@/engine/types";
 
 /** Safely convert Prisma Decimal|null|undefined to plain number */
@@ -68,13 +69,17 @@ type VariantLike = {
   }>;
   costItems: Array<{
     category: string;
-    details: DetailLike[];
+    materialCostAgg?: unknown;
+    laborCostAgg?: unknown;
+    otherCostAgg?: unknown;
+    details?: DetailLike[];
   }>;
   serviceComponents: Array<{
     id?: string;
     name: string;
     constructionCost?: unknown;
     en15459ComponentIndex: number;
+    sortOrder?: unknown;
   }>;
   designCosts: Array<{
     lineNumber: number;
@@ -85,8 +90,10 @@ type VariantLike = {
     siteManagementCost?: unknown;
   }>;
   wlcInput?: {
+    landCostMode?: unknown;
     landArea?: unknown;
     landPrice?: unknown;
+    landCostTotal?: unknown;
     enablingCost1?: unknown;
     enablingCost2?: unknown;
     planningFees1?: unknown;
@@ -115,6 +122,43 @@ type VariantLike = {
     expectedPricePerM2?: unknown;
   } | null;
 };
+
+function getLandCostMode(value: unknown): LandCostMode | undefined {
+  return value === "UNIT_PRICE" || value === "TOTAL_COST"
+    ? value
+    : undefined;
+}
+
+function resolveLandCost(wlc: NonNullable<VariantLike["wlcInput"]>): {
+  landCost: number;
+  landCostMode: LandCostMode;
+  landArea: number;
+  landPrice: number;
+  landCostTotal: number;
+} {
+  const landArea = d(wlc.landArea);
+  const landPrice = d(wlc.landPrice);
+  const landCostTotal = d(wlc.landCostTotal);
+  const explicitMode = getLandCostMode(wlc.landCostMode);
+  const inferredMode =
+    explicitMode ??
+    (landArea === 0 && landPrice > 0 ? "TOTAL_COST" : "UNIT_PRICE");
+
+  const landCost =
+    inferredMode === "TOTAL_COST"
+      ? explicitMode === "TOTAL_COST"
+        ? landCostTotal
+        : landCostTotal || landPrice
+      : landArea * landPrice;
+
+  return {
+    landCost,
+    landCostMode: inferredMode,
+    landArea,
+    landPrice,
+    landCostTotal: inferredMode === "TOTAL_COST" ? landCost : landCostTotal,
+  };
+}
 
 export function buildVariantInput(
   variant: VariantLike,
@@ -158,20 +202,24 @@ export function buildVariantInput(
     }),
   );
 
-  // Cost items: aggregate from details using resolveDetailCost
+  // Cost items: prefer auditable details; fall back to aggregate-only rows.
   const costItems: CostItemInput[] = variant.costItems.map((ci) => {
-    const materialCost = ci.details.reduce(
-      (sum: number, det) => sum + resolveDetailCost(det),
-      0,
-    );
-    const laborCost = ci.details.reduce(
-      (sum: number, det) => sum + d(det.laborCost),
-      0,
-    );
-    const otherCost = ci.details.reduce(
-      (sum: number, det) => sum + d(det.otherCost),
-      0,
-    );
+    const details = ci.details ?? [];
+    const materialCost =
+      details.length > 0
+        ? details.reduce(
+            (sum: number, det) => sum + resolveDetailCost(det),
+            0,
+          )
+        : d(ci.materialCostAgg);
+    const laborCost =
+      details.length > 0
+        ? details.reduce((sum: number, det) => sum + d(det.laborCost), 0)
+        : d(ci.laborCostAgg);
+    const otherCost =
+      details.length > 0
+        ? details.reduce((sum: number, det) => sum + d(det.otherCost), 0)
+        : d(ci.otherCostAgg);
     return {
       category: ci.category as string,
       materialCost,
@@ -181,15 +229,20 @@ export function buildVariantInput(
   });
 
   // Service components
-  const orderedServiceComponents = [...variant.serviceComponents].sort(
-    (a, b) => String(a.id ?? "").localeCompare(String(b.id ?? "")),
-  );
+  const orderedServiceComponents = [...variant.serviceComponents].sort((a, b) => {
+    if (a.sortOrder != null || b.sortOrder != null) {
+      const orderDelta = d(a.sortOrder) - d(b.sortOrder);
+      if (orderDelta !== 0) return orderDelta;
+    }
+
+    return String(a.id ?? "").localeCompare(String(b.id ?? ""));
+  });
   const serviceComponents: ServiceComponentInput[] =
     orderedServiceComponents.map((sc, index: number) => ({
       name: sc.name as string,
       constructionCost: d(sc.constructionCost),
       en15459ComponentIndex: sc.en15459ComponentIndex as number,
-      replicaOrder: index,
+      replicaOrder: sc.sortOrder != null ? d(sc.sortOrder) : index,
     }));
 
   // Design costs
@@ -213,8 +266,18 @@ export function buildVariantInput(
     0,
   );
 
+  const landCost = wlc
+    ? resolveLandCost(wlc)
+    : {
+        landCost: 0,
+        landCostMode: "UNIT_PRICE" as const,
+        landArea: 0,
+        landPrice: 0,
+        landCostTotal: 0,
+      };
+
   const wlcInput: WLCInputData = {
-    landCost: wlc ? d(wlc.landArea) * d(wlc.landPrice) : 0,
+    ...landCost,
     enablingCosts: wlc ? d(wlc.enablingCost1) + d(wlc.enablingCost2) : 0,
     planningFees: wlc ? d(wlc.planningFees1) + d(wlc.planningFees2) : 0,
     userSupportPropMgmt: wlc ? d(wlc.userSupportPropMgmt) : 0,

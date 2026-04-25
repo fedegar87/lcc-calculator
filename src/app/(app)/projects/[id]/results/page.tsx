@@ -2,11 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { ResultsDashboard } from "@/components/results/results-dashboard";
-import { ResultsAuditView } from "@/components/results/results-audit-view";
-import { VariantComparison } from "@/components/results/variant-comparison";
 import { ValidationSummaryCard } from "@/components/project/validation-summary-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -20,6 +19,19 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { computeProjectReadiness } from "@/lib/project-readiness";
+import type { FormulaMode } from "@/engine/types";
+
+const ResultsAuditView = dynamic(() =>
+  import("@/components/results/results-audit-view").then(
+    (module) => module.ResultsAuditView,
+  ),
+);
+
+const VariantComparison = dynamic(() =>
+  import("@/components/results/variant-comparison").then(
+    (module) => module.VariantComparison,
+  ),
+);
 
 function downloadTextFile(content: string, fileName: string, mimeType: string) {
   const blob = new Blob([content], { type: mimeType });
@@ -62,6 +74,8 @@ export default function ResultsPage() {
   const [view, setView] = useState<"dashboard" | "audit" | "compare">(
     "dashboard"
   );
+  const [formulaMode, setFormulaMode] =
+    useState<FormulaMode>("excel_bugfixed");
 
   const projectId = params.id;
 
@@ -77,7 +91,7 @@ export default function ResultsPage() {
   });
 
   const resultQuery = useQuery({
-    ...trpc.calculation.calculate.queryOptions({ variantId }),
+    ...trpc.calculation.calculate.queryOptions({ variantId, formulaMode }),
     enabled: Boolean(variantId),
   });
 
@@ -149,6 +163,10 @@ export default function ResultsPage() {
             Amount: resultQuery.data.nonConstructionCosts,
           },
           {
+            Metric: "Formula mode",
+            Amount: formulaMode,
+          },
+          {
             Metric: "Residual value",
             Amount: resultQuery.data.residualValue,
           },
@@ -166,7 +184,7 @@ export default function ResultsPage() {
 
     downloadTextFile(
       JSON.stringify(resultQuery.data, null, 2),
-      `${project?.name ?? "project"}-${activeVariantLabel.toLowerCase().replaceAll(" ", "-")}-results.json`,
+      `${project?.name ?? "project"}-${activeVariantLabel.toLowerCase().replaceAll(" ", "-")}-${formulaMode}-results.json`,
       "application/json"
     );
   }
@@ -179,7 +197,7 @@ export default function ResultsPage() {
 
     downloadTextFile(
       toCsvRows(exportRows),
-      `${project?.name ?? "project"}-${activeVariantLabel.toLowerCase().replaceAll(" ", "-")}-results.csv`,
+      `${project?.name ?? "project"}-${activeVariantLabel.toLowerCase().replaceAll(" ", "-")}-${formulaMode}-results.csv`,
       "text/csv;charset=utf-8"
     );
   }
@@ -188,7 +206,7 @@ export default function ResultsPage() {
     exportPdf.mutate({
       projectId,
       variantLabel: variantLabelForExport as "BASE" | "VARIANT_1" | "VARIANT_2",
-      formulaMode: "excel_bugfixed",
+      formulaMode,
     });
   }
 
@@ -196,7 +214,7 @@ export default function ResultsPage() {
     exportExcel.mutate({
       projectId,
       variantLabel: variantLabelForExport as "BASE" | "VARIANT_1" | "VARIANT_2",
-      formulaMode: "excel_bugfixed",
+      formulaMode,
     });
   }
 
@@ -224,6 +242,29 @@ export default function ResultsPage() {
       ) : null}
 
       <div className="flex flex-wrap items-center gap-2">
+        <div
+          className="mr-1 inline-flex rounded-md border bg-muted p-1"
+          aria-label="Formula mode"
+        >
+          {([
+            ["excel_bugfixed", "Bugfixed"],
+            ["excel_replica", "Excel replica"],
+          ] as const).map(([mode, label]) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setFormulaMode(mode)}
+              className={`rounded px-2.5 py-1 text-sm font-medium transition-colors ${
+                formulaMode === mode
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         <button
           onClick={() => setView("dashboard")}
           className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -304,16 +345,37 @@ export default function ResultsPage() {
         <ResultsDashboard
           variantId={variantId}
           projectId={projectId}
-          resultOverride={resultQuery.data}
+          formulaMode={formulaMode}
+          resultOverride={resultQuery.data ?? null}
+          skipQuery
+          loadingOverride={resultQuery.isPending}
+          errorOverride={resultQuery.error}
+          onRetryOverride={() => {
+            resultQuery.refetch();
+          }}
         />
       ) : view === "audit" ? (
         resultQuery.data ? (
           <ResultsAuditView result={resultQuery.data} />
         ) : (
-          <ResultsDashboard variantId={variantId} projectId={projectId} />
+          <ResultsDashboard
+            variantId={variantId}
+            projectId={projectId}
+            formulaMode={formulaMode}
+            skipQuery
+            loadingOverride={resultQuery.isPending}
+            errorOverride={resultQuery.error}
+            onRetryOverride={() => {
+              resultQuery.refetch();
+            }}
+          />
         )
       ) : (
-        <VariantComparison projectId={projectId} variants={variants} />
+        <VariantComparison
+          projectId={projectId}
+          variants={variants}
+          formulaMode={formulaMode}
+        />
       )}
     </div>
   );

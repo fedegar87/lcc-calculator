@@ -299,21 +299,29 @@ model ServiceComponent {
   name                 String
   constructionCost     Decimal @default(0) @db.Decimal(14, 2)
   en15459ComponentIndex Int     @default(1)
+  sortOrder            Int     @default(0)
 
-  @@index([variantId])
+  @@index([variantId, sortOrder])
 }
 
 // --- WLC INPUT -------------------------------------------------------
 // Excel: "WLC" rows 2-27
 
+enum LandCostMode {
+  UNIT_PRICE
+  TOTAL_COST
+}
+
 model WLCInput {
   id                  String   @id @default(cuid())
   variantId           String   @unique
   variant             Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  landCostMode        LandCostMode @default(UNIT_PRICE)
   landArea            Decimal? @default(0) @db.Decimal(14, 2)
   buildingIndex       Decimal? @db.Decimal(8, 4)
   floorHeight         Decimal? @db.Decimal(6, 2)
   landPrice           Decimal? @default(0) @db.Decimal(14, 2)
+  landCostTotal       Decimal? @default(0) @db.Decimal(14, 2)
   enablingCost1       Decimal? @default(0) @db.Decimal(14, 2)
   enablingCost2       Decimal? @default(0) @db.Decimal(14, 2)
   planningFees1       Decimal? @default(0) @db.Decimal(14, 2)

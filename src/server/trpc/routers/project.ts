@@ -334,7 +334,7 @@ export const projectRouter = createTRPCRouter({
             },
           },
           serviceComponents: {
-            orderBy: { id: "asc" },
+            orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
           },
           wlcInput: true,
           designCosts: {
@@ -454,6 +454,7 @@ export const projectRouter = createTRPCRouter({
                     name: component.name,
                     constructionCost: component.constructionCost,
                     en15459ComponentIndex: component.en15459ComponentIndex,
+                    sortOrder: component.sortOrder,
                   })),
                 }
               : undefined,
@@ -464,6 +465,8 @@ export const projectRouter = createTRPCRouter({
                   buildingIndex: sourceVariant.wlcInput.buildingIndex,
                   floorHeight: sourceVariant.wlcInput.floorHeight,
                   landPrice: sourceVariant.wlcInput.landPrice,
+                  landCostMode: sourceVariant.wlcInput.landCostMode,
+                  landCostTotal: sourceVariant.wlcInput.landCostTotal,
                   enablingCost1: sourceVariant.wlcInput.enablingCost1,
                   enablingCost2: sourceVariant.wlcInput.enablingCost2,
                   planningFees1: sourceVariant.wlcInput.planningFees1,

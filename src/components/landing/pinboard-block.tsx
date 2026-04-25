@@ -105,11 +105,11 @@ export function PinboardBlock() {
           aria-label="CRAVEzero Pinboard interface preview"
         >
           <Image
-            src="/cravezero/pinboard.jpg"
-            alt="Screenshot of the CRAVEzero Pinboard interactive web platform"
+            src="/visuals/pinboard_hub.png"
+            alt="Abstract 3D network graphic representing the CRAVEzero Pinboard data hub"
             width={1024}
             height={707}
-            className="max-h-[320px] w-full object-cover object-top"
+            className="max-h-[320px] w-full object-cover object-center"
             sizes="(min-width: 1024px) 40vw, 100vw"
           />
         </a>

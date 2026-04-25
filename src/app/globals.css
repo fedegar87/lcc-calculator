@@ -212,23 +212,6 @@
     background-size: 24px 24px;
   }
 
-  /* Ambient blurred blobs used by the AmbientBackground component. */
-  .ambient-blob {
-    position: absolute;
-    border-radius: 9999px;
-    filter: blur(64px);
-    pointer-events: none;
-  }
-  .ambient-blob-red {
-    background: color-mix(in oklab, #c8102e 10%, transparent);
-  }
-  .ambient-blob-blue {
-    background: color-mix(in oklab, #3b82f6 10%, transparent);
-  }
-  .ambient-blob-emerald {
-    background: color-mix(in oklab, #10b981 10%, transparent);
-  }
-
   .animate-fade-in {
     animation: fadeIn 0.3s ease-out;
   }

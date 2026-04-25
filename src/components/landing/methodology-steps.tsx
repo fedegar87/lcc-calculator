@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { GlassCard } from "@/components/shared/glass-card";
 
 const STEPS: Array<{ title: string; body: string }> = [
@@ -38,16 +39,27 @@ const STEPS: Array<{ title: string; body: string }> = [
 export function MethodologySteps() {
   return (
     <GlassCard id="methodology" className="space-y-5">
-      <header>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-eurac-red">
-          The CRAVEzero way
-        </p>
-        <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-          An 8-step framework from design to operation
-        </h2>
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-          The methodology that frames every project in LCCzero.
-        </p>
+      <header className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="max-w-xl space-y-1">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-eurac-red">
+            The CRAVEzero way
+          </p>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+            An 8-step framework from design to operation
+          </h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            The methodology that frames every project in LCCzero.
+          </p>
+        </div>
+        <div className="hidden shrink-0 sm:block sm:w-1/3 max-w-[200px]">
+           <Image 
+             src="/visuals/methodology_3d.png" 
+             width={300} 
+             height={300} 
+             alt="3D Isometric representation of methodology" 
+             className="w-full h-auto drop-shadow-xl" 
+           />
+        </div>
       </header>
 
       <ol className="grid gap-3 sm:grid-cols-2">

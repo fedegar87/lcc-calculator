@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { useAutosave } from "@/hooks/use-autosave";
 import { GlassCard } from "@/components/shared/glass-card";
@@ -61,10 +61,12 @@ const energyPricesSchema = z.object({
 type EnergyPricesValues = z.infer<typeof energyPricesSchema>;
 
 const wlcInputSchema = z.object({
+  landCostMode: z.enum(["UNIT_PRICE", "TOTAL_COST"]),
   landArea: z.number().nullable().optional(),
   buildingIndex: z.number().nullable().optional(),
   floorHeight: z.number().nullable().optional(),
   landPrice: z.number().nullable().optional(),
+  landCostTotal: z.number().nullable().optional(),
   enablingCost1: z.number().nullable().optional(),
   enablingCost2: z.number().nullable().optional(),
   planningFees1: z.number().nullable().optional(),
@@ -150,13 +152,22 @@ export function WLCForm({ variantId }: WLCFormProps) {
 
   return (
     <div className="space-y-6">
-      <BoundaryConditionSection variant={variant} variantId={variantId} />
+      <BoundaryConditionSection
+        variant={variant}
+        variantId={variantId}
+        projectId={variant.projectId}
+      />
       <EnergyPricesSection
         variant={variant}
         variantId={variantId}
+        projectId={variant.projectId}
         energySources={energySources}
       />
-      <NonConstructionSection variant={variant} variantId={variantId} />
+      <NonConstructionSection
+        variant={variant}
+        variantId={variantId}
+        projectId={variant.projectId}
+      />
       <DesignCostsSection variant={variant} variantId={variantId} />
     </div>
   );
@@ -167,14 +178,36 @@ export function WLCForm({ variantId }: WLCFormProps) {
 function BoundaryConditionSection({
   variant,
   variantId,
+  projectId,
 }: {
   variant: {
     boundaryCondition: Record<string, unknown> | null;
   };
   variantId: string;
+  projectId: string;
 }) {
   const trpc = useTRPC();
-  const upsertBC = useMutation(trpc.variant.upsertBoundaryCondition.mutationOptions());
+  const queryClient = useQueryClient();
+  const upsertBC = useMutation(
+    trpc.variant.upsertBoundaryCondition.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.variant.getById.queryKey({ variantId }),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.project.getById.queryKey({ projectId }),
+        });
+        for (const formulaMode of ["excel_bugfixed", "excel_replica"] as const) {
+          queryClient.invalidateQueries({
+            queryKey: trpc.calculation.calculate.queryKey({
+              variantId,
+              formulaMode,
+            }),
+          });
+        }
+      },
+    })
+  );
   const bc = variant.boundaryCondition;
 
   const form = useForm<BoundaryValues>({
@@ -325,6 +358,7 @@ function BoundaryConditionSection({
 function EnergyPricesSection({
   variant,
   variantId,
+  projectId,
   energySources,
 }: {
   variant: {
@@ -335,10 +369,31 @@ function EnergyPricesSection({
     }>;
   };
   variantId: string;
+  projectId: string;
   energySources: Array<{ index: number; name: string; category: string }>;
 }) {
   const trpc = useTRPC();
-  const upsertBC = useMutation(trpc.variant.upsertBoundaryCondition.mutationOptions());
+  const queryClient = useQueryClient();
+  const upsertBC = useMutation(
+    trpc.variant.upsertBoundaryCondition.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.variant.getById.queryKey({ variantId }),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.project.getById.queryKey({ projectId }),
+        });
+        for (const formulaMode of ["excel_bugfixed", "excel_replica"] as const) {
+          queryClient.invalidateQueries({
+            queryKey: trpc.calculation.calculate.queryKey({
+              variantId,
+              formulaMode,
+            }),
+          });
+        }
+      },
+    })
+  );
   const [showAllSources, setShowAllSources] = useState(false);
 
   // Parse existing energy prices from boundary condition JSON
@@ -505,16 +560,40 @@ function EnergyPricesSection({
 function NonConstructionSection({
   variant,
   variantId,
+  projectId,
 }: {
   variant: {
     wlcInput: Record<string, unknown> | null;
   };
   variantId: string;
+  projectId: string;
 }) {
   const trpc = useTRPC();
-  const upsertWLC = useMutation(trpc.variant.upsertWLCInput.mutationOptions());
+  const queryClient = useQueryClient();
+  const upsertWLC = useMutation(
+    trpc.variant.upsertWLCInput.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.variant.getById.queryKey({ variantId }),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.project.getById.queryKey({ projectId }),
+        });
+        for (const formulaMode of ["excel_bugfixed", "excel_replica"] as const) {
+          queryClient.invalidateQueries({
+            queryKey: trpc.calculation.calculate.queryKey({
+              variantId,
+              formulaMode,
+            }),
+          });
+        }
+      },
+    })
+  );
   const w = variant.wlcInput;
   const n = (key: string) => (w?.[key] as number) ?? 0;
+  const persistedMode =
+    w?.landCostMode === "TOTAL_COST" ? "TOTAL_COST" : "UNIT_PRICE";
   const [showOptional, setShowOptional] = useState(
     Boolean(
       n("enablingCost1") ||
@@ -532,10 +611,12 @@ function NonConstructionSection({
     resolver: zodResolver(wlcInputSchema),
     mode: "onBlur",
     defaultValues: {
+      landCostMode: persistedMode,
       landArea: n("landArea"),
       buildingIndex: n("buildingIndex"),
       floorHeight: n("floorHeight"),
       landPrice: n("landPrice"),
+      landCostTotal: n("landCostTotal"),
       enablingCost1: n("enablingCost1"),
       enablingCost2: n("enablingCost2"),
       planningFees1: n("planningFees1"),
@@ -555,6 +636,27 @@ function NonConstructionSection({
   );
 
   useAutosave({ control: form.control, onSave });
+
+  const landCostMode = form.watch("landCostMode");
+  const landArea = form.watch("landArea") ?? 0;
+  const landPrice = form.watch("landPrice") ?? 0;
+  const landCostTotal = form.watch("landCostTotal") ?? 0;
+  const computedUnitPriceTotal = landArea * landPrice;
+  const activeLandTotal =
+    landCostMode === "TOTAL_COST" ? landCostTotal : computedUnitPriceTotal;
+
+  const setLandCostMode = (mode: WLCInputValues["landCostMode"]) => {
+    if (mode === "TOTAL_COST" && !form.getValues("landCostTotal")) {
+      form.setValue("landCostTotal", computedUnitPriceTotal, {
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+    }
+    form.setValue("landCostMode", mode, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  };
 
   return (
     <GlassCard>
@@ -577,35 +679,73 @@ function NonConstructionSection({
       </div>
       <div className="space-y-6">
         <div>
-          <div className="mb-2 flex items-center gap-1.5">
-            <h3 className="text-sm font-medium text-muted-foreground">Land</h3>
-            <InfoTooltip content="These inputs capture site-related assumptions before design, construction, and operation are combined into WLC." />
+          <div className="mb-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-1.5">
+              <h3 className="text-sm font-medium text-muted-foreground">Land</h3>
+              <InfoTooltip content="Choose whether the source workbook gives a land unit price or a total land cost. Older WLCC sheets often store land as one total amount." />
+            </div>
+            <div className="inline-flex w-fit rounded-lg border bg-muted p-1">
+              {(["UNIT_PRICE", "TOTAL_COST"] as const).map((mode) => (
+                <Button
+                  key={mode}
+                  type="button"
+                  variant={landCostMode === mode ? "default" : "ghost"}
+                  size="sm"
+                  className="h-8 px-3"
+                  onClick={() => setLandCostMode(mode)}
+                >
+                  {mode === "UNIT_PRICE" ? "Unit price" : "Total cost"}
+                </Button>
+              ))}
+            </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <NumberInput
-              name="landArea"
-              control={form.control}
-              label="Land Area"
-              suffix=" m2"
-            />
-            <NumberInput
-              name="buildingIndex"
-              control={form.control}
-              label="Building Index"
-              decimalScale={3}
-              hint="Use the site-specific building index or floor area ratio."
-            />
-            <NumberInput
-              name="floorHeight"
-              control={form.control}
-              label="Floor Height"
-              suffix=" m"
-            />
-            <CurrencyInput
-              name="landPrice"
-              control={form.control}
-              label="Land Price (EUR/m2)"
-            />
+
+          {landCostMode === "UNIT_PRICE" ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <NumberInput
+                name="landArea"
+                control={form.control}
+                label="Land Area"
+                suffix=" m2"
+              />
+              <NumberInput
+                name="buildingIndex"
+                control={form.control}
+                label="Building Index"
+                decimalScale={3}
+                hint="Use the site-specific building index or floor area ratio."
+              />
+              <NumberInput
+                name="floorHeight"
+                control={form.control}
+                label="Floor Height"
+                suffix=" m"
+              />
+              <CurrencyInput
+                name="landPrice"
+                control={form.control}
+                label="Land Price (EUR/m2)"
+              />
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <CurrencyInput
+                name="landCostTotal"
+                control={form.control}
+                label="Land Cost Total"
+              />
+            </div>
+          )}
+
+          <div className="mt-3 rounded-lg border bg-muted/25 px-3 py-2 text-sm">
+            <span className="text-muted-foreground">Land cost used in WLC: </span>
+            <span className="font-medium tabular-nums">
+              {activeLandTotal.toLocaleString("en-US", {
+                style: "currency",
+                currency: "EUR",
+                maximumFractionDigits: 0,
+              })}
+            </span>
           </div>
         </div>
 

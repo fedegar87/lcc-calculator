@@ -19,6 +19,14 @@ export interface MaintenanceCostResult {
   maintenanceCostPerM2: number; // CAL-008 (0 if area=0)
 }
 
+function resolveMaxReplacementCycles(config: EngineConfig): number | null {
+  if (config.formulaMode === 'excel_replica') {
+    return 3;
+  }
+
+  return config.maxReplacementCycles ?? null;
+}
+
 /**
  * Compute building element and service maintenance costs.
  * CRITICAL: All discounting uses interestRate (Rint, nominal), NOT real rate (DEC-005).
@@ -29,6 +37,7 @@ export function computeMaintenanceCosts(
 ): MaintenanceCostResult {
   const { referencePeriod, interestRate, treatedFloorArea } = input;
   const n = referencePeriod;
+  const maxReplacementCycles = resolveMaxReplacementCycles(config);
   const interestDiscountFactors = computeDiscountFactors(
     interestRate,
     Math.max(n, 9),
@@ -94,10 +103,11 @@ export function computeMaintenanceCosts(
       const isReplacementYear =
         lifespan > 0 &&
         year % lifespan === 0 &&
-        replacementsUsed < config.maxReplacementCycles;
+        (maxReplacementCycles === null ||
+          replacementsUsed < maxReplacementCycles);
 
       if (isReplacementYear) {
-        // MNT-004: Replacement — charge full construction cost
+        // MNT-004: Replacement - charge full construction cost
         let exponent = year;
 
         // MNT-BUG-001: In excel_replica mode, last service component uses exponent 9

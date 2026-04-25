@@ -10,6 +10,7 @@ function validInput(): VariantInput {
     inflationRate: 0.02,
     treatedFloorArea: 500,
     energyPrices: [
+      { index: 3, name: 'Natural Gas', pricePerKwh: 0.09, annualIncrease: 0.02 },
       { index: 12, name: 'National Electricity-Mix', pricePerKwh: 0.25, annualIncrease: 0.02 },
     ],
     energyInputs: [
@@ -181,7 +182,75 @@ describe('validateVariantInput', () => {
     ];
     const errors = validateVariantInput(input);
     expect(errors.length).toBeGreaterThan(0);
-    expect(errors.some((e) => e.toLowerCase().includes('negative cost'))).toBe(true);
+    expect(errors.some((e) => e.toLowerCase().includes('cannot be negative'))).toBe(true);
+  });
+
+  it('rejects NaN and Infinity', () => {
+    const input = validInput();
+    input.interestRate = Number.NaN;
+    input.wlcInput.financeCost = Number.POSITIVE_INFINITY;
+    const errors = validateVariantInput(input);
+    expect(errors.some((e) => e.includes('Interest rate must be a finite number'))).toBe(true);
+    expect(errors.some((e) => e.includes('WLC finance cost must be a finite number'))).toBe(true);
+  });
+
+  it('rejects negative energy prices and consumption', () => {
+    const input = validInput();
+    input.energyPrices[0].pricePerKwh = -0.01;
+    input.energyInputs[0].specificConsumption = -5;
+    const errors = validateVariantInput(input);
+    expect(errors.some((e) => e.includes('Energy source price 3 price cannot be negative'))).toBe(true);
+    expect(errors.some((e) => e.includes('HEATING_1 specific consumption'))).toBe(true);
+  });
+
+  it('rejects consumption when no source is selected', () => {
+    const input = validInput();
+    input.energyInputs = [
+      { endUse: 'HEATING_1', energySourceIndex: 1, specificConsumption: 50 },
+    ];
+    const errors = validateVariantInput(input);
+    expect(errors).toContain(
+      'Energy input HEATING_1 has consumption but no energy source selected',
+    );
+  });
+
+  it('rejects selected source with zero consumption', () => {
+    const input = validInput();
+    input.energyInputs = [
+      { endUse: 'HEATING_1', energySourceIndex: 3, specificConsumption: 0 },
+    ];
+    const errors = validateVariantInput(input);
+    expect(errors).toContain(
+      'Energy input HEATING_1 has source 3 selected with zero consumption',
+    );
+  });
+
+  it('rejects PV production without active source 13 price', () => {
+    const input = validInput();
+    input.energyInputs = [
+      {
+        endUse: 'PV_PRODUCTION',
+        energySourceIndex: 13,
+        specificConsumption: 0,
+        pvProductionKwh: 1200,
+      },
+    ];
+    const errors = validateVariantInput(input);
+    expect(errors).toContain('PV production requires an active source 13 energy price');
+  });
+
+  it('rejects missing active energy price for selected source', () => {
+    const input = validInput();
+    input.energyInputs = [
+      { endUse: 'COOLING_1', energySourceIndex: 12, specificConsumption: 20 },
+    ];
+    input.energyPrices = [
+      { index: 3, name: 'Natural Gas', pricePerKwh: 0.09, annualIncrease: 0.02 },
+    ];
+    const errors = validateVariantInput(input);
+    expect(errors).toContain(
+      'Energy input COOLING_1 uses source 12, but no active energy price is configured',
+    );
   });
 
   // Negative maintenance percent

@@ -120,10 +120,13 @@ function serializeWLCInput(w: Record<string, unknown> | null) {
   return {
     id: w.id,
     variantId: w.variantId,
+    landCostMode:
+      w.landCostMode === "TOTAL_COST" ? "TOTAL_COST" : "UNIT_PRICE",
     landArea: d(w.landArea),
     buildingIndex: d(w.buildingIndex),
     floorHeight: d(w.floorHeight),
     landPrice: d(w.landPrice),
+    landCostTotal: d(w.landCostTotal),
     enablingCost1: d(w.enablingCost1),
     enablingCost2: d(w.enablingCost2),
     planningFees1: d(w.planningFees1),
@@ -181,6 +184,10 @@ const END_USE_VALUES = [
   "PV_PRODUCTION",
 ] as const;
 
+const finiteNumber = z.number().finite();
+const nonNegativeNumber = finiteNumber.min(0);
+const nullableNonNegativeNumber = nonNegativeNumber.nullable().optional();
+
 export const variantRouter = createTRPCRouter({
   // 1. Get variant with all relations
   getById: protectedProcedure
@@ -195,7 +202,7 @@ export const variantRouter = createTRPCRouter({
           boundaryCondition: true,
           energyInputs: true,
           costItems: { include: { details: { orderBy: { layerOrder: "asc" } } } },
-          serviceComponents: { orderBy: { id: "asc" } },
+          serviceComponents: { orderBy: [{ sortOrder: "asc" }, { id: "asc" }] },
           wlcInput: true,
           designCosts: { orderBy: { lineNumber: "asc" } },
           incomeInput: true,
@@ -253,6 +260,7 @@ export const variantRouter = createTRPCRouter({
           name: sc.name,
           constructionCost: d(sc.constructionCost),
           en15459ComponentIndex: sc.en15459ComponentIndex,
+          sortOrder: sc.sortOrder,
         })),
         wlcInput: serializeWLCInput(
           variant.wlcInput as unknown as Record<string, unknown>,
@@ -323,16 +331,16 @@ export const variantRouter = createTRPCRouter({
       z.object({
         variantId: z.string(),
         stakeholderRole: z.number().int().optional(),
-        referencePeriod: z.number().int().min(1).max(100).optional(),
-        interestRate: z.number().min(-0.1).max(0.5).optional(),
-        inflationRate: z.number().min(-0.1).max(0.5).optional(),
+        referencePeriod: finiteNumber.int().min(1).max(100).optional(),
+        interestRate: finiteNumber.min(-0.1).max(0.5).optional(),
+        inflationRate: finiteNumber.min(-0.1).max(0.5).optional(),
         energyPrices: z
           .array(
             z.object({
-              index: z.number().int(),
+              index: finiteNumber.int().min(1).max(19),
               name: z.string(),
-              pricePerKwh: z.number(),
-              annualIncrease: z.number(),
+              pricePerKwh: nonNegativeNumber,
+              annualIncrease: finiteNumber.min(-1).max(1),
             }),
           )
           .optional(),
@@ -361,9 +369,9 @@ export const variantRouter = createTRPCRouter({
         inputs: z.array(
           z.object({
             endUse: z.enum(END_USE_VALUES),
-            energySourceIndex: z.number().int().min(1).max(19),
-            specificConsumption: z.number().nullable().optional(),
-            pvProductionKwh: z.number().nullable().optional(),
+            energySourceIndex: finiteNumber.int().min(1).max(19),
+            specificConsumption: nullableNonNegativeNumber,
+            pvProductionKwh: nullableNonNegativeNumber,
           }),
         ),
       }),
@@ -411,18 +419,20 @@ export const variantRouter = createTRPCRouter({
     .input(
       z.object({
         variantId: z.string(),
-        landArea: z.number().nullable().optional(),
-        buildingIndex: z.number().nullable().optional(),
-        floorHeight: z.number().nullable().optional(),
-        landPrice: z.number().nullable().optional(),
-        enablingCost1: z.number().nullable().optional(),
-        enablingCost2: z.number().nullable().optional(),
-        planningFees1: z.number().nullable().optional(),
-        planningFees2: z.number().nullable().optional(),
-        userSupportPropMgmt: z.number().nullable().optional(),
-        userSupportCharges: z.number().nullable().optional(),
-        userSupportAdmin: z.number().nullable().optional(),
-        financeCost: z.number().nullable().optional(),
+        landCostMode: z.enum(["UNIT_PRICE", "TOTAL_COST"]).optional(),
+        landArea: nullableNonNegativeNumber,
+        buildingIndex: nullableNonNegativeNumber,
+        floorHeight: nullableNonNegativeNumber,
+        landPrice: nullableNonNegativeNumber,
+        landCostTotal: nullableNonNegativeNumber,
+        enablingCost1: nullableNonNegativeNumber,
+        enablingCost2: nullableNonNegativeNumber,
+        planningFees1: nullableNonNegativeNumber,
+        planningFees2: nullableNonNegativeNumber,
+        userSupportPropMgmt: nullableNonNegativeNumber,
+        userSupportCharges: nullableNonNegativeNumber,
+        userSupportAdmin: nullableNonNegativeNumber,
+        financeCost: nullableNonNegativeNumber,
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -449,10 +459,10 @@ export const variantRouter = createTRPCRouter({
           z.object({
             lineNumber: z.number().int(),
             description: z.string(),
-            preliminaryCost: z.number().optional(),
-            definitiveCost: z.number().optional(),
-            executiveCost: z.number().optional(),
-            siteManagementCost: z.number().optional(),
+            preliminaryCost: nonNegativeNumber.optional(),
+            definitiveCost: nonNegativeNumber.optional(),
+            executiveCost: nonNegativeNumber.optional(),
+            siteManagementCost: nonNegativeNumber.optional(),
           }),
         ),
       }),
@@ -490,22 +500,22 @@ export const variantRouter = createTRPCRouter({
     .input(
       z.object({
         variantId: z.string(),
-        rent1MonthlyPerM2: z.number().nullable().optional(),
-        rent1Area: z.number().nullable().optional(),
-        rent1Taxes: z.number().nullable().optional(),
-        rent2MonthlyPerM2: z.number().nullable().optional(),
-        rent2Area: z.number().nullable().optional(),
-        rent2Taxes: z.number().nullable().optional(),
-        rent3MonthlyPerM2: z.number().nullable().optional(),
-        rent3Area: z.number().nullable().optional(),
-        rent3Taxes: z.number().nullable().optional(),
-        otherIncome1: z.number().nullable().optional(),
-        otherIncome1Taxes: z.number().nullable().optional(),
-        otherIncome2: z.number().nullable().optional(),
-        otherIncome2Taxes: z.number().nullable().optional(),
-        otherIncome3: z.number().nullable().optional(),
-        otherIncome3Taxes: z.number().nullable().optional(),
-        expectedPricePerM2: z.number().nullable().optional(),
+        rent1MonthlyPerM2: nullableNonNegativeNumber,
+        rent1Area: nullableNonNegativeNumber,
+        rent1Taxes: nullableNonNegativeNumber,
+        rent2MonthlyPerM2: nullableNonNegativeNumber,
+        rent2Area: nullableNonNegativeNumber,
+        rent2Taxes: nullableNonNegativeNumber,
+        rent3MonthlyPerM2: nullableNonNegativeNumber,
+        rent3Area: nullableNonNegativeNumber,
+        rent3Taxes: nullableNonNegativeNumber,
+        otherIncome1: nullableNonNegativeNumber,
+        otherIncome1Taxes: nullableNonNegativeNumber,
+        otherIncome2: nullableNonNegativeNumber,
+        otherIncome2Taxes: nullableNonNegativeNumber,
+        otherIncome3: nullableNonNegativeNumber,
+        otherIncome3Taxes: nullableNonNegativeNumber,
+        expectedPricePerM2: nullableNonNegativeNumber,
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -528,7 +538,7 @@ export const variantRouter = createTRPCRouter({
     .input(
       z.object({
         variantId: z.string(),
-        buildingElementMaintenancePercent: z.number().min(0).max(1),
+        buildingElementMaintenancePercent: finiteNumber.min(0).max(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -553,8 +563,9 @@ export const variantRouter = createTRPCRouter({
         variantId: z.string(),
         componentId: z.string().optional(),
         name: z.string(),
-        constructionCost: z.number().min(0),
-        en15459ComponentIndex: z.number().int().min(1).max(79),
+        constructionCost: nonNegativeNumber,
+        en15459ComponentIndex: finiteNumber.int().min(1).max(79),
+        sortOrder: finiteNumber.int().min(0).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -573,11 +584,19 @@ export const variantRouter = createTRPCRouter({
           name: result.name,
           constructionCost: d(result.constructionCost),
           en15459ComponentIndex: result.en15459ComponentIndex,
+          sortOrder: result.sortOrder,
         };
       }
 
+      const sortOrder =
+        data.sortOrder ??
+        ((await ctx.db.serviceComponent.aggregate({
+          where: { variantId },
+          _max: { sortOrder: true },
+        }))._max.sortOrder ?? -1) + 1;
+
       const result = await ctx.db.serviceComponent.create({
-        data: { variantId, ...data },
+        data: { variantId, ...data, sortOrder },
       });
       return {
         id: result.id,
@@ -585,6 +604,7 @@ export const variantRouter = createTRPCRouter({
         name: result.name,
         constructionCost: d(result.constructionCost),
         en15459ComponentIndex: result.en15459ComponentIndex,
+        sortOrder: result.sortOrder,
       };
     }),
 

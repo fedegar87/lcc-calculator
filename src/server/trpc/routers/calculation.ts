@@ -1,10 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "../init";
-import {
-  calculateLCC,
-  DEFAULT_ENGINE_CONFIG,
-} from "@/engine/index";
+import { calculateLCC } from "@/engine/index";
 import type { EnergySourcePrice } from "@/engine/types";
 import { validateVariantInput } from "@/engine/validation";
 import { buildVariantInput, parseEnergySourcePrices } from "./_shared";
@@ -35,7 +32,7 @@ export const calculationRouter = createTRPCRouter({
           boundaryCondition: true,
           energyInputs: true,
           costItems: { include: { details: true } },
-          serviceComponents: { orderBy: { id: "asc" } },
+          serviceComponents: { orderBy: [{ sortOrder: "asc" }, { id: "asc" }] },
           wlcInput: true,
           designCosts: true,
           incomeInput: true,
@@ -108,8 +105,6 @@ export const calculationRouter = createTRPCRouter({
       try {
         const result = calculateLCC(variantInput, {
           formulaMode: input.formulaMode,
-          maxReplacementCycles:
-            DEFAULT_ENGINE_CONFIG.maxReplacementCycles,
         });
         return result;
       } catch {

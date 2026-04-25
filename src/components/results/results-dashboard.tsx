@@ -1,22 +1,42 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { GlassCard } from "@/components/shared/glass-card";
 import { KPICard } from "@/components/results/kpi-card";
 import { ConstructionBreakdownTable, WLCBreakdownTable } from "@/components/results/breakdown-table";
-import { LCCStackedBar } from "@/components/results/charts/lcc-stacked-bar";
-import { CostEvolutionLine } from "@/components/results/charts/cost-evolution-line";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import * as motion from "motion/react-client";
 import type { LCCResult } from "@/engine/types";
+import type { FormulaMode } from "@/engine/types";
 import { ReferenceButton } from "@/components/shared/reference-button";
 import {
   FOUNDATIONAL_CITATIONS,
   METHODOLOGY_CITATIONS,
   BOUNDARY_CITATIONS,
 } from "@/lib/citations";
+
+const LCCStackedBar = dynamic(() =>
+  import("@/components/results/charts/lcc-stacked-bar").then(
+    (module) => module.LCCStackedBar,
+  ),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-72 rounded-lg" />,
+  },
+);
+
+const CostEvolutionLine = dynamic(() =>
+  import("@/components/results/charts/cost-evolution-line").then(
+    (module) => module.CostEvolutionLine,
+  ),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-72 rounded-lg" />,
+  },
+);
 
 const LCC_BREAKDOWN_ASSUMPTIONS = [
   {
@@ -70,7 +90,12 @@ const CONSTRUCTION_ASSUMPTIONS = [
 interface ResultsDashboardProps {
   variantId: string;
   projectId: string;
+  formulaMode?: FormulaMode;
   resultOverride?: LCCResult | null;
+  skipQuery?: boolean;
+  loadingOverride?: boolean;
+  errorOverride?: { message?: string } | null;
+  onRetryOverride?: () => void;
 }
 
 function ResultsSkeleton() {
@@ -112,27 +137,40 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
 export function ResultsDashboard({
   variantId,
   projectId: _projectId,
+  formulaMode = "excel_bugfixed",
   resultOverride,
+  skipQuery = false,
+  loadingOverride = false,
+  errorOverride = null,
+  onRetryOverride,
 }: ResultsDashboardProps) {
   const trpc = useTRPC();
 
   const { data, isPending, error, refetch } = useQuery({
-    ...trpc.calculation.calculate.queryOptions({ variantId }),
-    enabled: !resultOverride,
+    ...trpc.calculation.calculate.queryOptions({ variantId, formulaMode }),
+    enabled: !skipQuery && !resultOverride,
   });
   const result = resultOverride ?? data;
+  const isLoading = skipQuery ? loadingOverride : !resultOverride && isPending;
+  const errorState = skipQuery ? errorOverride : error;
 
-  if (!resultOverride && isPending) return <ResultsSkeleton />;
+  if (isLoading) return <ResultsSkeleton />;
 
-  if (!resultOverride && error) {
+  if (errorState) {
     return (
       <GlassCard className="flex flex-col items-center gap-4 py-12">
         <AlertCircle className="size-10 text-destructive" />
         <p className="text-sm text-muted-foreground">
-          {error.message || "Calculation failed"}
+          {errorState.message || "Calculation failed"}
         </p>
         <button
-          onClick={() => refetch()}
+          onClick={() => {
+            if (onRetryOverride) {
+              onRetryOverride();
+            } else {
+              refetch();
+            }
+          }}
           className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
           <RefreshCw className="size-4" />

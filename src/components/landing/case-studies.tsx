@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { ExternalLink, MapPin } from "lucide-react";
 
@@ -13,6 +14,7 @@ type CaseStudy = {
   link?: string;
   flag: string;
   tone: "construction" | "fin" | "nrg" | "mnt";
+  image?: string;
 };
 
 const CASES: CaseStudy[] = [
@@ -28,6 +30,7 @@ const CASES: CaseStudy[] = [
     lcc: "€2,185 /m² · 40y",
     link: "https://cravezero.eu/2017/10/18/solallen/",
     tone: "construction",
+    image: "/cravezero/building_solallen.png",
   },
   {
     name: "Aspern IQ",
@@ -41,6 +44,7 @@ const CASES: CaseStudy[] = [
     lcc: "€1,681 /m² · 40y",
     link: "https://cravezero.eu/2017/10/18/aspern-iq/",
     tone: "fin",
+    image: "/cravezero/building_aspern_iq.png",
   },
   {
     name: "Résidence Alizari",
@@ -54,6 +58,7 @@ const CASES: CaseStudy[] = [
     lcc: "€2,230 /m² · 40y",
     link: "https://cravezero.eu/2018/02/20/alizari/",
     tone: "nrg",
+    image: "/cravezero/building_alizari.png",
   },
   {
     name: "MORE",
@@ -67,6 +72,7 @@ const CASES: CaseStudy[] = [
     lcc: "€4,716 /m² · 40y",
     link: "https://cravezero.eu/2017/10/18/more/",
     tone: "mnt",
+    image: "/cravezero/building_more.png",
   },
 ];
 
@@ -109,8 +115,19 @@ export function CaseStudies() {
               className={cn(
                 "group flex h-full flex-col gap-3 rounded-2xl border p-4 ring-1 transition hover:-translate-y-0.5 hover:shadow-md",
                 TONE_TILE[c.tone],
+                c.image ? "overflow-hidden" : ""
               )}
             >
+              {c.image && (
+                <div className="relative -mx-4 -mt-4 mb-1 aspect-video overflow-hidden border-b border-inherit">
+                  <Image
+                    src={c.image}
+                    alt={`${c.name} building`}
+                    fill
+                    className="object-cover transition duration-300 group-hover:scale-105"
+                  />
+                </div>
+              )}
               <header className="flex items-start justify-between gap-2">
                 <div>
                   <h4 className="text-sm font-bold text-slate-900 dark:text-slate-50">

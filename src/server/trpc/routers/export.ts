@@ -3,13 +3,11 @@ import { TRPCError } from "@trpc/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import React from "react";
 import { createTRPCRouter, protectedProcedure } from "../init";
-import {
-  calculateLCC,
-  DEFAULT_ENGINE_CONFIG,
-} from "@/engine/index";
+import { calculateLCC } from "@/engine/index";
 import { ENGINE_VERSION } from "@/engine/types";
 import type { FormulaMode, EnergySourcePrice } from "@/engine/types";
 import { validateVariantInput } from "@/engine/validation";
+import type { Prisma } from "@/generated/prisma/client";
 import { VariantLabel as PrismaVariantLabel } from "@/generated/prisma/enums";
 import { buildVariantInput, parseEnergySourcePrices } from "./_shared";
 import { getOrCreateSnapshot } from "@/server/export/snapshot";
@@ -52,12 +50,12 @@ const VARIANT_INCLUDE = {
   boundaryCondition: true,
   energyInputs: true,
   costItems: { include: { details: true } },
-  serviceComponents: { orderBy: { id: "asc" } },
+  serviceComponents: { orderBy: [{ sortOrder: "asc" }, { id: "asc" }] },
   wlcInput: true,
   designCosts: true,
   incomeInput: true,
   maintenanceConfig: true,
-} as const;
+} satisfies Prisma.VariantInclude;
 
 const inputSchema = z.object({
   projectId: z.string(),
@@ -140,7 +138,6 @@ export const exportRouter = createTRPCRouter({
 
       const result = calculateLCC(variantInput, {
         formulaMode,
-        maxReplacementCycles: DEFAULT_ENGINE_CONFIG.maxReplacementCycles,
       });
 
       // Snapshot
@@ -270,7 +267,6 @@ export const exportRouter = createTRPCRouter({
 
       const result = calculateLCC(variantInput, {
         formulaMode,
-        maxReplacementCycles: DEFAULT_ENGINE_CONFIG.maxReplacementCycles,
       });
 
       // Snapshot

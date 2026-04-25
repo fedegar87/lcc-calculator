@@ -59,6 +59,7 @@ interface ServiceComponent {
   name: string;
   constructionCost: number;
   en15459ComponentIndex: number;
+  sortOrder: number;
 }
 
 interface CategoryDef {
@@ -381,6 +382,8 @@ function CategoryItem({
   const total = costItem
     ? costItem.materialCostAgg + costItem.laborCostAgg + costItem.otherCostAgg
     : 0;
+  const isAggregateOnly =
+    Boolean(costItem) && total > 0 && (costItem?.details?.length ?? 0) === 0;
 
   return (
     <AccordionItem value={category.value}>
@@ -392,6 +395,15 @@ function CategoryItem({
               {formatCurrency(total)}
             </span>
           )}
+          {isAggregateOnly ? (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
+              Aggregate
+            </span>
+          ) : costItem && costItem.details.length > 0 ? (
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100">
+              Detail rows
+            </span>
+          ) : null}
         </div>
       </AccordionTrigger>
       <AccordionContent className="px-2">
@@ -420,6 +432,13 @@ function CategoryItem({
             onDelete={() => onDetailDelete(costItem.id, detail.id)}
           />
         ))}
+
+        {isAggregateOnly ? (
+          <div className="mt-2 rounded-lg border border-amber-300 bg-amber-50/70 p-3 text-sm text-amber-900 dark:bg-amber-950/20 dark:text-amber-100">
+            This seeded/imported row currently uses aggregate costs. Adding a
+            detail row will replace the aggregate source for this category.
+          </div>
+        ) : null}
 
         <Button
           type="button"
@@ -535,6 +554,24 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
     () => variant?.serviceComponents ?? [],
     [variant?.serviceComponents]
   );
+  const invalidateCalculationState = useCallback(() => {
+    queryClient.invalidateQueries({
+      queryKey: trpc.variant.getById.queryKey({ variantId }),
+    });
+    if (variant?.projectId) {
+      queryClient.invalidateQueries({
+        queryKey: trpc.project.getById.queryKey({ projectId: variant.projectId }),
+      });
+    }
+    for (const formulaMode of ["excel_bugfixed", "excel_replica"] as const) {
+      queryClient.invalidateQueries({
+        queryKey: trpc.calculation.calculate.queryKey({
+          variantId,
+          formulaMode,
+        }),
+      });
+    }
+  }, [queryClient, trpc, variant?.projectId, variantId]);
 
   // -- Mutations --
 
@@ -544,6 +581,7 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
         queryClient.invalidateQueries({
           queryKey: trpc.costItem.listByVariant.queryKey({ variantId }),
         });
+        invalidateCalculationState();
       },
     })
   );
@@ -554,6 +592,7 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
         queryClient.invalidateQueries({
           queryKey: trpc.costItem.listByVariant.queryKey({ variantId }),
         });
+        invalidateCalculationState();
         setStatus("saved");
       },
       onError: () => {
@@ -569,6 +608,7 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
         queryClient.invalidateQueries({
           queryKey: trpc.costItem.listByVariant.queryKey({ variantId }),
         });
+        invalidateCalculationState();
         setStatus("saved");
       },
       onError: () => {
@@ -580,9 +620,7 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
   const upsertServiceComponent = useMutation(
     trpc.variant.upsertServiceComponent.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.variant.getById.queryKey({ variantId }),
-        });
+        invalidateCalculationState();
         setStatus("saved");
       },
       onError: () => {
@@ -595,9 +633,7 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
   const deleteServiceComponent = useMutation(
     trpc.variant.deleteServiceComponent.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.variant.getById.queryKey({ variantId }),
-        });
+        invalidateCalculationState();
         setStatus("saved");
       },
       onError: () => {
@@ -658,6 +694,15 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
       let maxOrder = 0;
 
       if (existing) {
+        const aggregateOnlyTotal =
+          existing.materialCostAgg + existing.laborCostAgg + existing.otherCostAgg;
+        if (existing.details.length === 0 && aggregateOnlyTotal > 0) {
+          const confirmed = window.confirm(
+            "This category is using aggregate costs. Adding detail rows will replace the aggregate source for this category. Continue?",
+          );
+          if (!confirmed) return;
+        }
+
         costItemId = existing.id;
         maxOrder = existing.details
           ? Math.max(0, ...existing.details.map((d) => d.layerOrder))
@@ -698,6 +743,7 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
           field === "en15459ComponentIndex"
             ? Number(value)
             : existing.en15459ComponentIndex,
+        sortOrder: existing.sortOrder,
       });
     },
     [variantId, serviceComponents, setStatus, upsertServiceComponent]
@@ -868,7 +914,11 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
         onServiceComponentAdd={handleServiceComponentAdd}
       />
       {variant && (
-        <MaintenanceConfigSection variant={variant} variantId={variantId} />
+        <MaintenanceConfigSection
+          variant={variant}
+          variantId={variantId}
+          projectId={variant.projectId}
+        />
       )}
     </div>
   );
@@ -879,6 +929,7 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
 function MaintenanceConfigSection({
   variant,
   variantId,
+  projectId,
 }: {
   variant: {
     maintenanceConfig: {
@@ -886,10 +937,29 @@ function MaintenanceConfigSection({
     } | null;
   };
   variantId: string;
+  projectId: string;
 }) {
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const upsertMaintenance = useMutation(
-    trpc.variant.upsertMaintenanceConfig.mutationOptions()
+    trpc.variant.upsertMaintenanceConfig.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.variant.getById.queryKey({ variantId }),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.project.getById.queryKey({ projectId }),
+        });
+        for (const formulaMode of ["excel_bugfixed", "excel_replica"] as const) {
+          queryClient.invalidateQueries({
+            queryKey: trpc.calculation.calculate.queryKey({
+              variantId,
+              formulaMode,
+            }),
+          });
+        }
+      },
+    })
   );
 
   const mc = variant.maintenanceConfig;

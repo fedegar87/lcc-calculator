@@ -1,14 +1,34 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useQueries } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { GlassCard } from "@/components/shared/glass-card";
 import { KPICard } from "@/components/results/kpi-card";
-import { LCCStackedBar } from "@/components/results/charts/lcc-stacked-bar";
-import { VariantGroupedBar } from "@/components/results/charts/variant-grouped-bar";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as motion from "motion/react-client";
 import type { LCCResult } from "@/engine/types";
+import type { FormulaMode } from "@/engine/types";
+
+const LCCStackedBar = dynamic(() =>
+  import("@/components/results/charts/lcc-stacked-bar").then(
+    (module) => module.LCCStackedBar,
+  ),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-full rounded-lg" />,
+  },
+);
+
+const VariantGroupedBar = dynamic(() =>
+  import("@/components/results/charts/variant-grouped-bar").then(
+    (module) => module.VariantGroupedBar,
+  ),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-72 rounded-lg" />,
+  },
+);
 
 const eurFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -20,6 +40,7 @@ const eurFormatter = new Intl.NumberFormat("en-US", {
 interface VariantComparisonProps {
   projectId: string;
   variants: { id: string; label: string }[];
+  formulaMode: FormulaMode;
 }
 
 function VariantColumnSkeleton() {
@@ -50,7 +71,11 @@ const stagger = {
   }),
 };
 
-export function VariantComparison({ projectId: _projectId, variants }: VariantComparisonProps) {
+export function VariantComparison({
+  projectId: _projectId,
+  variants,
+  formulaMode,
+}: VariantComparisonProps) {
   const trpc = useTRPC();
 
   // API-05: Batch calculation uses parallel useQueries instead of a dedicated
@@ -58,7 +83,7 @@ export function VariantComparison({ projectId: _projectId, variants }: VariantCo
   // parallel individual queries are simpler and equally performant.
   const results = useQueries({
     queries: variants.map((v) =>
-      trpc.calculation.calculate.queryOptions({ variantId: v.id })
+      trpc.calculation.calculate.queryOptions({ variantId: v.id, formulaMode })
     ),
   });
 

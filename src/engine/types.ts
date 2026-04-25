@@ -3,15 +3,15 @@
 export const ENGINE_VERSION = '1.0.0';
 
 export type FormulaMode = 'excel_replica' | 'excel_bugfixed';
+export type LandCostMode = 'UNIT_PRICE' | 'TOTAL_COST';
 
 export interface EngineConfig {
   formulaMode: FormulaMode;
-  maxReplacementCycles: number;
+  maxReplacementCycles?: number | null;
 }
 
 export const DEFAULT_ENGINE_CONFIG: EngineConfig = {
   formulaMode: 'excel_bugfixed',
-  maxReplacementCycles: 3,
 };
 
 export type MaintenanceType = 'building_element' | 'building_service' | 'none';
@@ -101,6 +101,10 @@ export interface IncomeInputData {
 
 export interface WLCInputData {
   landCost: number;
+  landCostMode?: LandCostMode;
+  landArea?: number;
+  landPrice?: number;
+  landCostTotal?: number;
   enablingCosts: number;
   planningFees: number;
   userSupportPropMgmt: number;

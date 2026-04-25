@@ -142,8 +142,10 @@ interface ServiceComponentLike {
 }
 
 interface WLCInputLike {
+  landCostMode?: unknown;
   landArea?: unknown;
   landPrice?: unknown;
+  landCostTotal?: unknown;
 }
 
 export interface VariantLike {
@@ -235,7 +237,9 @@ function getSelectedEnergySources(energyInputs: EnergyInputLike[]): number[] {
       energyInputs
         .filter(
           (entry) =>
-            entry.endUse !== "PV_PRODUCTION" && entry.energySourceIndex > 1,
+            entry.energySourceIndex > 1 &&
+            (hasPositiveNumber(entry.specificConsumption) ||
+              hasPositiveNumber(entry.pvProductionKwh)),
         )
         .map((entry) => entry.energySourceIndex),
     ),
@@ -419,7 +423,14 @@ export function computeProjectReadiness(
     ],
     Boolean,
   );
-  const wlcRecommendedTotal = Math.max(selectedEnergySources.length, 1) + 3;
+  const landCostMode =
+    wlcInput?.landCostMode === "TOTAL_COST" ? "TOTAL_COST" : "UNIT_PRICE";
+  const landAssumptionConfigured =
+    landCostMode === "TOTAL_COST"
+      ? hasPositiveNumber(wlcInput?.landCostTotal)
+      : hasPositiveNumber(wlcInput?.landArea) &&
+        hasPositiveNumber(wlcInput?.landPrice);
+  const wlcRecommendedTotal = Math.max(selectedEnergySources.length, 1) + 2;
   const designCostTotal = designCosts.reduce(
     (sum, row) =>
       sum +
@@ -431,8 +442,7 @@ export function computeProjectReadiness(
   );
   const wlcRecommendedFilled = count(
     [
-      hasPositiveNumber(wlcInput?.landArea),
-      hasPositiveNumber(wlcInput?.landPrice),
+      landAssumptionConfigured,
       hasPositiveNumber(designCostTotal),
       ...selectedEnergySources.map((index) =>
         configuredEnergyPrices.some((row) => row.index === index),
@@ -662,6 +672,20 @@ export function computeProjectReadiness(
       severity: "warning",
       title: "Some selected energy sources still have no price assumption",
       description: "Add prices for all active energy sources to make O&M comparisons meaningful.",
+    });
+  }
+
+  if (
+    landCostMode === "UNIT_PRICE" &&
+    hasPositiveNumber(wlcInput?.landArea) &&
+    (toNumber(wlcInput?.landPrice) ?? 0) > 10000
+  ) {
+    warnings.push({
+      id: "suspicious-land-unit-price",
+      section: "wlc",
+      severity: "warning",
+      title: "Land price looks like a total cost",
+      description: "Switch land cost to Total cost if this value came from an older WLCC workbook total.",
     });
   }
 

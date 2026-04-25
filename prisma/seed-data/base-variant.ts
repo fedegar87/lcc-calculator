@@ -52,7 +52,9 @@ export const baseVariantData = {
   ],
 
   wlcInput: {
-    landPrice: 200000,
+    landCostMode: "TOTAL_COST" as const,
+    landCostTotal: 200000,
+    landPrice: 0,
     enablingCost1: 15000,
     planningFees1: 8000,
     userSupportPropMgmt: 3000,

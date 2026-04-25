@@ -4,13 +4,12 @@ import { useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { useAutosave } from "@/hooks/use-autosave";
 import { GlassCard } from "@/components/shared/glass-card";
 import { CurrencyInput } from "@/components/forms/shared/currency-input";
 import { NumberInput } from "@/components/forms/shared/number-input";
-import { PercentInput } from "@/components/forms/shared/percent-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -138,8 +137,16 @@ export function InfoForm({ projectId, variantId }: InfoFormProps) {
   return (
     <div className="space-y-6">
       <MetadataSection project={project} projectId={projectId} />
-      <GeometrySection variant={variant} variantId={variantId} />
-      <IncomeSection variant={variant} variantId={variantId} />
+      <GeometrySection
+        variant={variant}
+        variantId={variantId}
+        projectId={projectId}
+      />
+      <IncomeSection
+        variant={variant}
+        variantId={variantId}
+        projectId={projectId}
+      />
     </div>
   );
 }
@@ -163,7 +170,16 @@ function MetadataSection({
   projectId: string;
 }) {
   const trpc = useTRPC();
-  const updateProject = useMutation(trpc.project.update.mutationOptions());
+  const queryClient = useQueryClient();
+  const updateProject = useMutation(
+    trpc.project.update.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.project.getById.queryKey({ projectId }),
+        });
+      },
+    })
+  );
 
   const form = useForm<MetadataValues>({
     resolver: zodResolver(metadataSchema),
@@ -284,6 +300,7 @@ function MetadataSection({
 function GeometrySection({
   variant,
   variantId,
+  projectId,
 }: {
   variant: {
     geometry: {
@@ -309,9 +326,30 @@ function GeometrySection({
     } | null;
   };
   variantId: string;
+  projectId: string;
 }) {
   const trpc = useTRPC();
-  const upsertGeometry = useMutation(trpc.variant.upsertGeometry.mutationOptions());
+  const queryClient = useQueryClient();
+  const upsertGeometry = useMutation(
+    trpc.variant.upsertGeometry.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.variant.getById.queryKey({ variantId }),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.project.getById.queryKey({ projectId }),
+        });
+        for (const formulaMode of ["excel_bugfixed", "excel_replica"] as const) {
+          queryClient.invalidateQueries({
+            queryKey: trpc.calculation.calculate.queryKey({
+              variantId,
+              formulaMode,
+            }),
+          });
+        }
+      },
+    })
+  );
   const g = variant.geometry;
   const [showAdvanced, setShowAdvanced] = useState(
     Boolean(
@@ -624,6 +662,7 @@ function GeometrySection({
 function IncomeSection({
   variant,
   variantId,
+  projectId,
 }: {
   variant: {
     incomeInput: {
@@ -646,9 +685,30 @@ function IncomeSection({
     } | null;
   };
   variantId: string;
+  projectId: string;
 }) {
   const trpc = useTRPC();
-  const upsertIncome = useMutation(trpc.variant.upsertIncomeInput.mutationOptions());
+  const queryClient = useQueryClient();
+  const upsertIncome = useMutation(
+    trpc.variant.upsertIncomeInput.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.variant.getById.queryKey({ variantId }),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.project.getById.queryKey({ projectId }),
+        });
+        for (const formulaMode of ["excel_bugfixed", "excel_replica"] as const) {
+          queryClient.invalidateQueries({
+            queryKey: trpc.calculation.calculate.queryKey({
+              variantId,
+              formulaMode,
+            }),
+          });
+        }
+      },
+    })
+  );
   const inc = variant.incomeInput;
   const [showIncome, setShowIncome] = useState(
     Boolean(
@@ -693,6 +753,39 @@ function IncomeSection({
 
   useAutosave({ control: form.control, onSave });
 
+  const clearValues: IncomeValues = {
+    rent1MonthlyPerM2: 0,
+    rent1Area: 0,
+    rent1Taxes: 0,
+    rent2MonthlyPerM2: 0,
+    rent2Area: 0,
+    rent2Taxes: 0,
+    rent3MonthlyPerM2: 0,
+    rent3Area: 0,
+    rent3Taxes: 0,
+    otherIncome1: 0,
+    otherIncome1Taxes: 0,
+    otherIncome2: 0,
+    otherIncome2Taxes: 0,
+    otherIncome3: 0,
+    otherIncome3Taxes: 0,
+    expectedPricePerM2: 0,
+  };
+
+  const handleDisableIncome = async () => {
+    if (
+      !window.confirm(
+        "Disable income analysis and clear the saved income inputs?",
+      )
+    ) {
+      return;
+    }
+
+    form.reset(clearValues);
+    await upsertIncome.mutateAsync({ variantId, ...clearValues });
+    setShowIncome(false);
+  };
+
   if (!showIncome) {
     return (
       <GlassCard>
@@ -726,14 +819,25 @@ function IncomeSection({
             it disabled for cost-only comparisons.
           </p>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => setShowIncome(false)}
-        >
-          Hide income inputs
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowIncome(false)}
+          >
+            Collapse income inputs
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleDisableIncome}
+            disabled={upsertIncome.isPending}
+          >
+            Disable income analysis
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -749,15 +853,16 @@ function IncomeSection({
                 control={form.control}
                 label="Monthly / m2"
               />
-              <CurrencyInput
+              <NumberInput
                 name={`rent${n}Area` as keyof IncomeValues}
                 control={form.control}
                 label="Area (m2)"
+                suffix=" m2"
               />
-              <PercentInput
+              <CurrencyInput
                 name={`rent${n}Taxes` as keyof IncomeValues}
                 control={form.control}
-                label="Tax Rate"
+                label="Annual Taxes"
               />
             </div>
           </div>
@@ -775,10 +880,10 @@ function IncomeSection({
                 control={form.control}
                 label="Amount"
               />
-              <PercentInput
+              <CurrencyInput
                 name={`otherIncome${n}Taxes` as keyof IncomeValues}
                 control={form.control}
-                label="Tax Rate"
+                label="Taxes"
               />
             </div>
           </div>

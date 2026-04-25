@@ -28,6 +28,10 @@ const COST_CATEGORY_VALUES = [
   "E1_OUTDOOR",
 ] as const;
 
+const finiteNumber = z.number().finite();
+const nonNegativeNumber = finiteNumber.min(0);
+const nullableNonNegativeNumber = nonNegativeNumber.nullable().optional();
+
 /** Recompute parent cost item aggregates from its details */
 async function recomputeCostItemAggregates(
   db: PrismaClient,
@@ -216,13 +220,13 @@ export const costItemRouter = createTRPCRouter({
       z.object({
         costItemId: z.string(),
         detailId: z.string().optional(),
-        layerOrder: z.number().int().default(0),
+        layerOrder: finiteNumber.int().default(0),
         description: z.string().optional(),
-        area: z.number().nullable().optional(),
-        materialCost: z.number().nullable().optional(),
-        unitPrice: z.number().nullable().optional(),
-        laborCost: z.number().nullable().optional(),
-        otherCost: z.number().nullable().optional(),
+        area: nullableNonNegativeNumber,
+        materialCost: nullableNonNegativeNumber,
+        unitPrice: nullableNonNegativeNumber,
+        laborCost: nullableNonNegativeNumber,
+        otherCost: nullableNonNegativeNumber,
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -298,13 +302,13 @@ export const costItemRouter = createTRPCRouter({
             details: z
               .array(
                 z.object({
-                  layerOrder: z.number().int().default(0),
+                  layerOrder: finiteNumber.int().default(0),
                   description: z.string().optional(),
-                  area: z.number().nullable().optional(),
-                  materialCost: z.number().nullable().optional(),
-                  unitPrice: z.number().nullable().optional(),
-                  laborCost: z.number().nullable().optional(),
-                  otherCost: z.number().nullable().optional(),
+                  area: nullableNonNegativeNumber,
+                  materialCost: nullableNonNegativeNumber,
+                  unitPrice: nullableNonNegativeNumber,
+                  laborCost: nullableNonNegativeNumber,
+                  otherCost: nullableNonNegativeNumber,
                 }),
               )
               .optional(),

@@ -39,7 +39,10 @@ function buildVariantCreate(
       create: variantData.costItems,
     },
     serviceComponents: {
-      create: variantData.serviceComponents,
+      create: variantData.serviceComponents.map((component, index) => ({
+        ...component,
+        sortOrder: index,
+      })),
     },
     wlcInput: {
       create: variantData.wlcInput,

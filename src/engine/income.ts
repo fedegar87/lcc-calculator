@@ -33,7 +33,7 @@ export function computeIncome(
   );
   const netAnnualIncome = rentIncome + otherIncome;
 
-  // INC-002: Simple payback — null if income is zero or negative
+  // INC-002: Simple payback - null if income is zero or negative
   const simplePaybackYears =
     netAnnualIncome > 0 ? lcc / netAnnualIncome : null;
 

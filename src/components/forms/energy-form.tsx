@@ -4,7 +4,7 @@ import { useCallback, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { useAutosave } from "@/hooks/use-autosave";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -164,6 +164,7 @@ export function EnergyForm({ variantId }: EnergyFormProps) {
       <EnergyConsumptionSection
         variant={variant}
         variantId={variantId}
+        projectId={variant.projectId}
         energySources={energySources}
       />
     </div>
@@ -173,6 +174,7 @@ export function EnergyForm({ variantId }: EnergyFormProps) {
 function EnergyConsumptionSection({
   variant,
   variantId,
+  projectId,
   energySources,
 }: {
   variant: {
@@ -184,11 +186,30 @@ function EnergyConsumptionSection({
     }>;
   };
   variantId: string;
+  projectId: string;
   energySources: Array<{ index: number; name: string; category: string }>;
 }) {
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const upsertEnergy = useMutation(
-    trpc.variant.upsertEnergyInputs.mutationOptions()
+    trpc.variant.upsertEnergyInputs.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.variant.getById.queryKey({ variantId }),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.project.getById.queryKey({ projectId }),
+        });
+        for (const formulaMode of ["excel_bugfixed", "excel_replica"] as const) {
+          queryClient.invalidateQueries({
+            queryKey: trpc.calculation.calculate.queryKey({
+              variantId,
+              formulaMode,
+            }),
+          });
+        }
+      },
+    })
   );
   const isMobile = useIsMobile();
 

@@ -87,6 +87,55 @@ describe('MNT-BUG-001: Formula mode toggle', () => {
       expReplica.servicesCumulatedYear40,
     );
   });
+
+  it('excel_replica keeps the workbook cap of three replacement cycles', () => {
+    const input = baseInput();
+    input.referencePeriod = 75;
+    input.serviceComponents = [
+      {
+        name: 'Air conditioning unit',
+        constructionCost: 10000,
+        en15459ComponentIndex: 1,
+      },
+    ];
+
+    const replicaDefault = computeMaintenanceCosts(input, {
+      formulaMode: 'excel_replica',
+    });
+    const replicaCapThree = computeMaintenanceCosts(input, {
+      formulaMode: 'excel_replica',
+      maxReplacementCycles: 3,
+    });
+
+    expect(replicaDefault.services[60]).toBeCloseTo(
+      replicaCapThree.services[60],
+      2,
+    );
+  });
+
+  it('excel_bugfixed defaults to uncapped replacement cycles', () => {
+    const input = baseInput();
+    input.referencePeriod = 75;
+    input.serviceComponents = [
+      {
+        name: 'Air conditioning unit',
+        constructionCost: 10000,
+        en15459ComponentIndex: 1,
+      },
+    ];
+
+    const bugfixedDefault = computeMaintenanceCosts(input, {
+      formulaMode: 'excel_bugfixed',
+    });
+    const bugfixedCapThree = computeMaintenanceCosts(input, {
+      formulaMode: 'excel_bugfixed',
+      maxReplacementCycles: 3,
+    });
+
+    expect(bugfixedDefault.services[60]).toBeGreaterThan(
+      bugfixedCapThree.services[60],
+    );
+  });
 });
 
 describe('CAL-005..008: Maintenance totals', () => {
