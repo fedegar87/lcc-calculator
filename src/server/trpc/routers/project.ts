@@ -2,6 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "../init";
 import { requireProjectRole } from "../middleware/auth";
+import { ensurePublicPreviewProjects } from "@/server/demo/ensure-public-preview-projects";
 
 const BUILDING_USE_VALUES = [
   "RESIDENTIAL_SINGLE",
@@ -18,6 +19,8 @@ const VARIANT_LABELS = ["VARIANT_1", "VARIANT_2"] as const;
 export const projectRouter = createTRPCRouter({
   // 1. List all projects in the public preview workspace
   list: protectedProcedure.query(async ({ ctx }) => {
+    await ensurePublicPreviewProjects(ctx.db);
+
     return ctx.db.project.findMany({
       select: {
         id: true,
