@@ -8,33 +8,20 @@ import { d } from "./_shared";
 async function verifyVariantWriteAccess(
   db: PrismaClient,
   variantId: string,
-  userId: string,
+  _userId: string,
 ) {
   const variant = await db.variant.findUnique({
     where: { id: variantId },
     select: {
       id: true,
-      project: {
-        select: {
-          userId: true,
-          members: { select: { userId: true, role: true } },
-        },
-      },
     },
   });
   if (!variant) {
     throw new TRPCError({ code: "NOT_FOUND" });
   }
 
-  const isCreator = variant.project.userId === userId;
-  if (isCreator) return variant;
-
-  const membership = variant.project.members.find(
-    (m) => m.userId === userId,
-  );
-  if (!membership || membership.role === "VIEWER") {
-    throw new TRPCError({ code: "NOT_FOUND" });
-  }
+  // Public preview: every authenticated/anonymous session can edit
+  // existing variants. When account gating returns, restore role checks here.
   return variant;
 }
 
@@ -42,33 +29,20 @@ async function verifyVariantWriteAccess(
 async function verifyVariantReadAccess(
   db: PrismaClient,
   variantId: string,
-  userId: string,
+  _userId: string,
 ) {
   const variant = await db.variant.findUnique({
     where: { id: variantId },
     select: {
       id: true,
-      project: {
-        select: {
-          userId: true,
-          members: { select: { userId: true, role: true } },
-        },
-      },
     },
   });
   if (!variant) {
     throw new TRPCError({ code: "NOT_FOUND" });
   }
 
-  const isCreator = variant.project.userId === userId;
-  if (isCreator) return variant;
-
-  const isMember = variant.project.members.some(
-    (m) => m.userId === userId,
-  );
-  if (!isMember) {
-    throw new TRPCError({ code: "NOT_FOUND" });
-  }
+  // Public preview: every authenticated/anonymous session can read
+  // existing variants. When account gating returns, restore role checks here.
   return variant;
 }
 

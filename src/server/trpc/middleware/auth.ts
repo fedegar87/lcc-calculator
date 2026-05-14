@@ -6,7 +6,6 @@ type Role = "OWNER" | "EDITOR" | "VIEWER";
 
 interface AuthenticatedCtx {
   db: PrismaClient;
-  user: { id: string };
 }
 
 export function requireProjectRole(...allowedRoles: Role[]) {
@@ -19,26 +18,10 @@ export function requireProjectRole(...allowedRoles: Role[]) {
     }
 
     const { projectId } = input;
-    const userId = ctx.user.id;
 
-    const membership = await ctx.db.projectMember.findUnique({
-      where: {
-        projectId_userId: { projectId, userId },
-      },
-    });
-
-    if (membership) {
-      if (!allowedRoles.includes(membership.role as Role)) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-      return opts.next({
-        ctx: { ...opts.ctx, projectId, memberRole: membership.role as Role },
-      });
-    }
-
-    // Check if user is project creator (implicit OWNER)
-    const project = await ctx.db.project.findFirst({
-      where: { id: projectId, userId },
+    const project = await ctx.db.project.findUnique({
+      where: { id: projectId },
+      select: { id: true },
     });
 
     if (!project) {
@@ -49,6 +32,8 @@ export function requireProjectRole(...allowedRoles: Role[]) {
       throw new TRPCError({ code: "NOT_FOUND" });
     }
 
+    // Public preview: every authenticated/anonymous session can edit
+    // existing projects. When account gating returns, restore role checks here.
     return opts.next({
       ctx: { ...opts.ctx, projectId, memberRole: "OWNER" as Role },
     });

@@ -56,36 +56,22 @@ async function recomputeCostItemAggregates(
 async function verifyVariantAccess(
   db: PrismaClient,
   variantId: string,
-  userId: string,
-  requiredRole?: "write",
+  _userId: string,
+  _requiredRole?: "write",
 ) {
   const variant = await db.variant.findUnique({
     where: { id: variantId },
     select: {
       id: true,
       projectId: true,
-      project: { select: { userId: true } },
     },
   });
   if (!variant) {
     throw new TRPCError({ code: "NOT_FOUND" });
   }
 
-  const isCreator = variant.project.userId === userId;
-  if (isCreator) return variant;
-
-  const membership = await db.projectMember.findUnique({
-    where: {
-      projectId_userId: { projectId: variant.projectId, userId },
-    },
-  });
-  if (!membership) {
-    throw new TRPCError({ code: "NOT_FOUND" });
-  }
-  if (requiredRole === "write" && membership.role === "VIEWER") {
-    throw new TRPCError({ code: "NOT_FOUND" });
-  }
-
+  // Public preview: every authenticated/anonymous session can read and edit
+  // existing cost items. When account gating returns, restore role checks here.
   return variant;
 }
 

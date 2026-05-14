@@ -42,8 +42,6 @@ const VARIANT_INCLUDE = {
       id: true,
       name: true,
       city: true,
-      userId: true,
-      members: { select: { userId: true, role: true } },
     },
   },
   geometry: true,
@@ -78,17 +76,6 @@ export const exportRouter = createTRPCRouter({
 
       if (!variant) {
         throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
-      // Access check
-      const isCreator = variant.project.userId === ctx.user.id;
-      if (!isCreator) {
-        const membership = variant.project.members.find(
-          (m) => m.userId === ctx.user.id,
-        );
-        if (!membership || membership.role === "VIEWER") {
-          throw new TRPCError({ code: "NOT_FOUND" });
-        }
       }
 
       if (!variant.boundaryCondition) {
@@ -207,17 +194,6 @@ export const exportRouter = createTRPCRouter({
 
       if (!variant) {
         throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
-      // Access check
-      const isCreator = variant.project.userId === ctx.user.id;
-      if (!isCreator) {
-        const membership = variant.project.members.find(
-          (m) => m.userId === ctx.user.id,
-        );
-        if (!membership || membership.role === "VIEWER") {
-          throw new TRPCError({ code: "NOT_FOUND" });
-        }
       }
 
       if (!variant.boundaryCondition) {

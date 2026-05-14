@@ -16,10 +16,9 @@ const BUILDING_USE_VALUES = [
 const VARIANT_LABELS = ["VARIANT_1", "VARIANT_2"] as const;
 
 export const projectRouter = createTRPCRouter({
-  // 1. List own projects
+  // 1. List all projects in the public preview workspace
   list: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.project.findMany({
-      where: { userId: ctx.user.id },
       select: {
         id: true,
         name: true,
@@ -32,7 +31,7 @@ export const projectRouter = createTRPCRouter({
     });
   }),
 
-  // 2. Get project by ID (with access check)
+  // 2. Get project by ID
   getById: protectedProcedure
     .input(z.object({ projectId: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -52,13 +51,6 @@ export const projectRouter = createTRPCRouter({
       });
 
       if (!project) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
-      // Access check: creator or member
-      const isCreator = project.userId === ctx.user.id;
-      const isMember = project.members.some((m) => m.userId === ctx.user.id);
-      if (!isCreator && !isMember) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
@@ -117,21 +109,11 @@ export const projectRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { projectId, ...data } = input;
 
-      // Check access: creator or OWNER/EDITOR member
       const project = await ctx.db.project.findUnique({
         where: { id: projectId },
       });
       if (!project) {
         throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
-      if (project.userId !== ctx.user.id) {
-        const membership = await ctx.db.projectMember.findUnique({
-          where: { projectId_userId: { projectId, userId: ctx.user.id } },
-        });
-        if (!membership || membership.role === "VIEWER") {
-          throw new TRPCError({ code: "NOT_FOUND" });
-        }
       }
 
       return ctx.db.project.update({
