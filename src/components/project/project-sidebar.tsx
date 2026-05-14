@@ -40,13 +40,17 @@ export function ProjectSidebar() {
   const router = useRouter();
   const trpc = useTRPC();
   const { data: session } = authClient.useSession();
+  const user = session?.user;
+  const isAnonymous = Boolean(user?.isAnonymous);
+  const displayName = isAnonymous ? "Guest workspace" : user?.name ?? "User";
+  const displayDetail = isAnonymous ? "Anonymous session" : user?.email ?? "";
   const { data: projects, isPending } = useQuery(
     trpc.project.list.queryOptions()
   );
 
   async function handleSignOut() {
     await authClient.signOut();
-    router.push("/login");
+    router.push("/");
   }
 
   return (
@@ -129,10 +133,10 @@ export function ProjectSidebar() {
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="truncate text-sm font-medium">
-                    {session?.user?.name ?? "User"}
+                    {displayName}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {session?.user?.email ?? ""}
+                    {displayDetail}
                   </span>
                 </div>
                 <ChevronUp className="ml-auto size-4" />
@@ -140,12 +144,12 @@ export function ProjectSidebar() {
               <DropdownMenuContent side="top" align="start">
                 <DropdownMenuItem disabled>
                   <User className="mr-2 size-4" />
-                  {session?.user?.email ?? "Account"}
+                  {isAnonymous ? "Temporary browser workspace" : user?.email ?? "Account"}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="mr-2 size-4" />
-                  Sign out
+                  {isAnonymous ? "Reset session" : "Sign out"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
