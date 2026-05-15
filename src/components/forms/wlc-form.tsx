@@ -35,6 +35,8 @@ import {
 import { Plus, Trash2 } from "lucide-react";
 import { NumericFormat } from "react-number-format";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { UNITS } from "@/lib/units";
+import { getMethodDefaults } from "@/engine/method-profiles";
 
 // -- Schemas --
 
@@ -119,6 +121,8 @@ function formatPercent(value: number) {
 function computeRealRate(nominalRate: number, inflationRate: number) {
   return (1 + nominalRate) / (1 + inflationRate) - 1;
 }
+
+const legacyDefaults = getMethodDefaults("CRAVEZERO_LEGACY");
 
 // -- Component --
 
@@ -214,9 +218,9 @@ function BoundaryConditionSection({
     resolver: zodResolver(boundarySchema),
     mode: "onBlur",
     defaultValues: {
-      referencePeriod: (bc?.referencePeriod as number) ?? 30,
-      interestRate: (bc?.interestRate as number) ?? 0.03,
-      inflationRate: (bc?.inflationRate as number) ?? 0.02,
+      referencePeriod: (bc?.referencePeriod as number) ?? legacyDefaults.referencePeriod,
+      interestRate: (bc?.interestRate as number) ?? legacyDefaults.interestRate,
+      inflationRate: (bc?.inflationRate as number) ?? legacyDefaults.inflationRate,
       stakeholderRole: (bc?.stakeholderRole as number) ?? null,
     },
   });
@@ -706,7 +710,7 @@ function NonConstructionSection({
                 name="landArea"
                 control={form.control}
                 label="Land Area"
-                suffix=" m2"
+                suffix={` ${UNITS.m2}`}
               />
               <NumberInput
                 name="buildingIndex"
@@ -724,7 +728,7 @@ function NonConstructionSection({
               <CurrencyInput
                 name="landPrice"
                 control={form.control}
-                label="Land Price (EUR/m2)"
+                label={`Land Price (${UNITS.EUR_m2})`}
               />
             </div>
           ) : (

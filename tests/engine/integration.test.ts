@@ -15,6 +15,7 @@ describe('Integration: calculateLCC end-to-end', () => {
   it('has engine metadata', () => {
     expect(result.engineVersion).toBeDefined();
     expect(result.formulaMode).toBe('excel_bugfixed');
+    expect(result.methodProfile).toBe('CRAVEZERO_LEGACY');
   });
 
   it('real interest rate', () => {

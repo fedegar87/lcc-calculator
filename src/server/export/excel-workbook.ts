@@ -1,5 +1,6 @@
 import ExcelJS from "exceljs";
 import type { LCCResult } from "@/engine/types";
+import { getAnalysisYears } from "@/lib/results/time-series";
 
 const CATEGORY_LABELS: Record<string, string> = {
   A1_ROOFS: "A1 - Roofs",
@@ -69,6 +70,7 @@ export async function buildExcelWorkbook(
   wsSummary.addRow(["Date", new Date().toISOString().slice(0, 10)]);
   wsSummary.addRow(["Engine Version", result.engineVersion]);
   wsSummary.addRow(["Formula Mode", result.formulaMode]);
+  wsSummary.addRow(["Method Profile", result.methodProfile]);
   wsSummary.addRow([]);
   addHeaderRow(wsSummary, ["KPI", "Value"]);
 
@@ -131,17 +133,17 @@ export async function buildExcelWorkbook(
     "Net Energy",
   ]);
 
-  const years = result.heatingCosts.cumulated.length;
-  for (let i = 0; i < years; i++) {
-    const heating = result.heatingCosts.cumulated[i];
-    const cooling = result.coolingCosts.cumulated[i];
-    const dhw = result.dhwCosts.cumulated[i];
-    const household = result.householdCosts.cumulated[i];
-    const pv = result.pvProduction.cumulated[i];
+  const years = getAnalysisYears(result);
+  for (let year = 1; year <= years; year++) {
+    const heating = result.heatingCosts.cumulated[year];
+    const cooling = result.coolingCosts.cumulated[year];
+    const dhw = result.dhwCosts.cumulated[year];
+    const household = result.householdCosts.cumulated[year];
+    const pv = result.pvProduction.cumulated[year];
     const net = heating + cooling + dhw + household - pv;
 
     const row = wsEnergy.addRow([
-      i + 1,
+      year,
       heating,
       cooling,
       dhw,
@@ -171,13 +173,13 @@ export async function buildExcelWorkbook(
     "Cumulated",
   ]);
 
-  for (let i = 0; i < years; i++) {
+  for (let year = 1; year <= years; year++) {
     const row = wsMaintenance.addRow([
-      i + 1,
-      result.maintenanceElements[i],
-      result.maintenanceServices[i],
-      result.maintenanceTotal[i],
-      result.maintenanceCumulated[i],
+      year,
+      result.maintenanceElements[year],
+      result.maintenanceServices[year],
+      result.maintenanceTotal[year],
+      result.maintenanceCumulated[year],
     ]);
     for (let c = 2; c <= 5; c++) {
       row.getCell(c).numFmt = EUR_FORMAT;

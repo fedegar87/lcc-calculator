@@ -30,7 +30,7 @@ export const FOUNDATIONAL_CITATIONS: Citation[] = [
     year: "2021",
     publication: "Sustainable Cities and Society 74, 103139",
     description:
-      "Foundational paper behind LCCzero. Applies DSA + EE sensitivity analysis to 11 nZEB case studies and identifies the four parameters that dominate LCC: interest rate, structural-element cost, construction maintenance cost, HVAC maintenance cost.",
+      "Foundational methodological precedent. Applies DSA + EE sensitivity analysis to 11 nZEB case studies and identifies high-impact LCC parameters including interest rate, structural-element cost, construction maintenance cost, and HVAC maintenance cost.",
     link: "https://doi.org/10.1016/j.scs.2021.103139",
     fullCitation:
       "Pernetti, R., Garzia, F., & Filippi Oberegger, U. (2021). Sensitivity analysis as support for reliable life cycle cost evaluation applied to eleven nearly zero-energy buildings in Europe. Sustainable Cities and Society, 74, 103139. https://doi.org/10.1016/j.scs.2021.103139",
@@ -210,7 +210,7 @@ export const RESIDUAL_CITATIONS: Citation[] = [
     year: "2020",
     publication: "Sustainability 12, 6255",
     description:
-      "Method for estimating end-of-life costs and waste in nZEB demolitions. LCCzero excludes EoL by default (data gaps across EU) but exposes hooks for this method.",
+      "Method for estimating end-of-life costs and waste in nZEB demolitions. LCCzero currently reports service-component residual value separately; full demolition/EoL costs remain outside the deterministic core.",
     link: "https://doi.org/10.3390/su12156255",
   },
   {
@@ -221,7 +221,7 @@ export const RESIDUAL_CITATIONS: Citation[] = [
     year: "2018",
     publication: "Conference proceedings",
     description:
-      "Co-benefits framing for LCC of net-zero buildings — informs the income/NPV layer in LCCzero (a method improvement over the original Excel).",
+      "LCC framing for a net-zero building case, including co-benefits; useful background for income/NPV extensions without making co-benefits part of the deterministic core.",
   },
 ];
 

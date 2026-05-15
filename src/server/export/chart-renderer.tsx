@@ -1,6 +1,7 @@
 import React from "react";
 import sharp from "sharp";
 import type { LCCResult } from "@/engine/types";
+import { buildCostEvolutionRows } from "@/lib/results/time-series";
 
 // Dynamic import to avoid Next.js App Router blocking react-dom/server in static analysis
 async function renderToMarkup(element: React.ReactElement): Promise<string> {
@@ -98,23 +99,7 @@ export async function renderCostEvolutionPng(
   const { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } =
     await loadRecharts();
 
-  const length = result.heatingCosts.cumulated.length;
-
-  const data = Array.from({ length }, (_, i) => {
-    const energyCumulated =
-      result.heatingCosts.cumulated[i] +
-      result.coolingCosts.cumulated[i] +
-      result.dhwCosts.cumulated[i] +
-      result.householdCosts.cumulated[i] -
-      result.pvProduction.cumulated[i];
-
-    return {
-      year: i + 1,
-      Energy: energyCumulated,
-      Maintenance: result.maintenanceCumulated[i],
-      "Total O&M": energyCumulated + result.maintenanceCumulated[i],
-    };
-  });
+  const data = buildCostEvolutionRows(result);
 
   const svg = await renderToMarkup(
     <LineChart

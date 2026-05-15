@@ -2,6 +2,7 @@
 import React from "react";
 import { Document, Page, View, Text, Image } from "@react-pdf/renderer";
 import type { LCCResult } from "@/engine/types";
+import { getAnalysisYears } from "@/lib/results/time-series";
 import { styles } from "./pdf-styles";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -56,8 +57,9 @@ export function LCCReport({
   const nonZeroCategories = Object.entries(result.constructionByCategory).filter(
     ([, cost]) => cost > 0,
   );
+  const analysisYears = getAnalysisYears(result);
 
-  const footerText = `LCCzero | Engine ${result.engineVersion} | ${result.formulaMode} | ${generatedAt}`;
+  const footerText = `LCCzero | Engine ${result.engineVersion} | ${result.formulaMode} | ${result.methodProfile} | ${generatedAt}`;
 
   return (
     <Document>
@@ -81,12 +83,12 @@ export function LCCReport({
             <Text style={styles.tableCell}>Variant</Text>
             <Text style={styles.tableCellRight}>{variant.label}</Text>
           </View>
-          <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>Reference Period</Text>
-            <Text style={styles.tableCellRight}>
-              {result.heatingCosts.cumulated.length} years
-            </Text>
-          </View>
+	          <View style={styles.tableRow}>
+	            <Text style={styles.tableCell}>Reference Period</Text>
+	            <Text style={styles.tableCellRight}>
+	              {analysisYears} years
+	            </Text>
+	          </View>
           <View style={styles.tableRow}>
             <Text style={styles.tableCell}>Treated Floor Area</Text>
             <Text style={styles.tableCellRight}>
@@ -106,11 +108,15 @@ export function LCCReport({
               {(result.realInterestRate * 100).toFixed(2)}%
             </Text>
           </View>
-          <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>Formula Mode</Text>
-            <Text style={styles.tableCellRight}>{result.formulaMode}</Text>
-          </View>
-          <View style={styles.tableRow}>
+	          <View style={styles.tableRow}>
+	            <Text style={styles.tableCell}>Formula Mode</Text>
+	            <Text style={styles.tableCellRight}>{result.formulaMode}</Text>
+	          </View>
+	          <View style={styles.tableRow}>
+	            <Text style={styles.tableCell}>Method Profile</Text>
+	            <Text style={styles.tableCellRight}>{result.methodProfile}</Text>
+	          </View>
+	          <View style={styles.tableRow}>
             <Text style={styles.tableCell}>Engine Version</Text>
             <Text style={styles.tableCellRight}>{result.engineVersion}</Text>
           </View>

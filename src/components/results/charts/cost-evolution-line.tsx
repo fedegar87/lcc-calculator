@@ -13,6 +13,7 @@ import {
 import type { LCCResult } from "@/engine/types";
 import { ChartDataTable } from "@/components/results/chart-data-table";
 import { chartTheme, domainColor } from "@/lib/chart-theme";
+import { buildCostEvolutionRows } from "@/lib/results/time-series";
 
 const eurFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -33,25 +34,7 @@ interface CostEvolutionLineProps {
 }
 
 export function CostEvolutionLine({ result }: CostEvolutionLineProps) {
-  const length = result.heatingCosts.cumulated.length;
-
-  const data = Array.from({ length }, (_, i) => {
-    const energyCumulated =
-      result.heatingCosts.cumulated[i] +
-      result.coolingCosts.cumulated[i] +
-      result.dhwCosts.cumulated[i] +
-      result.householdCosts.cumulated[i] -
-      result.pvProduction.cumulated[i];
-
-    const maintenanceCumulated = result.maintenanceCumulated[i];
-
-    return {
-      year: i + 1,
-      Energy: energyCumulated,
-      Maintenance: maintenanceCumulated,
-      "Total O&M": energyCumulated + maintenanceCumulated,
-    };
-  });
+  const data = buildCostEvolutionRows(result);
 
   const prefersReduced =
     typeof window !== "undefined" &&

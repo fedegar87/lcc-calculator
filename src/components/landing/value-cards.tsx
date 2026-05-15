@@ -14,19 +14,19 @@ const VALUES: ValueCard[] = [
     icon: Calculator,
     iconTile: "bg-eurac-red/10 text-eurac-red",
     title: "Standard-compliant LCC",
-    body: "Net present value over 40 years per ISO 15686-5, with construction, energy, maintenance and residual value layered on a CEEC element breakdown.",
+    body: "Deterministic life-cycle cost over the selected reference period, with construction, energy, maintenance and residual value layered on a CEEC element breakdown.",
   },
   {
     icon: ScanSearch,
     iconTile: "bg-fin-100 text-fin-600",
-    title: "Sensitivity by design",
-    body: "Differential and Elementary-Effects sensitivity baked into the workflow. The four parameters that drive 26% of LCC variance are surfaced first.",
+    title: "Sensitivity-ready method",
+    body: "Pernetti et al. provide the DSA and Elementary-Effects precedent; the current app exposes deterministic inputs and will add embedded SA as a planned module.",
   },
   {
     icon: FileSpreadsheet,
     iconTile: "bg-construction-100 text-construction-600",
     title: "Built on real cases",
-    body: "Methodology validated on 11 nZEB case studies (Pernetti et al., 2021) across France, Italy, Sweden, Austria and Germany.",
+    body: "Grounded in CRAVEzero and the 11 nZEB case-study evidence discussed by Pernetti et al. (2021).",
   },
 ];
 

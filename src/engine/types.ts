@@ -1,4 +1,7 @@
 // PURE ENGINE TYPES - No Prisma or framework imports allowed
+import { DEFAULT_METHOD_PROFILE } from './method-profiles';
+import type { MethodProfileId } from './method-profiles';
+export type { MethodProfileId } from './method-profiles';
 
 export const ENGINE_VERSION = '1.0.0';
 
@@ -7,11 +10,13 @@ export type LandCostMode = 'UNIT_PRICE' | 'TOTAL_COST';
 
 export interface EngineConfig {
   formulaMode: FormulaMode;
+  methodProfile?: MethodProfileId;
   maxReplacementCycles?: number | null;
 }
 
 export const DEFAULT_ENGINE_CONFIG: EngineConfig = {
   formulaMode: 'excel_bugfixed',
+  methodProfile: DEFAULT_METHOD_PROFILE,
 };
 
 export type MaintenanceType = 'building_element' | 'building_service' | 'none';
@@ -144,6 +149,7 @@ export interface LCCResult {
   // Metadata
   engineVersion: string;
   formulaMode: FormulaMode;
+  methodProfile: MethodProfileId;
 
   // FIN-001: real interest rate
   realInterestRate: number;

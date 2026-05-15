@@ -1,6 +1,12 @@
 import { createHash } from "node:crypto";
 import type { PrismaClient } from "@/generated/prisma/client";
-import type { VariantInput, FormulaMode, LCCResult } from "@/engine/types";
+import type {
+  VariantInput,
+  FormulaMode,
+  LCCResult,
+  MethodProfileId,
+} from "@/engine/types";
+import { DEFAULT_METHOD_PROFILE } from "@/engine/method-profiles";
 
 /**
  * Produce a deterministic SHA-256 hex hash of the variant input + formula mode.
@@ -9,8 +15,9 @@ import type { VariantInput, FormulaMode, LCCResult } from "@/engine/types";
 export function computeInputsHash(
   input: VariantInput,
   formulaMode: FormulaMode,
+  methodProfile: MethodProfileId = DEFAULT_METHOD_PROFILE,
 ): string {
-  const payload = { input, formulaMode };
+  const payload = { input, formulaMode, methodProfile };
   const json = JSON.stringify(payload, (_key, value) => {
     if (value !== null && typeof value === "object" && !Array.isArray(value)) {
       return Object.keys(value)
@@ -30,6 +37,7 @@ interface SnapshotParams {
   variantLabel: "BASE" | "VARIANT_1" | "VARIANT_2";
   engineVersion: string;
   formulaMode: FormulaMode;
+  methodProfile?: MethodProfileId;
   variantInput: VariantInput;
   result: LCCResult;
   userId: string;
@@ -46,6 +54,7 @@ export async function getOrCreateSnapshot(
   const inputsHash = computeInputsHash(
     params.variantInput,
     params.formulaMode,
+    params.methodProfile ?? params.result.methodProfile ?? DEFAULT_METHOD_PROFILE,
   );
 
   // Check for existing snapshot with identical inputs

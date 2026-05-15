@@ -5,7 +5,6 @@ type TestVariant = Parameters<typeof buildVariantInput>[0];
 
 function makeVariant(): TestVariant {
   return {
-    id: 'variant-2',
     label: 'VARIANT_2',
     boundaryCondition: {
       referencePeriod: 40,

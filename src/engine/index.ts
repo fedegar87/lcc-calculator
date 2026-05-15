@@ -44,6 +44,11 @@ export function calculateLCC(
   input: VariantInput,
   config: EngineConfig = DEFAULT_ENGINE_CONFIG,
 ): LCCResult {
+  const engineConfig: EngineConfig = {
+    ...DEFAULT_ENGINE_CONFIG,
+    ...config,
+  };
+
   // 1. VALIDATE
   const errors = validateVariantInput(input);
   if (errors.length > 0) {
@@ -54,14 +59,14 @@ export function calculateLCC(
   const rr = computeRealInterestRate(
     input.interestRate,
     input.inflationRate,
-    config.formulaMode,
+    engineConfig.formulaMode,
   );
 
   // 3. ENERGY (NRG-001..007)
-  const energy = computeEnergyCosts(input, rr, config.formulaMode);
+  const energy = computeEnergyCosts(input, rr, engineConfig.formulaMode);
 
   // 4. MAINTENANCE (MNT-001..004, CAL-005..008)
-  const maintenance = computeMaintenanceCosts(input, config);
+  const maintenance = computeMaintenanceCosts(input, engineConfig);
 
   // 5. AGGREGATE (AGG-001..014, CAL-001..004)
   const agg = aggregateResults(
@@ -71,7 +76,7 @@ export function calculateLCC(
     maintenance,
     input.referencePeriod,
     input.treatedFloorArea,
-    config.formulaMode,
+    engineConfig.formulaMode,
   );
 
   // 6. RESIDUAL VALUE (RES-001)
@@ -93,7 +98,9 @@ export function calculateLCC(
   // 8. ASSEMBLE with output rounding (2dp EUR, 4dp rates)
   return {
     engineVersion: ENGINE_VERSION,
-    formulaMode: config.formulaMode,
+    formulaMode: engineConfig.formulaMode,
+    methodProfile:
+      engineConfig.methodProfile ?? DEFAULT_ENGINE_CONFIG.methodProfile!,
     realInterestRate: roundRate(rr),
 
     heatingCosts: roundYearlyCosts(energy.heating),

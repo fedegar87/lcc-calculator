@@ -1,22 +1,27 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { GlassCard } from "@/components/shared/glass-card";
 import { KPICard } from "@/components/results/kpi-card";
 import { ConstructionBreakdownTable, WLCBreakdownTable } from "@/components/results/breakdown-table";
-import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ChartSkeleton } from "@/components/ui/chart-skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
+import { AlertCircle, BarChart3, RefreshCw } from "lucide-react";
 import * as motion from "motion/react-client";
 import type { LCCResult } from "@/engine/types";
 import type { FormulaMode } from "@/engine/types";
 import { ReferenceButton } from "@/components/shared/reference-button";
+import { UNITS } from "@/lib/units";
 import {
   FOUNDATIONAL_CITATIONS,
   METHODOLOGY_CITATIONS,
   BOUNDARY_CITATIONS,
 } from "@/lib/citations";
+import { getAnalysisYears } from "@/lib/results/time-series";
 
 const LCCStackedBar = dynamic(() =>
   import("@/components/results/charts/lcc-stacked-bar").then(
@@ -24,7 +29,7 @@ const LCCStackedBar = dynamic(() =>
   ),
   {
     ssr: false,
-    loading: () => <Skeleton className="h-72 rounded-lg" />,
+    loading: () => <ChartSkeleton variant="bar" className="h-72" />,
   },
 );
 
@@ -34,44 +39,47 @@ const CostEvolutionLine = dynamic(() =>
   ),
   {
     ssr: false,
-    loading: () => <Skeleton className="h-72 rounded-lg" />,
+    loading: () => <ChartSkeleton variant="line" className="h-72" />,
   },
 );
 
-const LCC_BREAKDOWN_ASSUMPTIONS = [
-  {
-    rule: "NPV computed over a 40-year analysis period",
-    rationale:
-      "Pernetti et al. 2021 — balances life-cycle perspective and forecast reliability for nZEBs.",
-    citationId: "pernetti-2021-scs",
-  },
-  {
-    rule: "End-of-life costs excluded by default",
-    rationale:
-      "EU-wide demolition/disposal data is fragmented; included as an opt-in via Vázquez-López et al. 2020 method.",
-    citationId: "vazquez-lopez-2020",
-  },
-  {
-    rule: "Maintenance uses nominal rate (Rint), energy uses real (RR)",
-    rationale:
-      "Asymmetry inherited from the CRAVEzero spreadsheet — maintenance contracts are quoted nominally, energy-price escalators are typically real.",
-  },
-];
+function buildLccBreakdownAssumptions(result: LCCResult) {
+  return [
+    {
+      rule: `LCC calculated over a ${getAnalysisYears(result)}-year analysis period`,
+      rationale:
+        "The reference period comes from the variant boundary conditions and is reported with the calculation result.",
+      citationId: "iso-15686-5",
+    },
+    {
+      rule: "Residual value is calculated and shown separately",
+      rationale:
+        "Headline LCC/WLC are gross totals; LCC net residual subtracts the prorated service-component residual value.",
+      citationId: "vazquez-lopez-2020",
+    },
+    {
+      rule: "Maintenance uses nominal rate (Rint), energy uses real-rate discounting",
+      rationale:
+        "This convention is inherited from the CRAVEzero spreadsheet replica and is kept explicit until method profiles become selectable.",
+    },
+  ];
+}
 
-const COST_EVOLUTION_ASSUMPTIONS = [
-  {
-    rule: "Real discount rate = 1.51% baseline",
-    rationale:
-      "Euro-area average 2009–2016 (FRED INTDSREZQ193N) — the same baseline used in the foundational paper.",
-    citationId: "fred-eurodiscount",
-  },
-  {
-    rule: "Energy price escalation independent of general inflation",
-    rationale:
-      "Bounds taken from Eurostat per-country ranges; Pernetti 2021 shows escalation × interest rate is the strongest non-linear driver of LCC.",
-    citationId: "eurostat-electricity",
-  },
-];
+function buildCostEvolutionAssumptions(result: LCCResult) {
+  return [
+    {
+      rule: `Real discount rate = ${(result.realInterestRate * 100).toFixed(2)}%`,
+      rationale:
+        "The value is derived from the variant nominal interest and inflation rates using the active formula mode.",
+    },
+    {
+      rule: "Energy escalation uses per-carrier annual increase scalars",
+      rationale:
+        "Scenario curves are not implemented yet; current energy costs use the annual increase stored for each energy source.",
+      citationId: "eurostat-electricity",
+    },
+  ];
+}
 
 const CONSTRUCTION_ASSUMPTIONS = [
   {
@@ -103,17 +111,17 @@ function ResultsSkeleton() {
     <div className="space-y-4">
       <div className="grid grid-cols-4 gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-24 rounded-lg" />
+          <ChartSkeleton key={i} variant="table" className="h-24" />
         ))}
       </div>
       <div className="grid grid-cols-3 gap-4">
-        <Skeleton className="col-span-2 h-80 rounded-lg" />
-        <Skeleton className="h-80 rounded-lg" />
+        <ChartSkeleton variant="bar" className="col-span-2 h-80" />
+        <ChartSkeleton variant="table" className="h-80" />
       </div>
-      <Skeleton className="h-72 rounded-lg" />
+      <ChartSkeleton variant="line" className="h-72" />
       <div className="grid grid-cols-2 gap-4">
-        <Skeleton className="h-64 rounded-lg" />
-        <Skeleton className="h-64 rounded-lg" />
+        <ChartSkeleton variant="table" className="h-64" />
+        <ChartSkeleton variant="bar" className="h-64" />
       </div>
     </div>
   );
@@ -134,9 +142,53 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 1,
 });
 
+const RATIO_BAR_CLASSES = {
+  fin: "bg-fin-500",
+  construction: "bg-construction-500",
+  mnt: "bg-mnt-500",
+  res: "bg-res-500",
+} as const;
+
+function RatioBar({
+  label,
+  value,
+  domain,
+}: {
+  label: string;
+  value: number | null;
+  domain: keyof typeof RATIO_BAR_CLASSES;
+}) {
+  const hasValue = typeof value === "number" && Number.isFinite(value);
+  const isAnomaly = hasValue && value > 1;
+  const width = hasValue ? Math.min(Math.max(value, 0), 1) * 100 : 0;
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-sm">{label}</span>
+        <span className="inline-flex items-center gap-1 text-sm font-medium tabular-nums">
+          {isAnomaly ? (
+            <AlertCircle
+              className="size-3.5 text-destructive"
+              aria-label="Unexpected ratio greater than 100 percent"
+            />
+          ) : null}
+          {hasValue ? percentFormatter.format(value) : "N/A"}
+        </span>
+      </div>
+      <div className="h-1.5 rounded-full bg-muted" title={isAnomaly ? "Unexpected ratio > 100%" : undefined}>
+        <div
+          className={isAnomaly ? "h-1.5 rounded-full bg-destructive" : `h-1.5 rounded-full ${RATIO_BAR_CLASSES[domain]}`}
+          style={{ width: `${width}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function ResultsDashboard({
   variantId,
-  projectId: _projectId,
+  projectId,
   formulaMode = "excel_bugfixed",
   resultOverride,
   skipQuery = false,
@@ -150,6 +202,21 @@ export function ResultsDashboard({
     ...trpc.calculation.calculate.queryOptions({ variantId, formulaMode }),
     enabled: !skipQuery && !resultOverride,
   });
+  const { data: project } = useQuery({
+    ...trpc.project.getById.queryOptions({ projectId }),
+    enabled: Boolean(projectId),
+  });
+  const baseVariantId = project?.variants.find(
+    (variant) => variant.label === "BASE",
+  )?.id;
+  const isBaseVariant = baseVariantId === variantId;
+  const { data: baseResult } = useQuery({
+    ...trpc.calculation.calculate.queryOptions({
+      variantId: baseVariantId ?? variantId,
+      formulaMode,
+    }),
+    enabled: Boolean(baseVariantId && baseVariantId !== variantId),
+  });
   const result = resultOverride ?? data;
   const isLoading = skipQuery ? loadingOverride : !resultOverride && isPending;
   const errorState = skipQuery ? errorOverride : error;
@@ -157,13 +224,35 @@ export function ResultsDashboard({
   if (isLoading) return <ResultsSkeleton />;
 
   if (errorState) {
+    const errorMessage = errorState.message || "Calculation failed";
+    const isMissingInputs =
+      errorMessage.includes("Missing boundary") ||
+      errorMessage.includes("Input validation failed");
+
+    if (isMissingInputs) {
+      return (
+        <EmptyState
+          icon={<BarChart3 className="size-5" />}
+          title="No results yet"
+          description="Complete the required WLC, project info, and construction inputs to generate the first LCC breakdown."
+          action={
+            <Button render={<Link href={`/projects/${projectId}/wlc`} />}>
+              Go to WLC step
+            </Button>
+          }
+        />
+      );
+    }
+
     return (
       <GlassCard className="flex flex-col items-center gap-4 py-12">
         <AlertCircle className="size-10 text-destructive" />
         <p className="text-sm text-muted-foreground">
-          {errorState.message || "Calculation failed"}
+          {errorMessage}
         </p>
-        <button
+        <Button
+          type="button"
+          variant="outline"
           onClick={() => {
             if (onRetryOverride) {
               onRetryOverride();
@@ -171,29 +260,81 @@ export function ResultsDashboard({
               refetch();
             }
           }}
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
           <RefreshCw className="size-4" />
           Retry
-        </button>
+        </Button>
       </GlassCard>
     );
   }
 
-  if (!result) return null;
+  if (!result) {
+    return (
+      <EmptyState
+        icon={<BarChart3 className="size-5" />}
+        title="No results yet"
+        description="Fill at least project info and one construction category to see the LCC breakdown."
+        action={
+          <Button render={<Link href={`/projects/${projectId}/info`} />}>
+            Go to Step 1
+          </Button>
+        }
+      />
+    );
+  }
+
+  const hasAnyConstructionData =
+    result.totalConstruction > 0 ||
+    Object.values(result.constructionByCategory).some((value) => value > 0);
+
+  if (result.lcc === 0 && !hasAnyConstructionData) {
+    return (
+      <EmptyState
+        icon={<BarChart3 className="size-5" />}
+        title="No results yet"
+        description="Fill at least project info and one construction category to see the LCC breakdown."
+        action={
+          <Button render={<Link href={`/projects/${projectId}/info`} />}>
+            Go to Step 1
+          </Button>
+        }
+      />
+    );
+  }
+
+  const baseSubtitle = isBaseVariant ? "Reference variant" : undefined;
+  const lccBreakdownAssumptions = buildLccBreakdownAssumptions(result);
+  const costEvolutionAssumptions = buildCostEvolutionAssumptions(result);
 
   return (
     <div className="space-y-4">
       {/* Row 1: KPI Cards */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {[
-          { title: "LCC", value: result.lcc, unit: "EUR" },
-          { title: "WLC", value: result.wlc, unit: "EUR" },
-          { title: "LCC/m2", value: result.kpiLCCPerM2 ?? 0, unit: "EUR/m2" },
+          {
+            title: "LCC",
+            value: result.lcc,
+            unit: "EUR",
+            baseValue: baseResult?.lcc,
+          },
+          {
+            title: "WLC",
+            value: result.wlc,
+            unit: "EUR",
+            baseValue: baseResult?.wlc,
+          },
+          {
+            title: `LCC/${UNITS.m2}`,
+            value: result.kpiLCCPerM2,
+            unit: UNITS.EUR_m2,
+            baseValue: baseResult?.kpiLCCPerM2,
+          },
           {
             title: "Payback",
-            value: result.income?.simplePaybackYears ?? 0,
-            unit: result.income?.simplePaybackYears != null ? "years" : "N/A",
+            value: result.income?.simplePaybackYears ?? null,
+            unit: "years",
+            baseValue: baseResult?.income?.simplePaybackYears ?? null,
+            emptyDescription: "Enable income inputs to compute payback.",
           },
         ].map((kpi, i) => (
           <motion.div
@@ -203,7 +344,15 @@ export function ResultsDashboard({
             animate="visible"
             variants={stagger}
           >
-            <KPICard title={kpi.title} value={kpi.value} unit={kpi.unit} />
+            <KPICard
+              title={kpi.title}
+              value={kpi.value}
+              unit={kpi.unit}
+              baseValue={kpi.baseValue}
+              subtitle={baseSubtitle}
+              emptyDescription={kpi.emptyDescription}
+              lowerIsBetter
+            />
           </motion.div>
         ))}
       </div>
@@ -226,7 +375,7 @@ export function ResultsDashboard({
                 domain="construction"
                 title="LCC breakdown — methodology"
                 citations={FOUNDATIONAL_CITATIONS}
-                assumptions={LCC_BREAKDOWN_ASSUMPTIONS}
+                assumptions={lccBreakdownAssumptions}
               />
             </div>
             <LCCStackedBar result={result} />
@@ -266,7 +415,7 @@ export function ResultsDashboard({
               domain="fin"
               title="Cost evolution — boundary conditions"
               citations={BOUNDARY_CITATIONS}
-              assumptions={COST_EVOLUTION_ASSUMPTIONS}
+              assumptions={costEvolutionAssumptions}
             />
           </div>
           <CostEvolutionLine result={result} />
@@ -306,26 +455,30 @@ export function ResultsDashboard({
                 {
                   label: "Design / Investment Cost",
                   value: result.kpiDesignOverInvestmentCost,
+                  domain: "fin" as const,
                 },
                 {
                   label: "Construction / Investment Cost",
                   value: result.kpiConstructionOverInvestmentCost,
+                  domain: "construction" as const,
                 },
                 {
                   label: "Labor / Investment Cost",
                   value: result.kpiLaborOverInvestmentCost,
+                  domain: "construction" as const,
                 },
                 {
                   label: "O&M / Investment Cost",
                   value: result.kpiOMOverInvestmentCost,
+                  domain: "mnt" as const,
                 },
               ].map((kpi) => (
-                <div key={kpi.label} className="flex items-center justify-between">
-                  <span className="text-sm">{kpi.label}</span>
-                  <span className="text-sm font-medium tabular-nums">
-                    {kpi.value != null ? percentFormatter.format(kpi.value) : "N/A"}
-                  </span>
-                </div>
+                <RatioBar
+                  key={kpi.label}
+                  label={kpi.label}
+                  value={kpi.value}
+                  domain={kpi.domain}
+                />
               ))}
             </div>
           </GlassCard>

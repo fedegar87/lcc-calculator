@@ -30,7 +30,7 @@ const PUBLICATIONS = [
       "Sensitivity analysis as support for reliable life cycle cost evaluation applied to eleven nearly zero-energy buildings in Europe",
     journal: "Sustainable Cities and Society (2021)",
     description:
-      "Foundational paper. DSA + EE sensitivity analysis on 11 nZEBs; identifies the four parameters that drive 26% of LCC variance.",
+      "Foundational paper. DSA + Elementary Effects on 11 nZEBs; identifies high-impact LCC parameters and reports substantial LCC variation around the median.",
     link: "https://doi.org/10.1016/j.scs.2021.103139",
     type: "journal" as const,
   },
@@ -39,7 +39,7 @@ const PUBLICATIONS = [
       "Towards the definition of a nZEB cost spreadsheet as a support tool for the design",
     journal: "IOP Conference Series (2019)",
     description:
-      "Direct precursor of LCCzero — defines the CRAVEzero Excel LCC spreadsheet that this web app productises.",
+      "Direct precursor of LCCzero; defines the CRAVEzero Excel LCC spreadsheet that this web app productises.",
     type: "conference" as const,
   },
   {
@@ -47,7 +47,7 @@ const PUBLICATIONS = [
       "Assessment model of end-of-life costs and waste quantification in selective demolitions: Case studies of nearly zero-energy buildings",
     journal: "Sustainability (2020)",
     description:
-      "End-of-life cost methodology for nZEB demolitions — referenced for the residual-value layer.",
+      "End-of-life cost methodology for nZEB demolitions; referenced for the residual-value layer.",
     link: "https://doi.org/10.3390/su12156255",
     type: "journal" as const,
   },
@@ -56,7 +56,7 @@ const PUBLICATIONS = [
       "Life cycle cost reduction and market acceleration for new nearly zero-energy buildings",
     journal: "IOP Conference Series (2019)",
     description:
-      "CRAVEzero programme overview — extra costs, processes, technologies and business models for nZEBs.",
+      "CRAVEzero programme overview; extra costs, processes, technologies and business models for nZEBs.",
     type: "conference" as const,
   },
 ];

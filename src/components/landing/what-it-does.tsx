@@ -13,8 +13,9 @@ export function WhatItDoes() {
           Three domains, one life-cycle view
         </h2>
         <p className="max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-          Investment, operation, and sensitivity stay connected so design
-          choices can be read as a single life-cycle picture.
+          Investment and operation stay connected so design choices can be read
+          as a single life-cycle picture. Sensitivity analysis is planned as an
+          embedded module.
         </p>
       </header>
 

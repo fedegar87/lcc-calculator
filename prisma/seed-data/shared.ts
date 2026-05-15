@@ -1,3 +1,7 @@
+import { getMethodDefaults } from "../../src/engine/method-profiles";
+
+const legacyDefaults = getMethodDefaults("CRAVEZERO_LEGACY");
+
 export const DEMO_USER = {
   name: "Demo User",
   email: "demo@lcczero.dev",
@@ -13,9 +17,9 @@ export const PROJECT_META = {
 };
 
 export const BOUNDARY_CONDITIONS = {
-  referencePeriod: 40,
-  interestRate: 0.0151,
-  inflationRate: 0.0056,
+  referencePeriod: legacyDefaults.referencePeriod,
+  interestRate: legacyDefaults.interestRate,
+  inflationRate: legacyDefaults.inflationRate,
   energyPrices: [
     { index: 3, name: "Natural Gas", pricePerKwh: 0.065, annualIncrease: 0.02 },
     {

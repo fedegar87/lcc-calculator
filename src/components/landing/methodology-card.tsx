@@ -9,7 +9,7 @@ import {
 const ROWS = [
   {
     label: "LCC framework",
-    value: "ISO 15686-5 · NPV over 40 years",
+    value: "ISO 15686-5; selected reference period",
   },
   {
     label: "Cost breakdown",
@@ -21,11 +21,11 @@ const ROWS = [
   },
   {
     label: "Energy demand",
-    value: "PHPP — Passive House Planning Package",
+    value: "PHPP; Passive House Planning Package",
   },
   {
-    label: "Sensitivity analysis",
-    value: "DSA + Elementary Effects (Morris 1991, Campolongo 2007)",
+    label: "Sensitivity precedent",
+    value: "DSA + Elementary Effects planned for embedded SA",
   },
   {
     label: "Empirical baseline",
