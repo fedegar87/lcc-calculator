@@ -20,12 +20,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { ConfirmAction } from "@/components/ui/confirm-action";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Trash2 } from "lucide-react";
 import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
+import { UNITS } from "@/lib/units";
 
 // -- Types --
 
@@ -112,7 +114,7 @@ function DetailRow({ detail, onUpdate, onDelete }: DetailRowProps) {
             value={detail.area}
             onValueChange={(v) => onUpdate("area", v.floatValue ?? 0)}
             decimalScale={2}
-            placeholder="Area (m2)"
+            placeholder={`Area (${UNITS.m2})`}
             customInput={Input}
             className="h-9 text-sm"
           />
@@ -171,6 +173,7 @@ function DetailRow({ detail, onUpdate, onDelete }: DetailRowProps) {
               size="icon"
               className="h-8 w-8 text-muted-foreground hover:text-destructive"
               onClick={onDelete}
+              aria-label="Delete detail row"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </Button>
@@ -181,18 +184,28 @@ function DetailRow({ detail, onUpdate, onDelete }: DetailRowProps) {
   }
 
   return (
-    <div className="grid grid-cols-[1fr_80px_100px_100px_100px_100px_80px_32px] items-center gap-2 py-1.5">
+    <div className="grid grid-cols-[minmax(240px,1fr)_80px_100px_100px_100px_100px_80px_32px] items-center gap-2 py-1.5 max-xl:grid-cols-[minmax(240px,1fr)_32px] max-xl:rounded-lg max-xl:border max-xl:bg-muted/10 max-xl:p-2">
       <Input
         defaultValue={detail.description ?? ""}
         placeholder="Description"
         className="h-8 text-sm"
         onBlur={(e) => onUpdate("description", e.target.value)}
       />
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="hidden h-8 w-8 text-muted-foreground hover:text-destructive max-xl:inline-flex"
+        onClick={onDelete}
+        aria-label="Delete detail row"
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </Button>
       <NumericFormat
         value={detail.area}
         onValueChange={(v) => onUpdate("area", v.floatValue ?? 0)}
         decimalScale={2}
-        placeholder="m2"
+        placeholder={UNITS.m2}
         customInput={Input}
         className="h-8 text-sm"
       />
@@ -239,8 +252,9 @@ function DetailRow({ detail, onUpdate, onDelete }: DetailRowProps) {
         type="button"
         variant="ghost"
         size="icon"
-        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+        className="h-8 w-8 text-muted-foreground hover:text-destructive max-xl:hidden"
         onClick={onDelete}
+        aria-label="Delete detail row"
       >
         <Trash2 className="h-3.5 w-3.5" />
       </Button>
@@ -303,6 +317,7 @@ function ServiceComponentRow({
             size="icon"
             className="h-8 w-8 text-muted-foreground hover:text-destructive"
             onClick={onDelete}
+            aria-label="Delete service component"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
@@ -349,6 +364,7 @@ function ServiceComponentRow({
         size="icon"
         className="mt-6 h-8 w-8 text-muted-foreground hover:text-destructive"
         onClick={onDelete}
+        aria-label="Delete service component"
       >
         <Trash2 className="h-3.5 w-3.5" />
       </Button>
@@ -409,9 +425,9 @@ function CategoryItem({
       <AccordionContent className="px-2">
         {/* Detail row headers */}
         {!isMobile && (costItem?.details?.length ?? 0) > 0 && (
-          <div className="grid grid-cols-[1fr_80px_100px_100px_100px_100px_80px_32px] gap-2 border-b pb-1 text-xs font-medium text-muted-foreground">
-            <span>Description</span>
-            <span>Area (m2)</span>
+            <div className="grid grid-cols-[minmax(240px,1fr)_80px_100px_100px_100px_100px_80px_32px] gap-2 border-b pb-1 text-xs font-medium text-muted-foreground max-xl:hidden">
+              <span>Description</span>
+              <span>Area ({UNITS.m2})</span>
             <span>Material</span>
             <span>Unit Price</span>
             <span>Labor</span>
@@ -440,16 +456,31 @@ function CategoryItem({
           </div>
         ) : null}
 
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="mt-2"
-          onClick={() => onDetailAdd(category.value)}
-        >
-          <Plus className="mr-1.5 h-3.5 w-3.5" />
-          Add Detail
-        </Button>
+        {isAggregateOnly ? (
+          <ConfirmAction
+            title="Overwrite aggregate value?"
+            description="You're about to replace the imported aggregate cost with a detailed breakdown. The previous aggregate will be lost."
+            confirmLabel="Add detail row"
+            onConfirm={() => onDetailAdd(category.value)}
+            trigger={
+              <Button type="button" variant="outline" size="sm" className="mt-2">
+                <Plus className="mr-1.5 h-3.5 w-3.5" />
+                Add Detail
+              </Button>
+            }
+          />
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-2"
+            onClick={() => onDetailAdd(category.value)}
+          >
+            <Plus className="mr-1.5 h-3.5 w-3.5" />
+            Add Detail
+          </Button>
+        )}
       </AccordionContent>
     </AccordionItem>
   );
@@ -694,15 +725,6 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
       let maxOrder = 0;
 
       if (existing) {
-        const aggregateOnlyTotal =
-          existing.materialCostAgg + existing.laborCostAgg + existing.otherCostAgg;
-        if (existing.details.length === 0 && aggregateOnlyTotal > 0) {
-          const confirmed = window.confirm(
-            "This category is using aggregate costs. Adding detail rows will replace the aggregate source for this category. Continue?",
-          );
-          if (!confirmed) return;
-        }
-
         costItemId = existing.id;
         maxOrder = existing.details
           ? Math.max(0, ...existing.details.map((d) => d.layerOrder))

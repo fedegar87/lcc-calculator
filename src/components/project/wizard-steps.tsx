@@ -1,6 +1,18 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
+import {
+  AlertCircle,
+  AlertTriangle,
+  BarChart3,
+  CheckCircle2,
+  Circle,
+  ClipboardList,
+  Home,
+  Layers3,
+  Settings2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
   ProjectReadiness,
@@ -9,12 +21,12 @@ import type {
 } from "@/lib/project-readiness";
 
 const STEPS = [
-  { id: "overview", label: "Overview" },
-  { id: "info", label: "Info" },
-  { id: "wlc", label: "WLC" },
-  { id: "construction", label: "Construction" },
-  { id: "energy", label: "Energy" },
-  { id: "results", label: "Results" },
+  { id: "overview", label: "Overview", icon: Home },
+  { id: "info", label: "Info", icon: ClipboardList },
+  { id: "wlc", label: "WLC", icon: Settings2 },
+  { id: "construction", label: "Construction", icon: Layers3 },
+  { id: "energy", label: "Energy", icon: Settings2 },
+  { id: "results", label: "Results", icon: BarChart3 },
 ] as const;
 
 interface WizardStepsProps {
@@ -44,80 +56,136 @@ export function WizardSteps({
   currentStep,
   readiness,
 }: WizardStepsProps) {
+  const stepRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
   const overviewStatus = readiness
     ? `${readiness.statusLabel}, ${readiness.blockers.length} blockers, ${readiness.warnings.length} warnings`
     : "Project overview";
+  const currentIndex = STEPS.findIndex((step) => step.id === currentStep);
+  const currentLabel = STEPS[currentIndex]?.label ?? "Overview";
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      stepRefs.current[currentStep]?.scrollIntoView({
+        inline: "center",
+        block: "nearest",
+        behavior: "smooth",
+      });
+    }, 100);
+
+    return () => window.clearTimeout(timeout);
+  }, [currentStep]);
 
   return (
-    <nav className="flex flex-wrap items-center gap-2" aria-label="Project sections">
-      {STEPS.map((step, i) => {
-        const isCurrent = step.id === currentStep;
-        const section = getSection(readiness, step.id);
-        const hasBlockers = Boolean(section?.blockers);
-        const hasWarnings = Boolean(section?.warnings);
-        const isReady = Boolean(section?.isPreviewReady);
-        const statusText =
-          step.id === "overview"
-            ? overviewStatus
-            : section
-              ? `${section.requiredFilled} of ${section.requiredTotal} required, ${section.recommendedFilled} of ${section.recommendedTotal} recommended, ${section.blockers} blockers, ${section.warnings} warnings`
-              : "No progress data";
+    <div className="min-w-0 space-y-2 md:space-y-0">
+      <nav
+        className="relative max-w-full after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-8 after:bg-gradient-to-l after:from-background after:to-transparent xl:after:hidden"
+        aria-label="Project sections"
+      >
+        <div className="flex max-w-full flex-nowrap items-center gap-2 overflow-x-auto pb-1 xl:flex-wrap xl:overflow-visible xl:pb-0">
+          {STEPS.map((step, i) => {
+            const isCurrent = step.id === currentStep;
+            const section = getSection(readiness, step.id);
+            const hasBlockers =
+              step.id === "overview"
+                ? Boolean(readiness?.blockers.length)
+                : Boolean(section?.blockers);
+            const hasWarnings =
+              step.id === "overview"
+                ? Boolean(readiness?.warnings.length)
+                : Boolean(section?.warnings);
+            const isReady =
+              step.id === "overview"
+                ? Boolean(readiness?.previewReady)
+                : Boolean(section?.isPreviewReady);
+            const readinessLabel = hasBlockers
+              ? "has blockers"
+              : hasWarnings
+                ? "has warnings"
+                : isReady
+                  ? "ready"
+                  : "pending";
+            const statusText =
+              step.id === "overview"
+                ? overviewStatus
+                : section
+                  ? `${section.requiredFilled} of ${section.requiredTotal} required, ${section.recommendedFilled} of ${section.recommendedTotal} recommended, ${section.blockers} blockers, ${section.warnings} warnings`
+                  : "No progress data";
+            const StepIcon = step.icon;
+            const StatusIcon = hasBlockers
+              ? AlertCircle
+              : hasWarnings
+                ? AlertTriangle
+                : isReady
+                  ? CheckCircle2
+                  : Circle;
 
-        return (
-          <div key={step.id} className="flex items-center gap-2">
-            <Link
-              href={getStepHref(projectId, step.id)}
-              className={cn(
-                "group flex min-w-[7rem] flex-col gap-1 rounded-xl border px-3 py-2 transition-colors",
-                isCurrent
-                  ? "border-primary bg-primary/5"
-                  : "border-border bg-card/70 hover:bg-muted/40",
-              )}
-              aria-current={isCurrent ? "step" : undefined}
-              aria-label={`${step.label}. ${statusText}`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span
+            return (
+              <div key={step.id} className="flex items-center gap-2">
+                <Link
+                  ref={(node) => {
+                    stepRefs.current[step.id] = node;
+                  }}
+                  href={getStepHref(projectId, step.id)}
                   className={cn(
-                    "text-xs font-medium transition-colors",
+                    "group flex min-w-12 flex-col gap-1 rounded-xl border px-2 py-2 transition-colors md:min-w-[7rem] md:px-3",
                     isCurrent
-                      ? "text-primary"
-                      : "text-muted-foreground group-hover:text-foreground",
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-card/70 hover:bg-muted/40",
                   )}
+                  aria-current={isCurrent ? "step" : undefined}
+                  aria-label={`${step.label}, ${readinessLabel}. ${statusText}`}
                 >
-                  {step.label}
-                </span>
-                <span
-                  className={cn(
-                    "size-2.5 rounded-full",
-                    hasBlockers && "bg-destructive",
-                    !hasBlockers && hasWarnings && "bg-amber-400",
-                    !hasBlockers && !hasWarnings && isReady && "bg-emerald-500",
-                    !hasBlockers &&
-                      !hasWarnings &&
-                      !isReady &&
-                      "bg-muted-foreground/40",
-                  )}
-                />
-              </div>
-              <div className="text-[11px] text-muted-foreground">
-                {step.id === "overview" ? (
-                  readiness ? readiness.statusLabel : "Overview"
-                ) : section ? (
-                  <>
-                    {section.requiredFilled}/{section.requiredTotal} required
-                  </>
-                ) : (
-                  "Pending"
+                  <div className="flex items-center justify-center gap-1.5 md:justify-between md:gap-2">
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-1.5 text-xs font-medium transition-colors",
+                        isCurrent
+                          ? "text-primary"
+                          : "text-muted-foreground group-hover:text-foreground",
+                      )}
+                    >
+                      <span className="md:hidden">{i + 1}</span>
+                      <StepIcon className="size-4 md:hidden" />
+                      <span className="hidden md:inline">{step.label}</span>
+                    </span>
+                    <StatusIcon
+                      className={cn(
+                        "size-3.5 shrink-0",
+                        hasBlockers && "text-destructive",
+                        !hasBlockers && hasWarnings && "text-amber-500",
+                        !hasBlockers && !hasWarnings && isReady && "text-emerald-500",
+                        !hasBlockers &&
+                          !hasWarnings &&
+                          !isReady &&
+                          "text-muted-foreground/50",
+                      )}
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div className="hidden text-[11px] text-muted-foreground md:block">
+                    {step.id === "overview" ? (
+                      readiness ? readiness.statusLabel : "Overview"
+                    ) : section ? (
+                      <>
+                        {section.requiredFilled}/{section.requiredTotal} required
+                      </>
+                    ) : (
+                      "Pending"
+                    )}
+                  </div>
+                </Link>
+                {i < STEPS.length - 1 && (
+                  <div className="hidden h-px w-2 bg-border xl:block" />
                 )}
               </div>
-            </Link>
-            {i < STEPS.length - 1 && (
-              <div className="hidden h-px w-2 bg-border xl:block" />
-            )}
-          </div>
-        );
-      })}
-    </nav>
+            );
+          })}
+        </div>
+      </nav>
+      <div className="sticky top-0 z-10 rounded-lg border bg-background/95 px-3 py-2 text-xs font-medium shadow-sm md:hidden">
+        Step {currentIndex >= 0 ? currentIndex + 1 : 1} of {STEPS.length} —{" "}
+        {currentLabel}
+      </div>
+    </div>
   );
 }

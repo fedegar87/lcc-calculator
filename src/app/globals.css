@@ -133,6 +133,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --pattern-dot-color: rgb(15 23 42 / 0.03);
 }
 
 .dark {
@@ -162,6 +163,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --pattern-dot-color: rgb(248 250 252 / 0.04);
 }
 
 @layer base {
@@ -205,10 +207,9 @@
     border: 1px solid oklch(1 0 0 / 0.1);
   }
 
-  /* Subtle SVG dot texture overlay for primary hero cards (opacity ~3%). */
+  /* Subtle dot texture overlay for primary hero cards. */
   .pattern-dots {
-    background-image:
-      url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='%230f172a' fill-opacity='0.03'%3E%3Ccircle cx='4' cy='4' r='1.2'/%3E%3Ccircle cx='16' cy='12' r='1.2'/%3E%3Ccircle cx='8' cy='20' r='1.2'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: radial-gradient(var(--pattern-dot-color) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 
@@ -229,6 +230,13 @@
   }
   .animate-marquee-slow {
     animation: marqueeSlide 40s linear infinite;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .btn-touch-h {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 

@@ -52,6 +52,14 @@ function humanLabel(label: string): string {
   return LABEL_DISPLAY[label] ?? label;
 }
 
+function variantSummary(variant: Variant): string {
+  if (variant.diffCount) {
+    return `${variant.diffCount} changed input groups`;
+  }
+
+  return variant.label === "BASE" ? "Reference variant" : "No delta yet";
+}
+
 function getNextVariantLabel(
   variants: Variant[]
 ): "VARIANT_1" | "VARIANT_2" | null {
@@ -152,49 +160,96 @@ export function VariantTabs({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <Tabs value={activeVariantId} onValueChange={onVariantChange} className="min-w-0 flex-1">
-        <TabsList className="h-auto flex-wrap items-stretch justify-start gap-2 bg-transparent p-0">
-          {variants.map((v) => (
-            <TabsTrigger
-              key={v.id}
-              value={v.id}
-              className="min-w-[12rem] rounded-xl border bg-card px-3 py-2 data-[state=active]:border-primary data-[state=active]:bg-primary/5"
+    <>
+      <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-center">
+        <div className="flex min-w-0 gap-2 md:hidden">
+          <Select
+            value={activeVariantId}
+            onValueChange={(value) => {
+              if (value) onVariantChange(value);
+            }}
+          >
+            <SelectTrigger className="h-11 w-full min-w-0 flex-1">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="start">
+              {variants.map((variant) => (
+                <SelectItem
+                  key={variant.id}
+                  value={variant.id}
+                  className={variant.id === activeVariantId ? "font-semibold" : undefined}
+                >
+                  {humanLabel(variant.label)} · {variantSummary(variant)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {canAdd ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDialogOpen(true)}
+              aria-label="Create new variant"
             >
-              <div className="flex w-full items-start justify-between gap-3">
-                <div className="min-w-0 text-left">
-                  <div className="truncate text-sm font-medium">
-                    {humanLabel(v.label)}
-                  </div>
-                  <div className="mt-1 text-xs text-muted-foreground">
-                    {v.diffCount
-                      ? `${v.diffCount} changed input groups`
-                      : v.label === "BASE"
-                        ? "Reference variant"
-                        : "No delta yet"}
-                  </div>
-                  {v.description ? (
-                    <div className="mt-1 truncate text-[11px] text-muted-foreground/80">
-                      {v.description}
-                    </div>
-                  ) : null}
-                </div>
-                {v.readiness ? (
-                  <ReadinessPill status={v.readiness.status} className="shrink-0" />
-                ) : null}
-              </div>
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+              <Plus className="size-4" />
+              New
+            </Button>
+          ) : null}
+        </div>
 
-      {canAdd ? (
-        <>
-          <Button variant="outline" onClick={() => setDialogOpen(true)}>
+        <Tabs
+          value={activeVariantId}
+          onValueChange={onVariantChange}
+          className="hidden min-w-0 flex-1 md:block"
+        >
+          <div className="relative max-w-full after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-8 after:bg-gradient-to-l after:from-background after:to-transparent xl:after:hidden">
+            <div className="overflow-x-auto pb-1 xl:overflow-visible xl:pb-0">
+              <TabsList className="h-auto w-max flex-nowrap items-stretch justify-start gap-2 bg-transparent p-0">
+                {variants.map((v) => (
+                  <TabsTrigger
+                    key={v.id}
+                    value={v.id}
+                    className="min-w-[12rem] rounded-xl border bg-card px-3 py-2 data-[state=active]:border-l-4 data-[state=active]:border-primary data-[state=active]:bg-primary/5 data-[state=active]:pl-2"
+                  >
+                    <div className="flex w-full items-start justify-between gap-3">
+                      <div className="min-w-0 text-left">
+                        <div className="truncate text-sm font-medium">
+                          {humanLabel(v.label)}
+                        </div>
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          {variantSummary(v)}
+                        </div>
+                        {v.description ? (
+                          <div className="mt-1 truncate text-[11px] text-muted-foreground/80">
+                            {v.description}
+                          </div>
+                        ) : null}
+                      </div>
+                      {v.readiness ? (
+                        <ReadinessPill status={v.readiness.status} className="shrink-0" />
+                      ) : null}
+                    </div>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
+          </div>
+        </Tabs>
+
+        {canAdd ? (
+          <Button
+            variant="outline"
+            onClick={() => setDialogOpen(true)}
+            className="hidden md:inline-flex"
+          >
             <Plus className="size-4" />
             New variant
           </Button>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        ) : null}
+      </div>
+
+      {canAdd ? (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Create {humanLabel(nextLabel!)}</DialogTitle>
@@ -208,9 +263,9 @@ export function VariantTabs({
                   <Label>Creation mode</Label>
                   <Select
                     value={creationMode}
-                    onValueChange={(value) =>
-                      setCreationMode(value as typeof creationMode)
-                    }
+                    onValueChange={(value) => {
+                      if (value) setCreationMode(value as typeof creationMode);
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -263,8 +318,7 @@ export function VariantTabs({
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        </>
       ) : null}
-    </div>
+    </>
   );
 }

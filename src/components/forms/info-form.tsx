@@ -22,7 +22,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { ConfirmAction } from "@/components/ui/confirm-action";
 import { InfoTooltip } from "@/components/shared/info-tooltip";
+import { UNIT_LABELS, UNITS } from "@/lib/units";
 
 const BUILDING_USE_OPTIONS = [
   { value: "RESIDENTIAL_SINGLE", label: "Residential (Single)" },
@@ -467,38 +469,43 @@ function GeometrySection({
                   name="grossFloorArea"
                   control={form.control}
                   label="Gross Floor Area"
-                  suffix=" m2"
+                  suffix={` ${UNITS.m2}`}
+                  ariaLabel={`Gross floor area in ${UNIT_LABELS.m2}`}
                 />
                 <NumberInput
                   name="netFloorArea"
                   control={form.control}
                   label="Net Floor Area"
-                  suffix=" m2"
+                  suffix={` ${UNITS.m2}`}
+                  ariaLabel={`Net floor area in ${UNIT_LABELS.m2}`}
                 />
                 <NumberInput
                   name="treatedFloorArea"
                   control={form.control}
                   label="Treated Floor Area"
-                  suffix=" m2"
-                  hint="Used for LCC/m2 and WLC/m2."
+                  suffix={` ${UNITS.m2}`}
+                  hint={`Used for LCC/${UNITS.m2} and WLC/${UNITS.m2}.`}
+                  ariaLabel={`Treated floor area in ${UNIT_LABELS.m2}`}
                 />
                 <NumberInput
                   name="grossVolume"
                   control={form.control}
                   label="Gross Volume"
-                  suffix=" m3"
+                  suffix={` ${UNITS.m3}`}
+                  ariaLabel={`Gross volume in ${UNIT_LABELS.m3}`}
                 />
                 <NumberInput
                   name="netVolume"
                   control={form.control}
                   label="Net Volume"
-                  suffix=" m3"
+                  suffix={` ${UNITS.m3}`}
+                  ariaLabel={`Net volume in ${UNIT_LABELS.m3}`}
                 />
                 <NumberInput
                   name="windowArea"
                   control={form.control}
                   label="Window Area"
-                  suffix=" m2"
+                  suffix={` ${UNITS.m2}`}
                 />
               </div>
             </div>
@@ -516,21 +523,23 @@ function GeometrySection({
                   name="totalThermalEnvelope"
                   control={form.control}
                   label="Total Thermal Envelope"
-                  suffix=" m2"
+                  suffix={` ${UNITS.m2}`}
                 />
                 <NumberInput
                   name="avgUvalueOpaque"
                   control={form.control}
                   label="Avg U-value Opaque"
-                  suffix=" W/m2K"
+                  suffix={` ${UNITS.uvalue}`}
                   decimalScale={3}
+                  ariaLabel={`Average opaque U-value in ${UNIT_LABELS.uvalue}`}
                 />
                 <NumberInput
                   name="avgUvalueGlazing"
                   control={form.control}
                   label="Avg U-value Glazing"
-                  suffix=" W/m2K"
+                  suffix={` ${UNITS.uvalue}`}
                   decimalScale={3}
+                  ariaLabel={`Average glazing U-value in ${UNIT_LABELS.uvalue}`}
                 />
                 <NumberInput
                   name="avgHeatRecovery"
@@ -575,37 +584,37 @@ function GeometrySection({
                     name="balconiesArea"
                     control={form.control}
                     label="Balconies Area"
-                    suffix=" m2"
+                    suffix={` ${UNITS.m2}`}
                   />
                   <NumberInput
                     name="otherSurfacesArea"
                     control={form.control}
                     label="Other Surfaces"
-                    suffix=" m2"
+                    suffix={` ${UNITS.m2}`}
                   />
                   <NumberInput
                     name="unheatedGFA"
                     control={form.control}
                     label="Unheated GFA"
-                    suffix=" m2"
+                    suffix={` ${UNITS.m2}`}
                   />
                   <NumberInput
                     name="unheatedNFA"
                     control={form.control}
                     label="Unheated NFA"
-                    suffix=" m2"
+                    suffix={` ${UNITS.m2}`}
                   />
                   <NumberInput
                     name="unheatedGrossVol"
                     control={form.control}
                     label="Unheated Gross Volume"
-                    suffix=" m3"
+                    suffix={` ${UNITS.m3}`}
                   />
                   <NumberInput
                     name="unheatedNetVol"
                     control={form.control}
                     label="Unheated Net Volume"
-                    suffix=" m3"
+                    suffix={` ${UNITS.m3}`}
                   />
                 </div>
               )}
@@ -773,14 +782,6 @@ function IncomeSection({
   };
 
   const handleDisableIncome = async () => {
-    if (
-      !window.confirm(
-        "Disable income analysis and clear the saved income inputs?",
-      )
-    ) {
-      return;
-    }
-
     form.reset(clearValues);
     await upsertIncome.mutateAsync({ variantId, ...clearValues });
     setShowIncome(false);
@@ -828,15 +829,23 @@ function IncomeSection({
           >
             Collapse income inputs
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleDisableIncome}
-            disabled={upsertIncome.isPending}
-          >
-            Disable income analysis
-          </Button>
+          <ConfirmAction
+            title="Disable income inputs?"
+            description="Rental income, occupancy, and tariff data will be cleared. You can re-enable income later, but the values will not be restored."
+            confirmLabel="Disable income"
+            destructive
+            onConfirm={handleDisableIncome}
+            trigger={
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={upsertIncome.isPending}
+              >
+                Disable income analysis
+              </Button>
+            }
+          />
         </div>
       </div>
 
@@ -851,13 +860,13 @@ function IncomeSection({
               <CurrencyInput
                 name={`rent${n}MonthlyPerM2` as keyof IncomeValues}
                 control={form.control}
-                label="Monthly / m2"
+                label={`Monthly / ${UNITS.m2}`}
               />
               <NumberInput
                 name={`rent${n}Area` as keyof IncomeValues}
                 control={form.control}
-                label="Area (m2)"
-                suffix=" m2"
+                label={`Area (${UNITS.m2})`}
+                suffix={` ${UNITS.m2}`}
               />
               <CurrencyInput
                 name={`rent${n}Taxes` as keyof IncomeValues}
@@ -893,7 +902,7 @@ function IncomeSection({
           <CurrencyInput
             name="expectedPricePerM2"
             control={form.control}
-            label="Expected Price / m2"
+            label={`Expected Price / ${UNITS.m2}`}
           />
         </div>
       </div>

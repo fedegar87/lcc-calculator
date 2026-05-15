@@ -7,6 +7,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { ResultsDashboard } from "@/components/results/results-dashboard";
 import { ValidationSummaryCard } from "@/components/project/validation-summary-card";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   BarChart3,
@@ -162,11 +163,15 @@ export default function ResultsPage() {
             Metric: "Non-construction",
             Amount: resultQuery.data.nonConstructionCosts,
           },
-          {
-            Metric: "Formula mode",
-            Amount: formulaMode,
-          },
-          {
+	          {
+	            Metric: "Formula mode",
+	            Amount: formulaMode,
+	          },
+	          {
+	            Metric: "Method profile",
+	            Amount: resultQuery.data.methodProfile,
+	          },
+	          {
             Metric: "Residual value",
             Amount: resultQuery.data.residualValue,
           },
@@ -250,95 +255,95 @@ export default function ResultsPage() {
             ["excel_bugfixed", "Bugfixed"],
             ["excel_replica", "Excel replica"],
           ] as const).map(([mode, label]) => (
-            <button
+            <Button
               key={mode}
               type="button"
               onClick={() => setFormulaMode(mode)}
-              className={`rounded px-2.5 py-1 text-sm font-medium transition-colors ${
-                formulaMode === mode
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              variant={formulaMode === mode ? "outline" : "ghost"}
+              size="sm"
+              className={formulaMode === mode ? "bg-background shadow-sm" : "text-muted-foreground"}
             >
               {label}
-            </button>
+            </Button>
           ))}
         </div>
 
-        <button
+        <Button
+          type="button"
           onClick={() => setView("dashboard")}
-          className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-            view === "dashboard"
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:text-foreground"
-          }`}
+          variant={view === "dashboard" ? "default" : "secondary"}
+          size="sm"
         >
           <BarChart3 className="size-4" />
           Dashboard
-        </button>
-        <button
+        </Button>
+        <Button
+          type="button"
           onClick={() => setView("audit")}
-          className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-            view === "audit"
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:text-foreground"
-          }`}
+          variant={view === "audit" ? "default" : "secondary"}
+          size="sm"
         >
           <ClipboardList className="size-4" />
           Audit
-        </button>
+        </Button>
         {variants.length > 1 && (
-          <button
+          <Button
+            type="button"
             onClick={() => setView("compare")}
-            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-              view === "compare"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:text-foreground"
-            }`}
+            variant={view === "compare" ? "default" : "secondary"}
+            size="sm"
           >
             <GitCompare className="size-4" />
             Compare Variants
-          </button>
+          </Button>
         )}
 
         <div className="mx-2 hidden h-5 w-px bg-border sm:block" />
 
-        <button
+        <Button
+          type="button"
           onClick={handleExportPdf}
           disabled={exportPdf.isPending || exportBlocked}
           title={exportBlockedTitle}
-          className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+          variant="outline"
+          size="sm"
         >
           <FileText className="size-4" />
           {exportPdf.isPending ? "Exporting PDF..." : "Export PDF"}
-        </button>
-        <button
+        </Button>
+        <Button
+          type="button"
           onClick={handleExportExcel}
           disabled={exportExcel.isPending || exportBlocked}
           title={exportBlockedTitle}
-          className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+          variant="outline"
+          size="sm"
         >
           <FileSpreadsheet className="size-4" />
           {exportExcel.isPending ? "Exporting Excel..." : "Export Excel"}
-        </button>
-        <button
+        </Button>
+        <Button
+          type="button"
           onClick={handleExportCsv}
           disabled={!resultQuery.data || exportBlocked}
           title={exportBlockedTitle}
-          className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+          variant="outline"
+          size="sm"
         >
           <Download className="size-4" />
           Export CSV
-        </button>
-        <button
+        </Button>
+        <Button
+          type="button"
           onClick={handleExportJson}
           disabled={!resultQuery.data || exportBlocked}
           title={exportBlockedTitle}
-          className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+          variant="outline"
+          size="sm"
         >
           <FileJson className="size-4" />
           Export JSON
-        </button>
+        </Button>
       </div>
 
       {view === "dashboard" ? (

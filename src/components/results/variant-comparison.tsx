@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import * as motion from "motion/react-client";
 import type { LCCResult } from "@/engine/types";
 import type { FormulaMode } from "@/engine/types";
+import { UNITS } from "@/lib/units";
 
 const LCCStackedBar = dynamic(() =>
   import("@/components/results/charts/lcc-stacked-bar").then(
@@ -121,7 +122,7 @@ export function VariantComparison({
       value: (result: LCCResult) => eurFormatter.format(result.wlc),
     },
     {
-      metric: "Lowest LCC/m2",
+      metric: `Lowest LCC/${UNITS.m2}`,
       winner: successfulVariants.reduce((best, current) =>
         !best ||
         (current.result.kpiLCCPerM2 ?? Number.POSITIVE_INFINITY) <
@@ -220,9 +221,9 @@ export function VariantComparison({
                   <KPICard title="LCC" value={result.lcc} unit="EUR" />
                   <KPICard title="WLC" value={result.wlc} unit="EUR" />
                   <KPICard
-                    title="LCC/m2"
+                    title={`LCC/${UNITS.m2}`}
                     value={result.kpiLCCPerM2 ?? 0}
-                    unit="EUR/m2"
+                    unit={UNITS.EUR_m2}
                   />
                 </div>
 

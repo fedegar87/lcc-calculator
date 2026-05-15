@@ -20,6 +20,7 @@ interface NumberInputProps<T extends FieldValues> {
   decimalScale?: number;
   fixedDecimalScale?: boolean;
   hint?: string;
+  ariaLabel?: string;
 }
 
 export function NumberInput<T extends FieldValues>({
@@ -31,6 +32,7 @@ export function NumberInput<T extends FieldValues>({
   decimalScale = 2,
   fixedDecimalScale = false,
   hint,
+  ariaLabel,
 }: NumberInputProps<T>) {
   return (
     <Controller
@@ -52,6 +54,7 @@ export function NumberInput<T extends FieldValues>({
             placeholder={placeholder}
             customInput={Input}
             className={cn(fieldState.invalid && "border-destructive")}
+            aria-label={ariaLabel}
             aria-describedby={hint ? `${name}-hint` : undefined}
           />
           {hint && !fieldState.error ? (

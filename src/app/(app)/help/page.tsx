@@ -1,6 +1,7 @@
 "use client";
 
 import { GlassCard } from "@/components/shared/glass-card";
+import { UNITS } from "@/lib/units";
 
 const HELP_SECTIONS = [
   {
@@ -63,8 +64,7 @@ const HELP_SECTIONS = [
       },
       {
         label: "PV production",
-        copy:
-          "You can enter PV as total annual production in kWh/year or as a specific value in kWh/m2/year. The results use the same calculation engine either way.",
+        copy: `You can enter PV as total annual production in ${UNITS.kWh_y} or as a specific value in ${UNITS.kWh_m2_y}. The results use the same calculation engine either way.`,
       },
     ],
   },

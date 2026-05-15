@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ReadinessPill } from "@/components/project/readiness-pill";
 import { ValidationSummaryCard } from "@/components/project/validation-summary-card";
 import type { ProjectReadiness } from "@/lib/project-readiness";
@@ -33,6 +34,28 @@ export function ProjectOverview({
   readiness: ProjectReadiness;
   diffCount: number;
 }) {
+  const hasAnySectionData =
+    readiness.requiredFilled > 0 ||
+    readiness.recommendedFilled > 0 ||
+    readiness.sections.some(
+      (section) => section.requiredFilled > 0 || section.recommendedFilled > 0,
+    );
+
+  if (!hasAnySectionData) {
+    return (
+      <EmptyState
+        icon={<ClipboardList className="size-5" />}
+        title="Start with project info"
+        description="Fill the building metadata and geometry first. The overview will update as the variant becomes ready for calculation."
+        action={
+          <Button render={<Link href={`/projects/${projectId}/info`} />}>
+            Open Info
+          </Button>
+        }
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card className="border-border/70 bg-card/95 backdrop-blur-sm">

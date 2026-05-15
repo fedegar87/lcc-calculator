@@ -9,6 +9,7 @@ import { SaveStatusProvider, useSaveStatus } from "@/hooks/use-save-status";
 import { SaveStatusBadge } from "@/components/project/save-status";
 import { WizardSteps } from "@/components/project/wizard-steps";
 import { VariantTabs } from "@/components/project/variant-tabs";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   computeProjectReadiness,
@@ -117,12 +118,9 @@ function ProjectLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="/help"
-            className="inline-flex h-9 items-center rounded-md border px-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
+          <Button variant="outline" size="sm" render={<Link href="/help" />}>
             Help Center
-          </Link>
+          </Button>
           <WizardSteps
             projectId={projectId}
             currentStep={currentStep}

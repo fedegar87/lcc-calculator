@@ -30,6 +30,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { NumericFormat } from "react-number-format";
+import { UNITS } from "@/lib/units";
 
 const END_USE_ROWS = [
   {
@@ -422,8 +423,8 @@ function EnergyConsumptionSection({
         </div>
 
         <div className="mb-4 rounded-xl border bg-muted/25 p-4 text-sm text-muted-foreground">
-          Consumption inputs are specific values in `kWh/m2/year`. Rows marked
-          as `Not selected` are ignored by the cost calculation.
+          Consumption inputs are specific values in {UNITS.kWh_m2_y}. Rows
+          marked as Not selected are ignored by the cost calculation.
         </div>
 
         {isMobile ? (
@@ -451,7 +452,7 @@ function EnergyConsumptionSection({
                       <Label>System 1 consumption</Label>
                       {renderConsumptionInput(
                         `${fields.sys1}.specificConsumption`,
-                        "kWh/m2/year"
+                        UNITS.kWh_m2_y
                       )}
                     </div>
 
@@ -468,7 +469,7 @@ function EnergyConsumptionSection({
                           <Label>System 2 consumption</Label>
                           {renderConsumptionInput(
                             `${fields.sys2}.specificConsumption`,
-                            "kWh/m2/year"
+                            UNITS.kWh_m2_y
                           )}
                         </div>
                       </>
@@ -485,9 +486,9 @@ function EnergyConsumptionSection({
                 <TableRow>
                   <TableHead className="w-[190px]">End Use</TableHead>
                   <TableHead className="w-[220px]">Source 1</TableHead>
-                  <TableHead>System 1 (kWh/m2/year)</TableHead>
+                  <TableHead>System 1 ({UNITS.kWh_m2_y})</TableHead>
                   <TableHead className="w-[220px]">Source 2</TableHead>
-                  <TableHead>System 2 (kWh/m2/year)</TableHead>
+                  <TableHead>System 2 ({UNITS.kWh_m2_y})</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -512,7 +513,7 @@ function EnergyConsumptionSection({
                       <TableCell>
                         {renderConsumptionInput(
                           `${fields.sys1}.specificConsumption`,
-                          "kWh/m2/year"
+                          UNITS.kWh_m2_y
                         )}
                       </TableCell>
                       <TableCell>
@@ -529,7 +530,7 @@ function EnergyConsumptionSection({
                         {fields.sys2 ? (
                           renderConsumptionInput(
                             `${fields.sys2}.specificConsumption`,
-                            "kWh/m2/year"
+                            UNITS.kWh_m2_y
                           )
                         ) : (
                           <span className="text-xs text-muted-foreground">--</span>
@@ -560,7 +561,9 @@ function EnergyConsumptionSection({
       <GlassCard>
         <div className="mb-4 flex items-center gap-2">
           <h2 className="text-lg font-semibold">PV production</h2>
-          <InfoTooltip content="Choose whether you want to enter PV as a project total in kWh/year or as a specific value in kWh/m2/year. The engine supports both; this control makes the mode explicit." />
+          <InfoTooltip
+            content={`Choose whether you want to enter PV as a project total in ${UNITS.kWh_y} or as a specific value in ${UNITS.kWh_m2_y}. The engine supports both; this control makes the mode explicit.`}
+          />
         </div>
 
         <div className="mb-4 flex flex-wrap gap-2">
@@ -588,7 +591,7 @@ function EnergyConsumptionSection({
 
         {form.watch("pvProductionMode") === "total" ? (
           <div className="max-w-sm space-y-1">
-            <Label htmlFor="pvProduction">PV Production (kWh/year)</Label>
+            <Label htmlFor="pvProduction">PV Production ({UNITS.kWh_y})</Label>
             <Controller
               name="pvProductionKwh"
               control={form.control}
@@ -614,7 +617,7 @@ function EnergyConsumptionSection({
         ) : (
           <div className="max-w-sm space-y-1">
             <Label htmlFor="pvSpecificProduction">
-              PV Production (kWh/m2/year)
+              PV Production ({UNITS.kWh_m2_y})
             </Label>
             <Controller
               name="pvSpecificProduction"

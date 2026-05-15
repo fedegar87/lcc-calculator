@@ -23,15 +23,16 @@ export function Hero() {
             <strong className="text-slate-900 dark:text-slate-50">
               full Excel LCC workbook
             </strong>{" "}
-            — not the reduced web calculator that also lives on the Pinboard.
-            Rebuilt on the same ISO 15686-5 methodology that benchmarked nearly
-            zero-energy buildings across Europe, extended with collaboration,
-            shared case libraries, and current data.
+            and rebuilds the ISO 15686-5 methodology that benchmarked nearly
+            zero-energy buildings across Europe.
           </p>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center justify-center">
           <LandingCTA />
+          <p className="mt-3 text-xs text-muted-foreground">
+            No signup required · your preview data stays in this browser
+          </p>
         </div>
       </div>
     </section>
