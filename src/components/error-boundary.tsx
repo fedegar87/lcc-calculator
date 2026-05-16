@@ -1,8 +1,16 @@
 "use client";
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
-import { AlertCircle, Mail, RefreshCw } from "lucide-react";
+import {
+  AlertCircle,
+  Mail,
+  RefreshCw,
+  WifiOff,
+  Clock,
+  FileWarning,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { classifyError, type LCCzeroErrorCode } from "@/lib/errors";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -14,6 +22,25 @@ interface ErrorBoundaryProps {
 interface ErrorBoundaryState {
   error: Error | null;
 }
+
+const CODE_TITLE: Record<LCCzeroErrorCode, string> = {
+  INVALID_INPUT: "Invalid input",
+  MISSING_DATA: "Missing inputs",
+  COMPUTE_TIMEOUT: "Calculation timed out",
+  NETWORK: "Connection lost",
+  UNKNOWN: "Something went wrong",
+};
+
+const CODE_ICON: Record<
+  LCCzeroErrorCode,
+  React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>
+> = {
+  INVALID_INPUT: FileWarning,
+  MISSING_DATA: FileWarning,
+  COMPUTE_TIMEOUT: Clock,
+  NETWORK: WifiOff,
+  UNKNOWN: AlertCircle,
+};
 
 export class ErrorBoundary extends Component<
   ErrorBoundaryProps,
@@ -59,16 +86,18 @@ export class ErrorBoundary extends Component<
       ].join("\n"),
     );
 
+    const code = classifyError(error);
+    const Icon = CODE_ICON[code];
+    const title = this.props.fallbackTitle ?? CODE_TITLE[code];
+
     return (
       <div
         role="alert"
         className="flex flex-col items-center gap-4 rounded-xl border border-destructive/30 bg-destructive/5 p-8 text-center"
       >
-        <AlertCircle className="size-10 text-destructive" aria-hidden="true" />
+        <Icon className="size-10 text-destructive" aria-hidden={true} />
         <div>
-          <h2 className="text-base font-semibold">
-            {this.props.fallbackTitle ?? "Something went wrong"}
-          </h2>
+          <h2 className="text-base font-semibold">{title}</h2>
           <p className="mt-1 max-w-md text-sm text-muted-foreground">
             {error.message || "An unexpected error occurred."}
           </p>

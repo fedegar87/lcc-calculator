@@ -29,6 +29,37 @@ function getUrl() {
   return `${base}/api/trpc`;
 }
 
+const REQUEST_TIMEOUT_MS = 30_000;
+
+async function fetchWithTimeout(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> {
+  if (init?.signal?.aborted) {
+    return fetch(input, init);
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const upstream = init?.signal;
+  const forwardAbort = () => controller.abort();
+  upstream?.addEventListener("abort", forwardAbort, { once: true });
+
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (controller.signal.aborted && upstream?.aborted !== true) {
+      throw new Error(
+        `Request timed out after ${REQUEST_TIMEOUT_MS / 1000}s`,
+      );
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+    upstream?.removeEventListener("abort", forwardAbort);
+  }
+}
+
 export function TRPCReactProvider(props: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
   const [trpcClient] = useState(() =>
@@ -37,6 +68,7 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
         httpBatchLink({
           transformer: superjson,
           url: getUrl(),
+          fetch: fetchWithTimeout,
         }),
       ],
     })
