@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,10 +21,11 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { ConfirmAction } from "@/components/ui/confirm-action";
+import { ConstructionSearch } from "@/components/forms/construction-search";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Search, Trash2 } from "lucide-react";
 import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
 import { UNITS } from "@/lib/units";
@@ -440,7 +441,11 @@ function CategoryItem({
     Boolean(costItem) && total > 0 && (costItem?.details?.length ?? 0) === 0;
 
   return (
-    <AccordionItem value={category.value}>
+    <AccordionItem
+      value={category.value}
+      id={`construction-cat-${category.value}`}
+      data-category={category.value}
+    >
       <AccordionTrigger className="px-2">
         <div className="flex flex-1 items-center gap-3">
           <span>{category.label}</span>
@@ -873,6 +878,25 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
     0
   );
 
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [textFilter, setTextFilter] = useState("");
+  const [openByGroup, setOpenByGroup] = useState<Record<string, string[]>>({});
+  const normalizedFilter = textFilter.trim().toLowerCase();
+
+  const handleCategorySelect = useCallback((cat: CategoryDef) => {
+    setOpenByGroup((current) => {
+      const groupOpen = new Set(current[cat.group] ?? []);
+      groupOpen.add(cat.value);
+      return { ...current, [cat.group]: Array.from(groupOpen) };
+    });
+    setSearchOpen(false);
+    setTextFilter("");
+    setTimeout(() => {
+      const target = document.getElementById(`construction-cat-${cat.value}`);
+      target?.scrollIntoView({ block: "start", behavior: "smooth" });
+    }, 100);
+  }, []);
+
   if (costItemsPending) {
     return (
       <div className="space-y-4">
@@ -885,15 +909,47 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
 
   return (
     <div className="space-y-6">
+      <ConstructionSearch
+        open={searchOpen}
+        onOpenChange={setSearchOpen}
+        categories={categories as CategoryDef[]}
+        onSelect={handleCategorySelect}
+      />
       <GlassCard>
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div>
-            <h2 className="text-lg font-semibold">Construction cost detail</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Work category by category. Add one or more detail rows where you
-              need an auditable trail, and keep EN 15459 replacement components
-              in the dedicated section below.
-            </p>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold">Construction cost detail</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Work category by category. Add one or more detail rows where
+                  you need an auditable trail, and keep EN 15459 replacement
+                  components in the dedicated section below.
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setSearchOpen(true)}
+                className="shrink-0"
+              >
+                <Search className="size-3.5" />
+                Search
+                <span className="ml-1 hidden rounded border bg-muted/50 px-1 text-[10px] font-medium text-muted-foreground sm:inline">
+                  ⌘K
+                </span>
+              </Button>
+            </div>
+            <div className="mt-3">
+              <Input
+                value={textFilter}
+                onChange={(e) => setTextFilter(e.target.value)}
+                placeholder="Filter categories by code or label…"
+                aria-label="Filter construction categories"
+                className="h-8 text-sm"
+              />
+            </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <div className="rounded-xl border bg-muted/20 p-3">
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">
@@ -940,13 +996,28 @@ export function ConstructionForm({ variantId }: ConstructionFormProps) {
       </GlassCard>
 
       {GROUP_ORDER.map((groupName) => {
-        const groupCategories = groups[groupName];
-        if (!groupCategories?.length) return null;
+        const groupCategories = (groups[groupName] ?? []).filter((cat) => {
+          if (!normalizedFilter) return true;
+          return (
+            cat.value.toLowerCase().includes(normalizedFilter) ||
+            cat.label.toLowerCase().includes(normalizedFilter)
+          );
+        });
+        if (!groupCategories.length) return null;
 
         return (
           <GlassCard key={groupName}>
             <h3 className="mb-3 text-base font-semibold">{groupName}</h3>
-            <Accordion multiple>
+            <Accordion
+              multiple
+              value={openByGroup[groupName] ?? []}
+              onValueChange={(value) =>
+                setOpenByGroup((current) => ({
+                  ...current,
+                  [groupName]: value as string[],
+                }))
+              }
+            >
               {groupCategories.map((cat) => {
                 const costItem = costItems.find(
                   (ci) => ci.category === cat.value
