@@ -42,8 +42,8 @@ const TILES: Tile[] = [
   {
     domain: "fin",
     label: "Method",
-    metric: "SA-ready evidence base",
-    detail: "Morris/Campolongo planned; current engine is deterministic",
+    metric: "Sensitivity analysis",
+    detail: "DSA shipped (±10%, Pernetti 2021); Morris/Campolongo next",
     icon: TrendingUp,
     barWidth: "w-[92%]",
   },

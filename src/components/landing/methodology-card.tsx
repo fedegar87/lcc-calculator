@@ -24,8 +24,8 @@ const ROWS = [
     value: "PHPP; Passive House Planning Package",
   },
   {
-    label: "Sensitivity precedent",
-    value: "DSA + Elementary Effects planned for embedded SA",
+    label: "Sensitivity",
+    value: "DSA shipped (±10%, Pernetti 2021); Elementary Effects next",
   },
   {
     label: "Empirical baseline",

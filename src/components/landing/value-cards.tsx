@@ -19,8 +19,8 @@ const VALUES: ValueCard[] = [
   {
     icon: ScanSearch,
     iconTile: "bg-fin-100 text-fin-600",
-    title: "Sensitivity-ready method",
-    body: "Pernetti et al. provide the DSA and Elementary-Effects precedent; the current app exposes deterministic inputs and will add embedded SA as a planned module.",
+    title: "Sensitivity built in",
+    body: "Differential sensitivity at ±10% per Pernetti et al. (2021) — one click on any variant ranks which inputs drive your LCC. Elementary Effects screening lands next.",
   },
   {
     icon: FileSpreadsheet,

@@ -14,8 +14,9 @@ export function WhatItDoes() {
         </h2>
         <p className="max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
           Investment and operation stay connected so design choices can be read
-          as a single life-cycle picture. Sensitivity analysis is planned as an
-          embedded module.
+          as a single life-cycle picture. Differential sensitivity analysis is
+          available in the results tab; Elementary Effects screening is the
+          next milestone.
         </p>
       </header>
 
