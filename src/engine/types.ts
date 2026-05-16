@@ -80,6 +80,10 @@ export interface ServiceComponentInput {
   en15459ComponentIndex: number;
   // Stable ordering hint propagated from the data layer for replica-mode bugs.
   replicaOrder?: number;
+  // Sensitivity-analysis hooks: when present, override the EN 15459 catalogue
+  // lookup used by maintenance.ts. Absent in normal flow -> behaviour unchanged.
+  maintenancePctOverride?: number;
+  lifespanOverride?: number;
 }
 
 export interface CostItemInput {

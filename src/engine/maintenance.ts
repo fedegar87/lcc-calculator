@@ -91,11 +91,13 @@ export function computeMaintenanceCosts(
 
   for (const sc of serviceComponents) {
     const component = getEN15459Component(sc.en15459ComponentIndex);
-    const lifespan = component ? component.lifespanAvg : 0;
+    const lifespan =
+      sc.lifespanOverride ?? (component ? component.lifespanAvg : 0);
     const maintenancePct =
-      component && component.maintenancePctAvg !== null
+      sc.maintenancePctOverride ??
+      (component && component.maintenancePctAvg !== null
         ? component.maintenancePctAvg
-        : 0;
+        : 0);
 
     let replacementsUsed = 0;
 
