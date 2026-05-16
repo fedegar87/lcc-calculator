@@ -595,7 +595,7 @@ function NonConstructionSection({
     })
   );
   const w = variant.wlcInput;
-  const n = (key: string) => (w?.[key] as number) ?? 0;
+  const n = (key: string) => (w?.[key] as number | null | undefined) ?? null;
   const persistedMode =
     w?.landCostMode === "TOTAL_COST" ? "TOTAL_COST" : "UNIT_PRICE";
   const [showOptional, setShowOptional] = useState(

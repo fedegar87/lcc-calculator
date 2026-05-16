@@ -42,7 +42,7 @@ export function PercentInput<T extends FieldValues>({
 
               if (displayVal == null) {
                 setHelperText(null);
-                onChange(0);
+                onChange(null);
                 return;
               }
 

@@ -23,27 +23,33 @@ export function CurrencyInput<T extends FieldValues>({
     <Controller
       name={name}
       control={control}
-      render={({ field: { onChange, value, ref, ...field }, fieldState }) => (
-        <div className="space-y-1">
-          <Label htmlFor={name}>{label}</Label>
-          <NumericFormat
-            {...field}
-            getInputRef={ref}
-            id={name}
-            value={value as number | undefined}
-            onValueChange={(vals) => onChange(vals.floatValue ?? 0)}
-            thousandSeparator=","
-            decimalScale={2}
-            fixedDecimalScale
-            placeholder={placeholder}
-            customInput={Input}
-            className={cn(fieldState.invalid && "border-destructive")}
-          />
-          {fieldState.error && (
-            <p className="text-sm text-destructive">{fieldState.error.message}</p>
-          )}
-        </div>
-      )}
+      render={({ field: { onChange, value, ref, ...field }, fieldState }) => {
+        const isEmpty = value === null || value === undefined;
+        return (
+          <div className="space-y-1">
+            <Label htmlFor={name}>{label}</Label>
+            <NumericFormat
+              {...field}
+              getInputRef={ref}
+              id={name}
+              value={isEmpty ? "" : (value as number)}
+              onValueChange={(vals) => onChange(vals.floatValue ?? null)}
+              thousandSeparator=","
+              decimalScale={2}
+              fixedDecimalScale={!isEmpty}
+              placeholder={placeholder ?? "—"}
+              customInput={Input}
+              className={cn(
+                fieldState.invalid && "border-destructive",
+                isEmpty && "bg-muted/30",
+              )}
+            />
+            {fieldState.error && (
+              <p className="text-sm text-destructive">{fieldState.error.message}</p>
+            )}
+          </div>
+        );
+      }}
     />
   );
 }

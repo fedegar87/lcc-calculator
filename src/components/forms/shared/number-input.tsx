@@ -38,22 +38,27 @@ export function NumberInput<T extends FieldValues>({
     <Controller
       name={name}
       control={control}
-      render={({ field: { onChange, value, ref, ...field }, fieldState }) => (
+      render={({ field: { onChange, value, ref, ...field }, fieldState }) => {
+        const isEmpty = value === null || value === undefined;
+        return (
         <div className="space-y-1">
           <Label htmlFor={name}>{label}</Label>
           <NumericFormat
             {...field}
             getInputRef={ref}
             id={name}
-            value={value as number | undefined}
-            onValueChange={(vals) => onChange(vals.floatValue ?? 0)}
+            value={isEmpty ? "" : (value as number)}
+            onValueChange={(vals) => onChange(vals.floatValue ?? null)}
             thousandSeparator=","
             decimalScale={decimalScale}
             fixedDecimalScale={fixedDecimalScale}
-            suffix={suffix}
-            placeholder={placeholder}
+            suffix={isEmpty ? undefined : suffix}
+            placeholder={placeholder ?? (suffix ? `—${suffix}` : "—")}
             customInput={Input}
-            className={cn(fieldState.invalid && "border-destructive")}
+            className={cn(
+              fieldState.invalid && "border-destructive",
+              isEmpty && "bg-muted/30",
+            )}
             aria-label={ariaLabel}
             aria-describedby={hint ? `${name}-hint` : undefined}
           />
@@ -68,7 +73,8 @@ export function NumberInput<T extends FieldValues>({
             </p>
           )}
         </div>
-      )}
+        );
+      }}
     />
   );
 }
