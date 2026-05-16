@@ -18,6 +18,7 @@ import {
   ClipboardList,
   FileText,
   FileSpreadsheet,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { computeProjectReadiness } from "@/lib/project-readiness";
@@ -32,6 +33,12 @@ const ResultsAuditView = dynamic(() =>
 const VariantComparison = dynamic(() =>
   import("@/components/results/variant-comparison").then(
     (module) => module.VariantComparison,
+  ),
+);
+
+const SensitivityView = dynamic(() =>
+  import("@/components/results/sensitivity-view").then(
+    (module) => module.SensitivityView,
   ),
 );
 
@@ -73,9 +80,9 @@ export default function ResultsPage() {
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const trpc = useTRPC();
-  const [view, setView] = useState<"dashboard" | "audit" | "compare">(
-    "dashboard"
-  );
+  const [view, setView] = useState<
+    "dashboard" | "audit" | "compare" | "sensitivity"
+  >("dashboard");
   const [formulaMode, setFormulaMode] =
     useState<FormulaMode>("excel_bugfixed");
 
@@ -298,6 +305,15 @@ export default function ResultsPage() {
             Compare Variants
           </Button>
         )}
+        <Button
+          type="button"
+          onClick={() => setView("sensitivity")}
+          variant={view === "sensitivity" ? "default" : "secondary"}
+          size="sm"
+        >
+          <Sparkles className="size-4" />
+          Sensitivity
+        </Button>
 
         <div className="mx-2 hidden h-5 w-px bg-border sm:block" />
 
@@ -381,10 +397,16 @@ export default function ResultsPage() {
               }}
             />
           )
-        ) : (
+        ) : view === "compare" ? (
           <VariantComparison
             projectId={projectId}
             variants={variants}
+            formulaMode={formulaMode}
+          />
+        ) : (
+          <SensitivityView
+            projectId={projectId}
+            variantId={variantId}
             formulaMode={formulaMode}
           />
         )}

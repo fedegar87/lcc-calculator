@@ -12,6 +12,7 @@ import type {
   ParameterSpec,
 } from "@/engine/sensitivity/types";
 import type { EnergySourcePrice } from "@/engine/types";
+import { validateVariantInput } from "@/engine/validation";
 import { buildVariantInput, parseEnergySourcePrices } from "./_shared";
 
 const OUTPUT_IDS = [
@@ -136,15 +137,35 @@ export const sensitivityRouter = createTRPCRouter({
         input.formulaMode,
       );
 
-      const dsa = runDSA(
-        variantInput,
-        {
-          parameters: input.parameters,
-          outputs: input.outputs,
-          delta: input.delta,
-        },
-        { formulaMode: input.formulaMode },
-      );
+      const validationErrors = validateVariantInput(variantInput);
+      if (validationErrors.length > 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Input validation failed: ${validationErrors.join("; ")}`,
+        });
+      }
+
+      // TODO(SA-1 UI): when the dashboard exposes methodProfile selection,
+      // gate this mutation on methodProfile === "CRAVEZERO_LEGACY" per
+      // spec §10.4. Other profiles are metadata-only today.
+
+      let dsa;
+      try {
+        dsa = runDSA(
+          variantInput,
+          {
+            parameters: input.parameters,
+            outputs: input.outputs,
+            delta: input.delta,
+          },
+          { formulaMode: input.formulaMode },
+        );
+      } catch (err) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Sensitivity run failed: ${err instanceof Error ? err.message : String(err)}`,
+        });
+      }
 
       const resolvedSpecs = input.parameters
         .map((id) => DEFAULT_PARAMETER_REGISTRY.find((p) => p.id === id))
