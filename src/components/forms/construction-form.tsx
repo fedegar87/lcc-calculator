@@ -184,68 +184,106 @@ function DetailRow({ detail, onUpdate, onDelete }: DetailRowProps) {
   }
 
   return (
-    <div className="grid grid-cols-[minmax(240px,1fr)_80px_100px_100px_100px_100px_80px_32px] items-center gap-2 py-1.5 max-xl:grid-cols-[minmax(240px,1fr)_32px] max-xl:rounded-lg max-xl:border max-xl:bg-muted/10 max-xl:p-2">
-      <Input
-        defaultValue={detail.description ?? ""}
-        placeholder="Description"
-        className="h-8 text-sm"
-        onBlur={(e) => onUpdate("description", e.target.value)}
-      />
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="hidden h-8 w-8 text-muted-foreground hover:text-destructive max-xl:inline-flex"
-        onClick={onDelete}
-        aria-label="Delete detail row"
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-      </Button>
-      <NumericFormat
-        value={detail.area}
-        onValueChange={(v) => onUpdate("area", v.floatValue ?? 0)}
-        decimalScale={2}
-        placeholder={UNITS.m2}
-        customInput={Input}
-        className="h-8 text-sm"
-      />
-      <NumericFormat
-        value={detail.materialCost}
-        onValueChange={(v) => onUpdate("materialCost", v.floatValue ?? 0)}
-        thousandSeparator=","
-        decimalScale={2}
-        fixedDecimalScale
-        customInput={Input}
-        className="h-8 text-sm"
-      />
-      <NumericFormat
-        value={detail.unitPrice}
-        onValueChange={(v) => onUpdate("unitPrice", v.floatValue ?? 0)}
-        thousandSeparator=","
-        decimalScale={2}
-        fixedDecimalScale
-        customInput={Input}
-        className="h-8 text-sm"
-      />
-      <NumericFormat
-        value={detail.laborCost}
-        onValueChange={(v) => onUpdate("laborCost", v.floatValue ?? 0)}
-        thousandSeparator=","
-        decimalScale={2}
-        fixedDecimalScale
-        customInput={Input}
-        className="h-8 text-sm"
-      />
-      <NumericFormat
-        value={detail.otherCost}
-        onValueChange={(v) => onUpdate("otherCost", v.floatValue ?? 0)}
-        thousandSeparator=","
-        decimalScale={2}
-        fixedDecimalScale
-        customInput={Input}
-        className="h-8 text-sm"
-      />
-      <span className="text-right text-xs text-muted-foreground tabular-nums">
+    <div className="space-y-2 rounded-lg border bg-muted/10 p-2 xl:grid xl:grid-cols-[minmax(240px,1fr)_80px_100px_100px_100px_100px_80px_32px] xl:items-center xl:gap-2 xl:space-y-0 xl:rounded-none xl:border-0 xl:bg-transparent xl:p-0 xl:py-1.5">
+      {/* Row 1 (<xl): description + trash. On xl: description in col 1. */}
+      <div className="flex items-center gap-2 xl:contents">
+        <Input
+          defaultValue={detail.description ?? ""}
+          placeholder="Description"
+          className="h-8 flex-1 text-sm xl:flex-initial"
+          onBlur={(e) => onUpdate("description", e.target.value)}
+        />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-destructive xl:hidden"
+          onClick={onDelete}
+          aria-label="Delete detail row"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+      {/* Row 2 (<xl): numeric inputs in a fluid grid. On xl: each in its own column. */}
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5 xl:contents">
+        <div className="space-y-1 xl:contents">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground xl:hidden">
+            Area ({UNITS.m2})
+          </span>
+          <NumericFormat
+            value={detail.area}
+            onValueChange={(v) => onUpdate("area", v.floatValue ?? 0)}
+            decimalScale={2}
+            placeholder={UNITS.m2}
+            customInput={Input}
+            className="h-8 text-sm"
+            aria-label="Area"
+          />
+        </div>
+        <div className="space-y-1 xl:contents">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground xl:hidden">
+            Material
+          </span>
+          <NumericFormat
+            value={detail.materialCost}
+            onValueChange={(v) => onUpdate("materialCost", v.floatValue ?? 0)}
+            thousandSeparator=","
+            decimalScale={2}
+            fixedDecimalScale
+            customInput={Input}
+            className="h-8 text-sm"
+            aria-label="Material cost"
+          />
+        </div>
+        <div className="space-y-1 xl:contents">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground xl:hidden">
+            Unit price
+          </span>
+          <NumericFormat
+            value={detail.unitPrice}
+            onValueChange={(v) => onUpdate("unitPrice", v.floatValue ?? 0)}
+            thousandSeparator=","
+            decimalScale={2}
+            fixedDecimalScale
+            customInput={Input}
+            className="h-8 text-sm"
+            aria-label="Unit price"
+          />
+        </div>
+        <div className="space-y-1 xl:contents">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground xl:hidden">
+            Labor
+          </span>
+          <NumericFormat
+            value={detail.laborCost}
+            onValueChange={(v) => onUpdate("laborCost", v.floatValue ?? 0)}
+            thousandSeparator=","
+            decimalScale={2}
+            fixedDecimalScale
+            customInput={Input}
+            className="h-8 text-sm"
+            aria-label="Labor cost"
+          />
+        </div>
+        <div className="space-y-1 xl:contents">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground xl:hidden">
+            Other
+          </span>
+          <NumericFormat
+            value={detail.otherCost}
+            onValueChange={(v) => onUpdate("otherCost", v.floatValue ?? 0)}
+            thousandSeparator=","
+            decimalScale={2}
+            fixedDecimalScale
+            customInput={Input}
+            className="h-8 text-sm"
+            aria-label="Other cost"
+          />
+        </div>
+      </div>
+      {/* Row 3 (<xl): resolved cost summary. On xl: resolved in its column. */}
+      <span className="text-xs text-muted-foreground tabular-nums xl:text-right">
+        <span className="mr-1 xl:hidden">Resolved:</span>
         {formatCurrency(resolvedCost)}
       </span>
       <Button
