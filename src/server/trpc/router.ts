@@ -5,6 +5,7 @@ import { costItemRouter } from "./routers/cost-item";
 import { calculationRouter } from "./routers/calculation";
 import { referenceRouter } from "./routers/reference";
 import { exportRouter } from "./routers/export";
+import { sensitivityRouter } from "./routers/sensitivity";
 
 export const appRouter = createTRPCRouter({
   healthcheck: baseProcedure.query(() => ({ status: "ok" as const })),
@@ -14,6 +15,7 @@ export const appRouter = createTRPCRouter({
   calculation: calculationRouter,
   reference: referenceRouter,
   export: exportRouter,
+  sensitivity: sensitivityRouter,
 });
 
 export type AppRouter = typeof appRouter;
