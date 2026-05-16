@@ -307,69 +307,174 @@ function hasAnyIncome(incomeInput?: IncomeLike | null) {
   ].some(hasPositiveNumber);
 }
 
+export type VariantDiffGroup = {
+  id:
+    | "geometry"
+    | "boundary"
+    | "energy"
+    | "construction"
+    | "designCosts"
+    | "income"
+    | "maintenance"
+    | "serviceComponents";
+  label: string;
+  step: Exclude<ProjectStepId, "overview" | "results">;
+  changedFields: number;
+};
+
+const GEOMETRY_DIFF_KEYS = [
+  "grossFloorArea",
+  "netFloorArea",
+  "treatedFloorArea",
+  "grossVolume",
+  "windowArea",
+  "totalThermalEnvelope",
+  "avgUvalueOpaque",
+  "airTightness",
+  "pvInstalledCapacity",
+] as const;
+
+const BOUNDARY_DIFF_KEYS = [
+  "referencePeriod",
+  "interestRate",
+  "inflationRate",
+  "stakeholderRole",
+] as const;
+
+function diffNumericGroup(
+  base: Record<string, unknown> | null | undefined,
+  current: Record<string, unknown> | null | undefined,
+  keys: ReadonlyArray<string>,
+): number {
+  if (base === current) return 0;
+  const a = base ?? {};
+  const b = current ?? {};
+  let changes = 0;
+  for (const key of keys) {
+    const left = a[key] ?? 0;
+    const right = b[key] ?? 0;
+    if (left !== right) changes += 1;
+  }
+  return changes;
+}
+
+function diffJsonGroup(base: unknown, current: unknown): number {
+  return JSON.stringify(base ?? null) === JSON.stringify(current ?? null)
+    ? 0
+    : 1;
+}
+
+export function computeVariantDiff(
+  baseVariant: VariantLike | null | undefined,
+  currentVariant: VariantLike | null | undefined,
+): VariantDiffGroup[] {
+  if (!baseVariant || !currentVariant || baseVariant === currentVariant) {
+    return [];
+  }
+
+  const groups: VariantDiffGroup[] = [];
+
+  const geometryChanges = diffNumericGroup(
+    baseVariant.geometry as Record<string, unknown> | null | undefined,
+    currentVariant.geometry as Record<string, unknown> | null | undefined,
+    GEOMETRY_DIFF_KEYS,
+  );
+  if (geometryChanges > 0) {
+    groups.push({
+      id: "geometry",
+      label: "Geometry",
+      step: "info",
+      changedFields: geometryChanges,
+    });
+  }
+
+  const boundaryChanges = diffNumericGroup(
+    baseVariant.boundaryCondition as
+      | Record<string, unknown>
+      | null
+      | undefined,
+    currentVariant.boundaryCondition as
+      | Record<string, unknown>
+      | null
+      | undefined,
+    BOUNDARY_DIFF_KEYS,
+  );
+  if (boundaryChanges > 0) {
+    groups.push({
+      id: "boundary",
+      label: "Boundary conditions",
+      step: "wlc",
+      changedFields: boundaryChanges,
+    });
+  }
+
+  if (diffJsonGroup(baseVariant.energyInputs, currentVariant.energyInputs)) {
+    groups.push({
+      id: "energy",
+      label: "Energy inputs",
+      step: "energy",
+      changedFields: 1,
+    });
+  }
+  if (diffJsonGroup(baseVariant.costItems, currentVariant.costItems)) {
+    groups.push({
+      id: "construction",
+      label: "Construction items",
+      step: "construction",
+      changedFields: 1,
+    });
+  }
+  if (diffJsonGroup(baseVariant.designCosts, currentVariant.designCosts)) {
+    groups.push({
+      id: "designCosts",
+      label: "Design costs",
+      step: "wlc",
+      changedFields: 1,
+    });
+  }
+  if (diffJsonGroup(baseVariant.incomeInput, currentVariant.incomeInput)) {
+    groups.push({
+      id: "income",
+      label: "Income",
+      step: "info",
+      changedFields: 1,
+    });
+  }
+  if (
+    diffJsonGroup(
+      baseVariant.maintenanceConfig,
+      currentVariant.maintenanceConfig,
+    )
+  ) {
+    groups.push({
+      id: "maintenance",
+      label: "Maintenance config",
+      step: "construction",
+      changedFields: 1,
+    });
+  }
+  if (
+    diffJsonGroup(
+      baseVariant.serviceComponents,
+      currentVariant.serviceComponents,
+    )
+  ) {
+    groups.push({
+      id: "serviceComponents",
+      label: "Service components",
+      step: "construction",
+      changedFields: 1,
+    });
+  }
+
+  return groups;
+}
+
 export function computeVariantDiffCount(
   baseVariant: VariantLike | null | undefined,
   currentVariant: VariantLike | null | undefined,
 ): number {
-  if (!baseVariant || !currentVariant || baseVariant === currentVariant) {
-    return 0;
-  }
-
-  const comparisons: Array<boolean> = [];
-  const baseGeometry = baseVariant.geometry ?? {};
-  const currentGeometry = currentVariant.geometry ?? {};
-
-  for (const key of [
-    "grossFloorArea",
-    "netFloorArea",
-    "treatedFloorArea",
-    "grossVolume",
-    "windowArea",
-    "totalThermalEnvelope",
-    "avgUvalueOpaque",
-    "airTightness",
-    "pvInstalledCapacity",
-  ] as const) {
-    comparisons.push((baseGeometry[key] ?? 0) !== (currentGeometry[key] ?? 0));
-  }
-
-  const baseBoundary = baseVariant.boundaryCondition ?? {};
-  const currentBoundary = currentVariant.boundaryCondition ?? {};
-  for (const key of [
-    "referencePeriod",
-    "interestRate",
-    "inflationRate",
-    "stakeholderRole",
-  ] as const) {
-    comparisons.push((baseBoundary[key] ?? 0) !== (currentBoundary[key] ?? 0));
-  }
-
-  comparisons.push(
-    JSON.stringify(baseVariant.energyInputs ?? []) !==
-      JSON.stringify(currentVariant.energyInputs ?? []),
-  );
-  comparisons.push(
-    JSON.stringify(baseVariant.costItems ?? []) !==
-      JSON.stringify(currentVariant.costItems ?? []),
-  );
-  comparisons.push(
-    JSON.stringify(baseVariant.designCosts ?? []) !==
-      JSON.stringify(currentVariant.designCosts ?? []),
-  );
-  comparisons.push(
-    JSON.stringify(baseVariant.incomeInput ?? null) !==
-      JSON.stringify(currentVariant.incomeInput ?? null),
-  );
-  comparisons.push(
-    JSON.stringify(baseVariant.maintenanceConfig ?? null) !==
-      JSON.stringify(currentVariant.maintenanceConfig ?? null),
-  );
-  comparisons.push(
-    JSON.stringify(baseVariant.serviceComponents ?? []) !==
-      JSON.stringify(currentVariant.serviceComponents ?? []),
-  );
-
-  return comparisons.filter(Boolean).length;
+  return computeVariantDiff(baseVariant, currentVariant).length;
 }
 
 export function computeProjectReadiness(

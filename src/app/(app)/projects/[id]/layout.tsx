@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   computeProjectReadiness,
-  computeVariantDiffCount,
+  computeVariantDiff,
   type ProjectStepId,
 } from "@/lib/project-readiness";
 
@@ -67,13 +67,16 @@ function ProjectLayoutInner({ children }: { children: React.ReactNode }) {
           ? computeProjectReadiness(project, variantData)
           : null;
 
+      const diff =
+        variant.label === "BASE"
+          ? []
+          : computeVariantDiff(baseVariant ?? null, variantData ?? null);
+
       return {
         ...variant,
         readiness: variantReadiness,
-        diffCount:
-          variant.label === "BASE"
-            ? 0
-            : computeVariantDiffCount(baseVariant ?? null, variantData ?? null),
+        diff,
+        diffCount: diff.length,
       };
     }) ?? [];
 

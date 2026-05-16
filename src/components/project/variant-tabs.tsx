@@ -7,7 +7,11 @@ import { useTRPC } from "@/server/trpc/client";
 import { toast } from "sonner";
 import { Plus, Loader2 } from "lucide-react";
 import { ReadinessPill } from "@/components/project/readiness-pill";
-import type { ProjectReadiness } from "@/lib/project-readiness";
+import { VariantDiffPopover } from "@/components/project/variant-diff-popover";
+import type {
+  ProjectReadiness,
+  VariantDiffGroup,
+} from "@/lib/project-readiness";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +37,7 @@ interface Variant {
   description?: string | null;
   readiness?: ProjectReadiness | null;
   diffCount?: number;
+  diff?: VariantDiffGroup[];
 }
 
 interface VariantTabsProps {
@@ -125,6 +130,10 @@ export function VariantTabs({
   const canAdd = nextLabel !== null;
   const isPending = addVariant.isPending || cloneVariant.isPending;
   const baseVariantId = variants.find((variant) => variant.label === "BASE")?.id;
+  const activeVariant = variants.find(
+    (variant) => variant.id === activeVariantId,
+  );
+  const activeDiff = activeVariant?.diff ?? [];
   const cloneSourceId = useMemo(() => {
     if (creationMode === "clone_current") {
       return activeVariantId;
@@ -235,6 +244,16 @@ export function VariantTabs({
             </div>
           </div>
         </Tabs>
+
+        {activeVariant && activeVariant.label !== "BASE" && activeDiff.length > 0 ? (
+          <div className="hidden md:inline-flex">
+            <VariantDiffPopover
+              projectId={projectId}
+              variantId={activeVariantId}
+              diff={activeDiff}
+            />
+          </div>
+        ) : null}
 
         {canAdd ? (
           <Button
