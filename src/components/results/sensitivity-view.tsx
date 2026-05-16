@@ -22,6 +22,14 @@ import {
   type TornadoRow,
   baselineOutputLabel,
 } from "./sensitivity-tornado";
+import {
+  SensitivityEEScatter,
+  type EEScatterPoint,
+} from "./sensitivity-ee-scatter";
+import {
+  SensitivityBoxPlot,
+  type BoxRow,
+} from "./sensitivity-box-plot";
 import type { FormulaMode } from "@/engine/types";
 
 const PAPER_TOP4 = [
@@ -43,6 +51,26 @@ interface DSAEntryView {
   relativeChangePlus: number;
   relativeChangeMinus: number;
   sensitivityIndex: number;
+}
+
+interface EEEntryView {
+  parameterId: string;
+  output: string;
+  mu: number;
+  muStar: number;
+  sigma: number;
+}
+
+interface EEDistributionView {
+  output: string;
+  samples: number[];
+  median: number;
+  p25: number;
+  p75: number;
+  min: number;
+  max: number;
+  whiskerLow: number;
+  whiskerHigh: number;
 }
 
 interface SensitivityViewProps {
@@ -67,6 +95,14 @@ export function SensitivityView({
     baselineOutput: number;
     output: string;
   } | null>(null);
+  const [lastEE, setLastEE] = useState<{
+    entries: EEEntryView[];
+    distribution: EEDistributionView[];
+    scheme: "fixedPct" | "literature";
+    elapsedMs: number;
+    engineRuns: number;
+  } | null>(null);
+  const [scatterScale, setScatterScale] = useState<"linear" | "log">("linear");
 
   const parametersQuery = useQuery(
     trpc.sensitivity.listParameters.queryOptions({ variantId, formulaMode }),
@@ -86,6 +122,31 @@ export function SensitivityView({
         });
         toast.success(
           `DSA complete — ${data.diagnostics.engineRuns} engine runs, ${data.diagnostics.elapsedMs} ms`,
+        );
+        queryClient.invalidateQueries({
+          queryKey: trpc.sensitivity.listRuns.queryKey({ variantId }),
+        });
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
+
+  const runEE = useMutation(
+    trpc.sensitivity.runEE.mutationOptions({
+      onSuccess: (data) => {
+        setLastEE({
+          entries: data.entries,
+          distribution: data.distribution,
+          scheme:
+            (data.diagnostics as { variationScheme?: "fixedPct" | "literature" })
+              .variationScheme ?? "literature",
+          elapsedMs: data.diagnostics.elapsedMs,
+          engineRuns: data.diagnostics.engineRuns,
+        });
+        toast.success(
+          `EE complete — ${data.diagnostics.engineRuns} engine runs, ${data.diagnostics.elapsedMs} ms`,
         );
         queryClient.invalidateQueries({
           queryKey: trpc.sensitivity.listRuns.queryKey({ variantId }),
@@ -137,6 +198,57 @@ export function SensitivityView({
       formulaMode,
     });
   }
+
+  function handleEERun(scheme: "fixedPct" | "literature") {
+    if (allParamIds.length < 2) {
+      toast.error(
+        "EE needs at least 2 applicable parameters. Add construction items or service components first.",
+      );
+      return;
+    }
+    runEE.mutate({
+      variantId,
+      parameters: allParamIds,
+      outputs: ["lcc"],
+      r: 10,
+      rCandidates: 10_000,
+      rSamples: 100,
+      p: 4,
+      seed: 42,
+      variationScheme: scheme,
+      formulaMode,
+    });
+  }
+
+  const eeScatterPoints = useMemo<EEScatterPoint[]>(() => {
+    if (!lastEE) return [];
+    const specsById = new Map(
+      (parametersQuery.data ?? []).map((p) => [p.id, p]),
+    );
+    return lastEE.entries
+      .filter((e) => e.output === "lcc")
+      .map((e) => ({
+        parameterId: e.parameterId,
+        label: specsById.get(e.parameterId)?.label ?? e.parameterId,
+        muStar: e.muStar,
+        sigma: e.sigma,
+      }));
+  }, [lastEE, parametersQuery.data]);
+
+  const eeBoxRows = useMemo<BoxRow[]>(() => {
+    if (!lastEE) return [];
+    return lastEE.distribution.map((d) => ({
+      output: d.output,
+      label: baselineOutputLabel(d.output),
+      min: d.min,
+      max: d.max,
+      p25: d.p25,
+      p75: d.p75,
+      median: d.median,
+      whiskerLow: d.whiskerLow,
+      whiskerHigh: d.whiskerHigh,
+    }));
+  }, [lastEE]);
 
   const tornadoRows = useMemo<TornadoRow[]>(() => {
     if (!lastRun) return [];
@@ -215,6 +327,44 @@ export function SensitivityView({
             components to the variant first.
           </p>
         ) : null}
+
+        <div className="mt-4 border-t pt-4">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Elementary Effects (Morris, paper §2.2.3) — r=10, p=4
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => handleEERun("literature")}
+              disabled={runEE.isPending || allParamIds.length < 2}
+            >
+              {runEE.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Sparkles className="size-4" />
+              )}
+              EE — literature bounds ({allParamIds.length} params)
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleEERun("fixedPct")}
+              disabled={runEE.isPending || allParamIds.length < 2}
+            >
+              <Play className="size-4" />
+              EE — fixed ±10%
+            </Button>
+          </div>
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            EE runs r·(n+1) ≈ {allParamIds.length > 0 ? 10 * (allParamIds.length + 1) : 0}{" "}
+            engine evaluations and is reproducible under seed=42.
+          </p>
+        </div>
       </GlassCard>
 
       {lastRun ? (
@@ -240,6 +390,61 @@ export function SensitivityView({
           description="Run a DSA above to see which inputs drive your LCC the most."
         />
       )}
+
+      {lastEE ? (
+        <>
+          <GlassCard>
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Elementary Effects — μ* vs σ ({lastEE.scheme} bounds)
+              </h3>
+              <div className="flex items-center gap-1 text-[11px]">
+                <button
+                  type="button"
+                  className={`rounded-md border px-2 py-0.5 ${
+                    scatterScale === "linear"
+                      ? "bg-foreground text-background"
+                      : "text-muted-foreground"
+                  }`}
+                  onClick={() => setScatterScale("linear")}
+                >
+                  linear
+                </button>
+                <button
+                  type="button"
+                  className={`rounded-md border px-2 py-0.5 ${
+                    scatterScale === "log"
+                      ? "bg-foreground text-background"
+                      : "text-muted-foreground"
+                  }`}
+                  onClick={() => setScatterScale("log")}
+                >
+                  log
+                </button>
+              </div>
+            </div>
+            <SensitivityEEScatter
+              points={eeScatterPoints}
+              scale={scatterScale}
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Top-right = high importance + high non-linearity/interaction
+              (paper Fig. 3/4). Dashed line: σ = μ*.
+            </p>
+          </GlassCard>
+
+          <GlassCard>
+            <h3 className="mb-2 text-sm font-medium text-muted-foreground">
+              LCC distribution (paper Fig. 5) — {lastEE.engineRuns} runs
+            </h3>
+            <SensitivityBoxPlot rows={eeBoxRows} />
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Box = IQR (25th–75th percentile). Whiskers clipped to
+              ±1.5·IQR. Bar height encodes the median.
+            </p>
+          </GlassCard>
+        </>
+      ) : null}
 
       <GlassCard>
         <h3 className="mb-3 text-sm font-medium text-muted-foreground">
