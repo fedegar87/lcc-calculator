@@ -2,7 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "../init";
 import { ENGINE_VERSION } from "@/engine/types";
-import { runDSA } from "@/engine/sensitivity";
+import { runDSA, runEE } from "@/engine/sensitivity";
 import {
   DEFAULT_PARAMETER_REGISTRY,
   listApplicableParameters,
@@ -233,5 +233,105 @@ export const sensitivityRouter = createTRPCRouter({
       });
       if (!run) throw new TRPCError({ code: "NOT_FOUND" });
       return run;
+    }),
+
+  runEE: protectedProcedure
+    .input(
+      z.object({
+        variantId: z.string(),
+        parameters: z.array(z.string()).min(2).max(40),
+        outputs: z.array(z.enum(OUTPUT_IDS)).min(1),
+        r: z.number().int().min(4).max(50).default(10),
+        rCandidates: z.number().int().min(100).max(20_000).default(10_000),
+        rSamples: z.number().int().min(10).max(500).default(100),
+        p: z.number().int().refine((v) => v % 2 === 0, "p must be even").default(4),
+        seed: z.number().int().default(42),
+        variationScheme: z.enum(["fixedPct", "literature"]).default("literature"),
+        formulaMode: formulaModeSchema,
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { input: variantInput } = await buildInputForVariant(
+        ctx.db,
+        input.variantId,
+        input.formulaMode,
+      );
+
+      const validationErrors = validateVariantInput(variantInput);
+      if (validationErrors.length > 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Input validation failed: ${validationErrors.join("; ")}`,
+        });
+      }
+
+      let ee;
+      try {
+        ee = runEE(
+          variantInput,
+          {
+            parameters: input.parameters,
+            outputs: input.outputs,
+            r: input.r,
+            rCandidates: input.rCandidates,
+            rSamples: input.rSamples,
+            p: input.p,
+            seed: input.seed,
+            variationScheme: input.variationScheme,
+          },
+          { formulaMode: input.formulaMode },
+        );
+      } catch (err) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `EE run failed: ${err instanceof Error ? err.message : String(err)}`,
+        });
+      }
+
+      const resolvedSpecs = input.parameters
+        .map((id) => DEFAULT_PARAMETER_REGISTRY.find((p) => p.id === id))
+        .filter((spec): spec is ParameterSpec => spec !== undefined)
+        .map((spec) => resolveSpecForPersistence(spec, variantInput));
+
+      const run = await ctx.db.sensitivityRun.create({
+        data: {
+          variantId: input.variantId,
+          method: "EE",
+          config: {
+            parameters: input.parameters,
+            outputs: input.outputs,
+            r: input.r,
+            rCandidates: input.rCandidates,
+            rSamples: input.rSamples,
+            p: input.p,
+            seed: input.seed,
+            variationScheme: input.variationScheme,
+          },
+          parameterSpecs: JSON.parse(JSON.stringify(resolvedSpecs)),
+          baselineSnapshot: JSON.parse(JSON.stringify(ee.baseline)),
+          result: JSON.parse(
+            JSON.stringify({ entries: ee.entries, distribution: ee.distribution }),
+          ),
+          diagnostics: JSON.parse(JSON.stringify(ee.diagnostics)),
+          engineVersion: ENGINE_VERSION,
+          formulaMode:
+            input.formulaMode === "excel_replica"
+              ? "EXCEL_REPLICA"
+              : "EXCEL_BUGFIXED",
+          methodProfile: "CRAVEZERO_LEGACY",
+          seed: input.seed,
+          createdById: ctx.user.id,
+        },
+      });
+
+      return {
+        id: run.id,
+        method: run.method,
+        createdAt: run.createdAt,
+        entries: ee.entries,
+        distribution: ee.distribution,
+        diagnostics: ee.diagnostics,
+        baseline: ee.baseline,
+      };
     }),
 });
