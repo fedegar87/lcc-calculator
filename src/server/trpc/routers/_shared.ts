@@ -11,10 +11,19 @@ import type {
   LandCostMode,
 } from "@/engine/types";
 
-/** Safely convert Prisma Decimal|null|undefined to plain number */
+/** Safely convert Prisma Decimal|null|undefined to plain number (engine inputs).
+ *  Coerces nullish to 0 so callers feeding the engine never see null. */
 export function d(val: unknown): number {
   if (val == null) return 0;
   return Number(val);
+}
+
+/** Convert Prisma Decimal|null|undefined to number | null, preserving the
+ *  "not provided" semantics for client-side rendering (e.g. empty inputs). */
+export function dNullable(val: unknown): number | null {
+  if (val == null) return null;
+  const n = Number(val);
+  return Number.isFinite(n) ? n : null;
 }
 
 /** Resolve detail material cost: MAX(materialCost, unitPrice * area) per architecture decision */

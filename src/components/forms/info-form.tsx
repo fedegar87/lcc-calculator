@@ -306,25 +306,25 @@ function GeometrySection({
 }: {
   variant: {
     geometry: {
-      grossFloorArea: number;
-      netFloorArea: number;
-      treatedFloorArea: number;
-      windowArea: number;
-      balconiesArea: number;
-      otherSurfacesArea: number;
-      unheatedGFA: number;
-      unheatedNFA: number;
-      grossVolume: number;
-      netVolume: number;
-      unheatedGrossVol: number;
-      unheatedNetVol: number;
-      totalThermalEnvelope: number;
-      avgUvalueOpaque: number;
-      avgUvalueGlazing: number;
-      avgHeatRecovery: number;
-      airTightness: number;
-      pvInstalledCapacity: number;
-      manualDesignConstructionCost: number;
+      grossFloorArea: number | null;
+      netFloorArea: number | null;
+      treatedFloorArea: number | null;
+      windowArea: number | null;
+      balconiesArea: number | null;
+      otherSurfacesArea: number | null;
+      unheatedGFA: number | null;
+      unheatedNFA: number | null;
+      grossVolume: number | null;
+      netVolume: number | null;
+      unheatedGrossVol: number | null;
+      unheatedNetVol: number | null;
+      totalThermalEnvelope: number | null;
+      avgUvalueOpaque: number | null;
+      avgUvalueGlazing: number | null;
+      avgHeatRecovery: number | null;
+      airTightness: number | null;
+      pvInstalledCapacity: number | null;
+      manualDesignConstructionCost: number | null;
     } | null;
   };
   variantId: string;
@@ -675,22 +675,22 @@ function IncomeSection({
 }: {
   variant: {
     incomeInput: {
-      rent1MonthlyPerM2: number;
-      rent1Area: number;
-      rent1Taxes: number;
-      rent2MonthlyPerM2: number;
-      rent2Area: number;
-      rent2Taxes: number;
-      rent3MonthlyPerM2: number;
-      rent3Area: number;
-      rent3Taxes: number;
-      otherIncome1: number;
-      otherIncome1Taxes: number;
-      otherIncome2: number;
-      otherIncome2Taxes: number;
-      otherIncome3: number;
-      otherIncome3Taxes: number;
-      expectedPricePerM2: number;
+      rent1MonthlyPerM2: number | null;
+      rent1Area: number | null;
+      rent1Taxes: number | null;
+      rent2MonthlyPerM2: number | null;
+      rent2Area: number | null;
+      rent2Taxes: number | null;
+      rent3MonthlyPerM2: number | null;
+      rent3Area: number | null;
+      rent3Taxes: number | null;
+      otherIncome1: number | null;
+      otherIncome1Taxes: number | null;
+      otherIncome2: number | null;
+      otherIncome2Taxes: number | null;
+      otherIncome3: number | null;
+      otherIncome3Taxes: number | null;
+      expectedPricePerM2: number | null;
     } | null;
   };
   variantId: string;

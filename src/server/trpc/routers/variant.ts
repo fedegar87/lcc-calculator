@@ -2,7 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "../init";
 import type { PrismaClient } from "../../../generated/prisma/client";
-import { d } from "./_shared";
+import { d, dNullable } from "./_shared";
 
 /** Verify user has OWNER/EDITOR access to a variant's project */
 async function verifyVariantWriteAccess(
@@ -46,31 +46,31 @@ async function verifyVariantReadAccess(
   return variant;
 }
 
-/** Convert all geometry fields to plain numbers */
+/** Convert all geometry fields to nullable numbers (null = not provided) */
 function serializeGeometry(g: Record<string, unknown> | null) {
   if (!g) return null;
   return {
     id: g.id,
     variantId: g.variantId,
-    grossFloorArea: d(g.grossFloorArea),
-    netFloorArea: d(g.netFloorArea),
-    grossVolume: d(g.grossVolume),
-    netVolume: d(g.netVolume),
-    unheatedGFA: d(g.unheatedGFA),
-    unheatedNFA: d(g.unheatedNFA),
-    unheatedGrossVol: d(g.unheatedGrossVol),
-    unheatedNetVol: d(g.unheatedNetVol),
-    balconiesArea: d(g.balconiesArea),
-    otherSurfacesArea: d(g.otherSurfacesArea),
-    treatedFloorArea: d(g.treatedFloorArea),
-    windowArea: d(g.windowArea),
-    totalThermalEnvelope: d(g.totalThermalEnvelope),
-    avgUvalueOpaque: d(g.avgUvalueOpaque),
-    avgUvalueGlazing: d(g.avgUvalueGlazing),
-    avgHeatRecovery: d(g.avgHeatRecovery),
-    airTightness: d(g.airTightness),
-    pvInstalledCapacity: d(g.pvInstalledCapacity),
-    manualDesignConstructionCost: d(g.manualDesignConstructionCost),
+    grossFloorArea: dNullable(g.grossFloorArea),
+    netFloorArea: dNullable(g.netFloorArea),
+    grossVolume: dNullable(g.grossVolume),
+    netVolume: dNullable(g.netVolume),
+    unheatedGFA: dNullable(g.unheatedGFA),
+    unheatedNFA: dNullable(g.unheatedNFA),
+    unheatedGrossVol: dNullable(g.unheatedGrossVol),
+    unheatedNetVol: dNullable(g.unheatedNetVol),
+    balconiesArea: dNullable(g.balconiesArea),
+    otherSurfacesArea: dNullable(g.otherSurfacesArea),
+    treatedFloorArea: dNullable(g.treatedFloorArea),
+    windowArea: dNullable(g.windowArea),
+    totalThermalEnvelope: dNullable(g.totalThermalEnvelope),
+    avgUvalueOpaque: dNullable(g.avgUvalueOpaque),
+    avgUvalueGlazing: dNullable(g.avgUvalueGlazing),
+    avgHeatRecovery: dNullable(g.avgHeatRecovery),
+    airTightness: dNullable(g.airTightness),
+    pvInstalledCapacity: dNullable(g.pvInstalledCapacity),
+    manualDesignConstructionCost: dNullable(g.manualDesignConstructionCost),
   };
 }
 
@@ -88,7 +88,7 @@ function serializeBoundaryCondition(bc: Record<string, unknown> | null) {
   };
 }
 
-/** Convert WLC input fields to plain numbers */
+/** Convert WLC input fields to nullable numbers (null = not provided) */
 function serializeWLCInput(w: Record<string, unknown> | null) {
   if (!w) return null;
   return {
@@ -96,44 +96,44 @@ function serializeWLCInput(w: Record<string, unknown> | null) {
     variantId: w.variantId,
     landCostMode:
       w.landCostMode === "TOTAL_COST" ? "TOTAL_COST" : "UNIT_PRICE",
-    landArea: d(w.landArea),
-    buildingIndex: d(w.buildingIndex),
-    floorHeight: d(w.floorHeight),
-    landPrice: d(w.landPrice),
-    landCostTotal: d(w.landCostTotal),
-    enablingCost1: d(w.enablingCost1),
-    enablingCost2: d(w.enablingCost2),
-    planningFees1: d(w.planningFees1),
-    planningFees2: d(w.planningFees2),
-    userSupportPropMgmt: d(w.userSupportPropMgmt),
-    userSupportCharges: d(w.userSupportCharges),
-    userSupportAdmin: d(w.userSupportAdmin),
-    financeCost: d(w.financeCost),
+    landArea: dNullable(w.landArea),
+    buildingIndex: dNullable(w.buildingIndex),
+    floorHeight: dNullable(w.floorHeight),
+    landPrice: dNullable(w.landPrice),
+    landCostTotal: dNullable(w.landCostTotal),
+    enablingCost1: dNullable(w.enablingCost1),
+    enablingCost2: dNullable(w.enablingCost2),
+    planningFees1: dNullable(w.planningFees1),
+    planningFees2: dNullable(w.planningFees2),
+    userSupportPropMgmt: dNullable(w.userSupportPropMgmt),
+    userSupportCharges: dNullable(w.userSupportCharges),
+    userSupportAdmin: dNullable(w.userSupportAdmin),
+    financeCost: dNullable(w.financeCost),
   };
 }
 
-/** Convert income input fields to plain numbers */
+/** Convert income input fields to nullable numbers (null = not provided) */
 function serializeIncomeInput(inc: Record<string, unknown> | null) {
   if (!inc) return null;
   return {
     id: inc.id,
     variantId: inc.variantId,
-    rent1MonthlyPerM2: d(inc.rent1MonthlyPerM2),
-    rent1Area: d(inc.rent1Area),
-    rent1Taxes: d(inc.rent1Taxes),
-    rent2MonthlyPerM2: d(inc.rent2MonthlyPerM2),
-    rent2Area: d(inc.rent2Area),
-    rent2Taxes: d(inc.rent2Taxes),
-    rent3MonthlyPerM2: d(inc.rent3MonthlyPerM2),
-    rent3Area: d(inc.rent3Area),
-    rent3Taxes: d(inc.rent3Taxes),
-    otherIncome1: d(inc.otherIncome1),
-    otherIncome1Taxes: d(inc.otherIncome1Taxes),
-    otherIncome2: d(inc.otherIncome2),
-    otherIncome2Taxes: d(inc.otherIncome2Taxes),
-    otherIncome3: d(inc.otherIncome3),
-    otherIncome3Taxes: d(inc.otherIncome3Taxes),
-    expectedPricePerM2: d(inc.expectedPricePerM2),
+    rent1MonthlyPerM2: dNullable(inc.rent1MonthlyPerM2),
+    rent1Area: dNullable(inc.rent1Area),
+    rent1Taxes: dNullable(inc.rent1Taxes),
+    rent2MonthlyPerM2: dNullable(inc.rent2MonthlyPerM2),
+    rent2Area: dNullable(inc.rent2Area),
+    rent2Taxes: dNullable(inc.rent2Taxes),
+    rent3MonthlyPerM2: dNullable(inc.rent3MonthlyPerM2),
+    rent3Area: dNullable(inc.rent3Area),
+    rent3Taxes: dNullable(inc.rent3Taxes),
+    otherIncome1: dNullable(inc.otherIncome1),
+    otherIncome1Taxes: dNullable(inc.otherIncome1Taxes),
+    otherIncome2: dNullable(inc.otherIncome2),
+    otherIncome2Taxes: dNullable(inc.otherIncome2Taxes),
+    otherIncome3: dNullable(inc.otherIncome3),
+    otherIncome3Taxes: dNullable(inc.otherIncome3Taxes),
+    expectedPricePerM2: dNullable(inc.expectedPricePerM2),
   };
 }
 
