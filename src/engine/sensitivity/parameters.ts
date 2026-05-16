@@ -1,7 +1,11 @@
 import type { VariantInput, CostItemInput } from '../types';
 import { CATEGORY_MAINTENANCE_MAP } from '../types';
 import { getEN15459Component } from '../constants';
-import type { ParameterSpec } from './types';
+import type {
+  ParameterSpec,
+  ParameterBounds,
+  VariationScheme,
+} from './types';
 
 function cloneInput(input: VariantInput): VariantInput {
   return {
@@ -61,10 +65,17 @@ const INTEREST_RATE: ParameterSpec = {
   baseline: (input) => input.interestRate,
   apply: (input, value) => ({ ...cloneInput(input), interestRate: value }),
   defaultBounds: {
-    fixedPct: { min: -0.1, max: 0.1, distribution: 'uniform', source: 'paper-fixed-10pct' },
+    fixedPct: {
+      min: -0.1,
+      max: 0.1,
+      scale: 'fractionalOffset',
+      distribution: 'uniform',
+      source: 'paper-fixed-10pct',
+    },
     literature: {
       min: 0.0025,
       max: 0.05,
+      scale: 'absolute',
       distribution: 'uniform',
       source: 'Pernetti 2021 Table 2 [FRED INTDSREZQ193N, Euro area 2009-2016]',
     },
@@ -82,10 +93,17 @@ const BUILDING_ELEMENT_MAINTENANCE: ParameterSpec = {
     buildingElementMaintenancePercent: value,
   }),
   defaultBounds: {
-    fixedPct: { min: -0.1, max: 0.1, distribution: 'uniform', source: 'paper-fixed-10pct' },
+    fixedPct: {
+      min: -0.1,
+      max: 0.1,
+      scale: 'fractionalOffset',
+      distribution: 'uniform',
+      source: 'paper-fixed-10pct',
+    },
     literature: {
       min: 0.01,
       max: 0.02,
+      scale: 'absolute',
       distribution: 'uniform',
       source: 'Pernetti 2021 Table 2 [EN 15459-1:2017]',
     },
@@ -109,7 +127,22 @@ const HVAC_MAINTENANCE_MULTIPLIER: ParameterSpec = {
     return next;
   },
   defaultBounds: {
-    fixedPct: { min: 0.9, max: 1.1, distribution: 'uniform', source: 'paper-fixed-10pct' },
+    fixedPct: {
+      min: 0.9,
+      max: 1.1,
+      scale: 'absolute',
+      distribution: 'uniform',
+      source: 'paper-fixed-10pct',
+    },
+    literature: {
+      // Spec §3.2: EN 15459 component min/max imply a ~±50% multiplier
+      // envelope when computed across the catalogue; conservative range here.
+      min: 0.5,
+      max: 1.5,
+      scale: 'absolute',
+      distribution: 'uniform',
+      source: 'EN 15459-1:2017 component min/max ranges',
+    },
   },
 };
 
@@ -125,7 +158,13 @@ function makeCostCategoryParam(
     baseline: (input) => categoryTotal(input.costItems, category),
     apply: (input, value) => scaleCategory(input, category, value),
     defaultBounds: {
-      fixedPct: { min: -0.1, max: 0.1, distribution: 'uniform', source: 'paper-fixed-10pct' },
+      fixedPct: {
+        min: -0.1,
+        max: 0.1,
+        scale: 'fractionalOffset',
+        distribution: 'uniform',
+        source: 'paper-fixed-10pct',
+      },
     },
   };
 }
@@ -170,6 +209,26 @@ export function listApplicableParameters(
   input: VariantInput,
 ): ParameterSpec[] {
   return DEFAULT_PARAMETER_REGISTRY.filter((p) => p.applicable(input));
+}
+
+/** Convert a ParameterBounds into absolute [min, max] in apply()-space, given
+ *  the current baseline. For `fractionalOffset` bounds: [baseline*(1+min),
+ *  baseline*(1+max)]. For `absolute`: returns the stored values unchanged. */
+export function resolveAbsoluteBounds(
+  spec: ParameterSpec,
+  input: VariantInput,
+  scheme: VariationScheme,
+): { min: number; max: number; bounds: ParameterBounds } | null {
+  const bounds =
+    scheme === 'literature'
+      ? spec.defaultBounds.literature ?? spec.defaultBounds.fixedPct
+      : spec.defaultBounds.fixedPct;
+  if (!bounds) return null;
+  if (bounds.scale === 'absolute') {
+    return { min: bounds.min, max: bounds.max, bounds };
+  }
+  const b = spec.baseline(input);
+  return { min: b * (1 + bounds.min), max: b * (1 + bounds.max), bounds };
 }
 
 export { cloneInput, categoryTotal, scaleCategory, CATEGORY_MAINTENANCE_MAP };
