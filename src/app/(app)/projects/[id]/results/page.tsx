@@ -7,6 +7,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { ResultsDashboard } from "@/components/results/results-dashboard";
 import { ValidationSummaryCard } from "@/components/project/validation-summary-card";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -346,27 +347,17 @@ export default function ResultsPage() {
         </Button>
       </div>
 
-      {view === "dashboard" ? (
-        <ResultsDashboard
-          variantId={variantId}
-          projectId={projectId}
-          formulaMode={formulaMode}
-          resultOverride={resultQuery.data ?? null}
-          skipQuery
-          loadingOverride={resultQuery.isPending}
-          errorOverride={resultQuery.error}
-          onRetryOverride={() => {
-            resultQuery.refetch();
-          }}
-        />
-      ) : view === "audit" ? (
-        resultQuery.data ? (
-          <ResultsAuditView result={resultQuery.data} />
-        ) : (
+      <ErrorBoundary
+        key={`${variantId}-${view}`}
+        fallbackTitle="Results view failed to render"
+        onRetry={() => resultQuery.refetch()}
+      >
+        {view === "dashboard" ? (
           <ResultsDashboard
             variantId={variantId}
             projectId={projectId}
             formulaMode={formulaMode}
+            resultOverride={resultQuery.data ?? null}
             skipQuery
             loadingOverride={resultQuery.isPending}
             errorOverride={resultQuery.error}
@@ -374,14 +365,30 @@ export default function ResultsPage() {
               resultQuery.refetch();
             }}
           />
-        )
-      ) : (
-        <VariantComparison
-          projectId={projectId}
-          variants={variants}
-          formulaMode={formulaMode}
-        />
-      )}
+        ) : view === "audit" ? (
+          resultQuery.data ? (
+            <ResultsAuditView result={resultQuery.data} />
+          ) : (
+            <ResultsDashboard
+              variantId={variantId}
+              projectId={projectId}
+              formulaMode={formulaMode}
+              skipQuery
+              loadingOverride={resultQuery.isPending}
+              errorOverride={resultQuery.error}
+              onRetryOverride={() => {
+                resultQuery.refetch();
+              }}
+            />
+          )
+        ) : (
+          <VariantComparison
+            projectId={projectId}
+            variants={variants}
+            formulaMode={formulaMode}
+          />
+        )}
+      </ErrorBoundary>
     </div>
   );
 }
