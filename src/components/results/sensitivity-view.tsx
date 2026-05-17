@@ -139,9 +139,7 @@ export function SensitivityView({
         setLastEE({
           entries: data.entries,
           distribution: data.distribution,
-          scheme:
-            (data.diagnostics as { variationScheme?: "fixedPct" | "literature" })
-              .variationScheme ?? "literature",
+          scheme: data.diagnostics.variationScheme,
           elapsedMs: data.diagnostics.elapsedMs,
           engineRuns: data.diagnostics.engineRuns,
         });

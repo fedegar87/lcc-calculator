@@ -20,7 +20,7 @@ const VALUES: ValueCard[] = [
     icon: ScanSearch,
     iconTile: "bg-fin-100 text-fin-600",
     title: "Sensitivity built in",
-    body: "Differential sensitivity at ±10% per Pernetti et al. (2021) — one click on any variant ranks which inputs drive your LCC. Elementary Effects screening lands next.",
+    body: "Differential sensitivity at ±10% and Morris/Campolongo Elementary Effects per Pernetti et al. (2021) — one click on any variant ranks which inputs drive your LCC and quantifies the full LCC distribution.",
   },
   {
     icon: FileSpreadsheet,

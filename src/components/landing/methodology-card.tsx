@@ -25,7 +25,7 @@ const ROWS = [
   },
   {
     label: "Sensitivity",
-    value: "DSA shipped (±10%, Pernetti 2021); Elementary Effects next",
+    value: "DSA + Elementary Effects (Morris/Campolongo) per Pernetti 2021",
   },
   {
     label: "Empirical baseline",

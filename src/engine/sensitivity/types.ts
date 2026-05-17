@@ -82,6 +82,7 @@ export interface EEResult {
     selectedSampleSpread: number;
     seed: number;
     droppedParameters: ParameterId[];
+    variationScheme: VariationScheme;
   };
 }
 

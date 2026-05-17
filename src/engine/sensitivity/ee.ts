@@ -251,6 +251,7 @@ export function runEE(
       selectedSampleSpread: spread,
       seed: cfg.seed,
       droppedParameters: dropped,
+      variationScheme: cfg.variationScheme,
     },
   };
 }
