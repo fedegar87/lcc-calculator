@@ -248,17 +248,27 @@ export default function ProjectsPage() {
               className="cursor-pointer transition-shadow hover:shadow-md"
               onClick={() => router.push(`/projects/${project.id}`)}
             >
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-2">
                 <h3 className="font-semibold leading-tight">
                   {project.name}
                 </h3>
-                <Badge variant="secondary" className="ml-2 shrink-0">
-                  {
-                    BUILDING_USE_OPTIONS.find(
-                      (o) => o.value === project.buildingUse
-                    )?.label ?? project.buildingUse
-                  }
-                </Badge>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  {project.isSample ? (
+                    <Badge
+                      variant="outline"
+                      className="border-fin-100 bg-fin-50 text-fin-700"
+                    >
+                      CRAVEzero sample
+                    </Badge>
+                  ) : null}
+                  <Badge variant="secondary">
+                    {
+                      BUILDING_USE_OPTIONS.find(
+                        (o) => o.value === project.buildingUse
+                      )?.label ?? project.buildingUse
+                    }
+                  </Badge>
+                </div>
               </div>
 
               <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">

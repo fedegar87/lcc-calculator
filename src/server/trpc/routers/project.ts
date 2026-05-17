@@ -21,17 +21,26 @@ export const projectRouter = createTRPCRouter({
   list: protectedProcedure.query(async ({ ctx }) => {
     await ensurePublicPreviewProjects(ctx.db);
 
-    return ctx.db.project.findMany({
+    const projects = await ctx.db.project.findMany({
       select: {
         id: true,
         name: true,
         buildingUse: true,
         city: true,
         updatedAt: true,
+        userId: true,
         _count: { select: { variants: true } },
       },
       orderBy: { updatedAt: "desc" },
     });
+
+    // Surface the "sample / case study" flag so the UI can label them
+    // separately from user-owned projects. PREVIEW_USER_ID is owned by
+    // ensurePublicPreviewProjects(); see src/server/demo/...
+    return projects.map((p) => ({
+      ...p,
+      isSample: p.userId === "preview-demo-user",
+    }));
   }),
 
   // 2. Get project by ID
