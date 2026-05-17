@@ -118,6 +118,33 @@ Login or registration redirects to the wrong URL.
 
 **Fix:** Verify `BETTER_AUTH_URL` in `.env` matches the dev server port. The default is `http://localhost:3000`.
 
+## Sensitivity analysis
+
+Every project gets a **Sensitivity** tab in the results page implementing
+the methodology from Pernetti, Garzia & Filippi Oberegger (2021,
+*Sustainable Cities and Society* 74, 103139). Two methods, paper-faithful:
+
+- **DSA — Differential Sensitivity Analysis.** One-click "paper top-4" run
+  (interest rate, building-element maintenance %, HVAC maintenance multiplier,
+  structural construction cost). Tornado plot ranked by sensitivity index
+  `s = (ΔO/O_b) / (ΔI/I_b)`. ~33 engine evaluations, < 500 ms.
+- **EE — Elementary Effects** (Morris 1991 + Campolongo et al. 2007 screening,
+  paper §2.2.3 variant). 10 000 candidate trajectories, 100 random samples of
+  10, max-spread selection. Uses the paper's modified EE definition
+  (Eq. 4: absolute Δ-LCC, not normalised). Outputs μ, μ\*, σ per parameter
+  + box-plot LCC distribution (paper Fig. 5). `r·(n+1) ≈ 170` engine
+  evaluations, reproducible under seed=42.
+
+Every run is persisted as a `SensitivityRun` row with the resolved
+parameter specs and a baseline LCC snapshot — runs are self-contained and
+restorable from the history list without re-execution.
+
+A regression test (`tests/engine/sensitivity-paper-replication.test.ts`)
+runs DSA on a Väla Gård-like fixture and asserts the paper-consistent
+top-3 ranking and LCC-variation envelope.
+
 ## Known Limitations
 
 - **PDF/Excel export is disabled.** Recharts chart components use `React.createContext`, which is not available in React Server Components. This blocks server-side chart rendering required for PDF generation. A future migration to a server-compatible chart library will re-enable exports.
+- **Sobol / LHS / Monte Carlo** are not implemented (Phase SA-3, deferred). EE box plot covers most uncertainty-quantification needs for the foreseeable future.
+- **EPBD_2025 / Level(s)-50y method profiles** are metadata-only. The engine uses CRAVEzero defaults; switching profile is informational, not yet behavioural.

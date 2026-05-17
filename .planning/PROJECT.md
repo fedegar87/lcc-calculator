@@ -40,9 +40,14 @@ Accurate, standards-compliant LCC calculations (ISO 15686-5:2017, EN 15459:2018)
 - ✓ WLC form Stakeholder Role dropdown (Owner / Tenant / Third Party) in Boundary Conditions — v1.2
 - ✓ MaintenanceConfig slider moved from Energy to Construction form — v1.2
 
+- ✓ Reporting hygiene — methodProfile metadata, dashboard assumptions, landing copy honest — v1.3
+- ✓ Sensitivity analysis SA-0: Väla Gård regression fixture (Pernetti 2021 replication) — SA milestone
+- ✓ Sensitivity analysis SA-1: DSA driver + parameter registry + Prisma SensitivityRun + tRPC + UI tornado + run history — SA milestone
+- ✓ Sensitivity analysis SA-2: Morris/Campolongo Elementary Effects + μ/μ*/σ + box-plot LCC distribution + scatter μ*–σ — SA milestone
+
 ### Active
 
-(None — define with next milestone)
+(None — define with next milestone. Candidate: v2.0 cash-flow ledger + EPBD profile foundation, gated by [[decision-epbd-profile-gate]] research-phase per memory note.)
 
 ### Out of Scope
 
@@ -50,10 +55,12 @@ Accurate, standards-compliant LCC calculations (ISO 15686-5:2017, EN 15459:2018)
 - Real-time collaboration (WebSocket) — single-user editing sufficient for v1
 - Mobile native app — responsive web is sufficient
 - OAuth / social login — email/password sufficient for academic/research context
-- Multi-language i18n — English only for v1
+- Multi-language i18n — English only for v1, full rollout (next-intl + IT/DE/EN) deferred
 - Building energy simulation integration (PHPP) — manual input of energy values
-- Sensitivity analysis (OAT) — deferred to v2
+- ~~Sensitivity analysis (OAT) — deferred to v2~~ ✓ shipped in SA milestone (DSA + EE)
 - CSV import for batch cost data entry — deferred to v2
+- Sobol / LHS / Monte Carlo (SA-3) — gated on profiling, deferred
+- Cash-flow ledger v2.0 + EPBD_2025_DRAFT profile coding — gated on research-phase
 
 ## Context
 

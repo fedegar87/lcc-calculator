@@ -570,17 +570,15 @@ Each is an independent ticket; none belongs to v2.0 EPBD work.
 4. **Methodology profile gating** — **RESOLVED**: yes, block SA on metadata-only profiles. Button disabled with tooltip pointing to [[decision-epbd-profile-gate]].
 5. **Trajectory-screening cost** — **RESOLVED**: paper does NOT do brute-force enumeration of `C(10000, 10)`. It draws 100 random samples of 10 trajectories and picks the max-spread sample. Implementation in §3.5 step 4 above. Cost is trivially `O(100·45·n)` distance computations — single-millisecond range. **No fallback needed.**
 
-### Open questions that remain
+### Open questions that remain — STATUS as of 2026-05-17
 
-A. **PRNG library** — Node has no built-in seeded PRNG with public seed control. Options:
-   - Implement `mulberry32` inline (~10 lines, zero deps) — **recommended**.
-   - Add `seedrandom` (npm, no transitive deps) — only if the deterministic-test story shows that mulberry32's quality is insufficient for `rCandidates = 10 000` uniform draws (unlikely).
+A. **PRNG library** — **RESOLVED**: implemented `mulberry32` inline in `src/engine/sensitivity/rng.ts` (28 LOC, zero deps). Reproducibility test in `rng.test.ts` confirms byte-identical sequences across seeds.
 
-B. **Per-carrier or global energy-price perturbation?** — The paper perturbs *per carrier per country* (Table 2 has one row per carrier×country). Our `input.energyPrices[]` already has one entry per carrier. For SA-1 we expose **per carrier** parameters; the user with multiple carriers gets one parameter per carrier. We do **not** introduce a "country" dimension — the project already encodes that elsewhere (`Project.country`).
+B. **Per-carrier or global energy-price perturbation?** — **DEFERRED to SA-3**. The SA-1 registry exposes only the paper's top-4 + the four envelope cost categories (A1, A2, A3, A5) + structure (A9). Per-carrier `energyPrices[]` parameters are not yet in the registry; the user perturbs them via the `service.hvac.maintenancePctMultiplier` umbrella for now. Add `energyPrices.<carrier>.pricePerKwh` and `.annualIncrease` parameters when SA-3 lands.
 
-C. **Energy-demand perturbation: per end-use or aggregate?** — Paper Table 3 lists heating, cooling, DHW, household, PV separately, each with ±10 %. Expose them as **five separate parameters per variant** so the user can disable irrelevant end-uses (e.g. no cooling for a passive-house residential).
+C. **Energy-demand perturbation: per end-use or aggregate?** — **DEFERRED to SA-3** (same scope as B). Five per-end-use parameters (`energyInputs.<endUse>.specificConsumption` + `pv.pvProductionKwh`) join the registry at the same time.
 
-D. **Replication run for paper-replication fixture** — when seeding Väla Gård, we need at least the cost breakdown by category, the service-component list with construction costs, and the four energy-demand values. Paper Table 1 + Table 3 provide enough for a faithful seed, but window-area / treated-floor-area / inflation-rate require interpolation (use Eurac Research's CRAVEzero D6.4 deliverable [58] for the missing fields if accessible). **Action:** before SA-0, confirm we can populate every required `VariantInput` field from the published paper + supplementary; otherwise mark SA-0 fixture as "best-effort approximation" not "paper-exact replication".
+D. **Replication run for paper-replication fixture** — **PARTIALLY RESOLVED**: SA-0 ships `tests/fixtures/vala-gard.ts` and `tests/engine/sensitivity-paper-replication.test.ts`. The fixture is marked as a "best-effort approximation" in its file-level comment because per-line-item cost splits had to be interpolated (paper Table 1+3 only publish per-category totals). Regression test asserts the *ranking* the paper demonstrates is robust, not absolute LCC values.
 
 ---
 

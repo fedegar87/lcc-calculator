@@ -4,6 +4,9 @@
 
 - v1.0 **LCCzero Calculator** -- Phases 1-11 (shipped 2026-03-28)
 - v1.1 **Local Dev Operativo** -- Phases 12-15 (shipped 2026-03-28)
+- v1.2 **Gap Analysis Fixes** -- Phase 16 (shipped 2026-03-28)
+- v1.3 **Reporting Hygiene** -- methodProfile metadata, off-by-one fix, dashboard assumptions, landing honest copy, visual identity continuation (shipped 2026-05-15, commits 02b6b87..287f88e)
+- SA **Sensitivity Analysis** (Pernetti et al. 2021) -- DSA + Elementary Effects + paper replication fixture + UI tornado/scatter/box plot + print stylesheet + comparison KPI table (shipped 2026-05-17, commits 270c858..ce2d1b0)
 
 ## Phases
 
@@ -67,6 +70,11 @@
 | 14. E2E Verification + Tech Debt | v1.1 | 2/2 | Complete | 2026-03-28 |
 | 15. Documentation | v1.1 | 1/1 | Complete | 2026-03-28 |
 | 16. Gap Analysis Fixes | v1.2 | 2/2 | Complete | 2026-03-28 |
+| 17. Reporting Hygiene | v1.3 | 3/3 | Complete | 2026-05-15 |
+| SA-0. Paper-Replication Fixture (Väla Gård) | SA | 1/1 | Complete | 2026-05-16 |
+| SA-1. DSA + Parameter Registry + UI + Persistence | SA | 6/6 | Complete | 2026-05-16 |
+| SA-2. Elementary Effects (Morris + Campolongo) + UI | SA | 3/3 | Complete | 2026-05-17 |
+| SA-Hygiene. Print stylesheet, run-history restore, comparison KPI table, sample badge | SA | 5/5 | Complete | 2026-05-17 |
 
 ---
-*Last updated: 2026-03-28 after Phase 16 complete -- v1.2 shipped*
+*Last updated: 2026-05-17 after SA milestone shipped -- DSA + EE per Pernetti et al. 2021*

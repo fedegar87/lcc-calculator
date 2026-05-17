@@ -1,5 +1,19 @@
-# LCCzero — Implementation Plan for AI Agent (v4)
+# LCCzero — Implementation Plan for AI Agent (v4) — HISTORICAL (v1.0)
 
+> **STATUS:** This document drove the v1.0 build (March 2026). It is kept
+> at the repo root because `.planning/phases/01-…` through `.planning/phases/16-…`
+> contain working references to its path. Current planning state lives in
+> `.planning/PROJECT.md`, `.planning/STATE.md`, `.planning/MILESTONES.md` and
+> `.planning/ROADMAP.md`. Milestones shipped after v1.0:
+>
+> - v1.1 Local Dev Operativo (Phases 12–15)
+> - v1.2 Gap Analysis Fixes (Phase 16)
+> - v1.3 Reporting Hygiene (Phase 17)
+> - SA  Sensitivity Analysis — Pernetti et al. 2021 (Phases SA-0 / SA-1 / SA-2 / SA-Hygiene)
+>
+> The plan below is preserved verbatim for traceability of v1.0 decisions.
+> Do **not** rely on it for current project state.
+>
 > **This document is an instruction set for an AI coding agent.**
 > Read it entirely before starting. Execute tasks in order. Do not skip steps.
 > The Excel workbook is the source of truth for formulas and behavior.

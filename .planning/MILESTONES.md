@@ -1,5 +1,46 @@
 # Milestones
 
+## SA Sensitivity Analysis — Pernetti et al. 2021 (Shipped: 2026-05-17, local)
+
+**Phases completed:** 4 phases (SA-0 + SA-1 + SA-2 + SA-Hygiene), 15 plans
+
+**Key accomplishments:**
+- Engine: pure-TS `src/engine/sensitivity/` module with seedable mulberry32 RNG, lens-based parameter registry (top-4 paper-dominant + costItems extension), DSA driver with paper-style sensitivity index, Morris radial trajectory sampling at p=4 levels, Campolongo 100×10 sample screening (paper §2.2.3, not exhaustive enumeration), Elementary Effects driver with paper-modified Eq. 4 (absolute LCC units, not normalised), three indices μ/μ*/σ per paper Eqs. 5–7, box-plot LCC distribution capture
+- Persistence: Prisma `SensitivityRun` model + `SAMethod` enum + handwritten migration (no shadow DB needed)
+- API: tRPC `sensitivity.listParameters`, `runDSA`, `runEE`, `listRuns`, `getRun` with input validation + variation scheme echo
+- UI: Sensitivity tab in results page with tornado plot (paper Fig. 1/2), μ*–σ scatter with linear/log toggle (paper Fig. 3/4), LCC distribution box plot (paper Fig. 5), run history with one-click restore
+- Paper replication: Väla Gård fixture + regression suite asserts top-3 contains interest rate + structural cost, LCC variation in 15–37% envelope
+- Print stylesheet: `@media print` rules + `print:hidden` on chrome so the report renders cleanly
+- Comparison view: sortable KPI table + "Best LCC" badge on the winning variant column
+- Onboarding: "CRAVEzero sample" badge distinguishes preview projects from user-owned
+- Landing copy: dropped "EE next" wording after SA-2 shipped — methodology card now reads "DSA + EE per Pernetti 2021"
+- 225 tests passing across 22 files (28 new for SA), tsc + lint clean
+
+### Known Gaps
+- Sobol / LHS / Monte Carlo (SA-3) — gated on profiling
+- `methodProfile` gate at `sensitivity.ts:148` — activates with method-profile UI
+- Migration not applied to Render production yet — user reviewing build locally first
+
+---
+
+## v1.3 Reporting Hygiene (Shipped: 2026-05-15)
+
+**Phases completed:** 1 phase (Phase 17), 3 plans (audit + operative plan + visual identity)
+
+**Key accomplishments:**
+- Independent audit + operative plan (`docs/research/2026-05-15-*.md`) addresses methodology gaps flagged after publication review
+- Engine: methodProfile metadata threaded into LCCResult (CRAVEZERO_LEGACY / EPBD_2025_DRAFT / LEVELS_50Y_DRAFT / CUSTOM)
+- Engine: off-by-one fix on cumulated arrays (shared helper, no logic duplication, Vitest covered)
+- Dashboard: assumptions box now dynamic against `methodProfile` instead of hard-coded "40 years / 1.51%"
+- Landing copy: drop unsupported claims ("Sobol", "energy ≈ 12% of LCC", "sensitivity baked into the workflow")
+- Visual identity continuation: ambient backgrounds, glass-card polish, error toast hardening
+
+### Known Gaps
+- EPBD_2025_DRAFT and LEVELS_50Y_DRAFT remain `status: "metadata_only"` until their respective method-profile coding lands
+- 8 deferred decisions documented in `operative-plan.md §8` still gate v2.x
+
+---
+
 ## v1.2 Gap Analysis Fixes (Shipped: 2026-03-28)
 
 **Phases completed:** 1 phase, 2 plans
