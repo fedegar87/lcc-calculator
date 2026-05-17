@@ -103,6 +103,47 @@ export function SensitivityView({
     engineRuns: number;
   } | null>(null);
   const [scatterScale, setScatterScale] = useState<"linear" | "log">("linear");
+  const [restoreRunId, setRestoreRunId] = useState<string | null>(null);
+
+  async function handleRestoreRun(runId: string, method: "DSA" | "EE") {
+    setRestoreRunId(runId);
+    try {
+      const run = await queryClient.fetchQuery(
+        trpc.sensitivity.getRun.queryOptions({ runId }),
+      );
+      if (method === "DSA") {
+        const entries = run.result as unknown as DSAEntryView[];
+        const baseline = run.baselineSnapshot as { lcc: number };
+        setLastRun({
+          entries,
+          baselineOutput: baseline.lcc,
+          output: "lcc",
+        });
+      } else {
+        const payload = run.result as unknown as {
+          entries: EEEntryView[];
+          distribution: EEDistributionView[];
+        };
+        const diag = run.diagnostics as {
+          engineRuns: number;
+          elapsedMs: number;
+          variationScheme?: "fixedPct" | "literature";
+        };
+        setLastEE({
+          entries: payload.entries,
+          distribution: payload.distribution,
+          scheme: diag.variationScheme ?? "literature",
+          elapsedMs: diag.elapsedMs,
+          engineRuns: diag.engineRuns,
+        });
+      }
+      toast.success(`Restored ${method} run`);
+    } catch (err) {
+      toast.error(`Restore failed: ${err instanceof Error ? err.message : "unknown"}`);
+    } finally {
+      setRestoreRunId(null);
+    }
+  }
 
   const parametersQuery = useQuery(
     trpc.sensitivity.listParameters.queryOptions({ variantId, formulaMode }),
@@ -455,9 +496,14 @@ export function SensitivityView({
             {runsQuery.data.map((run) => (
               <li
                 key={run.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm hover:bg-muted/40"
               >
-                <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  className="flex flex-1 items-center gap-3 text-left"
+                  onClick={() => handleRestoreRun(run.id, run.method)}
+                  disabled={restoreRunId === run.id}
+                >
                   <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-semibold tracking-wide">
                     {run.method}
                   </span>
@@ -467,7 +513,10 @@ export function SensitivityView({
                   <span className="text-[11px] text-muted-foreground">
                     engine {run.engineVersion} · {run.formulaMode}
                   </span>
-                </div>
+                  {restoreRunId === run.id ? (
+                    <Loader2 className="size-3 animate-spin text-muted-foreground" />
+                  ) : null}
+                </button>
               </li>
             ))}
           </ul>

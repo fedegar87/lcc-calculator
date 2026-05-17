@@ -248,3 +248,25 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* --- Print --- forces light theme, removes chrome, avoids page-break mid-card */
+@media print {
+  @page {
+    margin: 16mm 14mm;
+  }
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print\:hidden { display: none !important; }
+  [class*="GlassCard"], .glass-card, section, article, .recharts-wrapper {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* Recharts SVGs sometimes render oversized when print scales — clamp width */
+  .recharts-wrapper, .recharts-surface {
+    max-width: 100% !important;
+  }
+}

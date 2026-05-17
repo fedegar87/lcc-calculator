@@ -254,7 +254,7 @@ export default function ResultsPage() {
         <ValidationSummaryCard projectId={projectId} readiness={readiness} />
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 print:hidden">
         <div
           className="mr-1 inline-flex rounded-md border bg-muted p-1"
           aria-label="Formula mode"
