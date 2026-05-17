@@ -1,15 +1,18 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useMemo, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { GlassCard } from "@/components/shared/glass-card";
 import { KPICard } from "@/components/results/kpi-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowDown, ArrowUp, ArrowUpDown, Award } from "lucide-react";
 import * as motion from "motion/react-client";
 import type { LCCResult } from "@/engine/types";
 import type { FormulaMode } from "@/engine/types";
 import { UNITS } from "@/lib/units";
+import { cn } from "@/lib/utils";
 
 const LCCStackedBar = dynamic(() =>
   import("@/components/results/charts/lcc-stacked-bar").then(
@@ -42,6 +45,206 @@ interface VariantComparisonProps {
   projectId: string;
   variants: { id: string; label: string }[];
   formulaMode: FormulaMode;
+}
+
+interface TableRow {
+  label: string;
+  values: number[];
+  format: (v: number) => string;
+  /** "min" = lower is better (LCC, payback). "max" = higher is better (energy produced). */
+  optimum: "min" | "max";
+}
+
+function formatPaybackYears(v: number): string {
+  if (!Number.isFinite(v)) return "N/A";
+  return `${v.toFixed(1)} years`;
+}
+
+function ComparisonTable({
+  variants,
+}: {
+  variants: { label: string; result: LCCResult }[];
+}) {
+  const [sortBy, setSortBy] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  const rows = useMemo<TableRow[]>(() => {
+    return [
+      {
+        label: "LCC",
+        values: variants.map((v) => v.result.lcc),
+        format: (v) => eurFormatter.format(v),
+        optimum: "min",
+      },
+      {
+        label: "WLC",
+        values: variants.map((v) => v.result.wlc),
+        format: (v) => eurFormatter.format(v),
+        optimum: "min",
+      },
+      {
+        label: `LCC / ${UNITS.m2}`,
+        values: variants.map((v) => v.result.kpiLCCPerM2 ?? NaN),
+        format: (v) => (Number.isFinite(v) ? eurFormatter.format(v) : "N/A"),
+        optimum: "min",
+      },
+      {
+        label: "Energy consumed",
+        values: variants.map((v) => v.result.energyConsumed),
+        format: (v) => eurFormatter.format(v),
+        optimum: "min",
+      },
+      {
+        label: "Energy produced (PV)",
+        values: variants.map((v) => v.result.energyProduced),
+        format: (v) => eurFormatter.format(v),
+        optimum: "max",
+      },
+      {
+        label: "Maintenance",
+        values: variants.map((v) => v.result.maintenanceAtRefPeriod),
+        format: (v) => eurFormatter.format(v),
+        optimum: "min",
+      },
+      {
+        label: "O&M total",
+        values: variants.map((v) => v.result.operationAndMaintenance),
+        format: (v) => eurFormatter.format(v),
+        optimum: "min",
+      },
+      {
+        label: "Payback",
+        values: variants.map(
+          (v) => v.result.income?.simplePaybackYears ?? Number.POSITIVE_INFINITY,
+        ),
+        format: formatPaybackYears,
+        optimum: "min",
+      },
+    ];
+  }, [variants]);
+
+  const orderedVariants = useMemo(() => {
+    if (sortBy === null) return variants.map((_, i) => i);
+    const row = rows.find((r) => r.label === sortBy);
+    if (!row) return variants.map((_, i) => i);
+    const idx = variants.map((_, i) => i);
+    idx.sort((a, b) => {
+      const va = row.values[a];
+      const vb = row.values[b];
+      if (!Number.isFinite(va) && !Number.isFinite(vb)) return 0;
+      if (!Number.isFinite(va)) return 1;
+      if (!Number.isFinite(vb)) return -1;
+      const diff = va - vb;
+      return sortDir === "asc" ? diff : -diff;
+    });
+    return idx;
+  }, [rows, sortBy, sortDir, variants]);
+
+  function toggleSort(label: string) {
+    if (sortBy === label) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(label);
+      setSortDir("asc");
+    }
+  }
+
+  function winnerIdx(row: TableRow): number {
+    let bestIdx = -1;
+    let bestVal = row.optimum === "min" ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+    for (let i = 0; i < row.values.length; i++) {
+      const v = row.values[i];
+      if (!Number.isFinite(v)) continue;
+      if (row.optimum === "min" ? v < bestVal : v > bestVal) {
+        bestVal = v;
+        bestIdx = i;
+      }
+    }
+    return bestIdx;
+  }
+
+  return (
+    <GlassCard>
+      <h3 className="mb-3 text-sm font-medium text-muted-foreground">
+        Side-by-side KPI table — click a variant header to sort
+      </h3>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
+              <th className="py-2 pr-3 font-medium">Metric</th>
+              {orderedVariants.map((i) => {
+                const v = variants[i];
+                return (
+                  <th
+                    key={v.label}
+                    className="py-2 pr-3 font-medium"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => toggleSort(rows[0].label)}
+                      className="inline-flex items-center gap-1 hover:text-foreground"
+                    >
+                      {v.label}
+                      {sortBy === rows[0].label ? (
+                        sortDir === "asc" ? (
+                          <ArrowUp className="size-3" />
+                        ) : (
+                          <ArrowDown className="size-3" />
+                        )
+                      ) : (
+                        <ArrowUpDown className="size-3 opacity-40" />
+                      )}
+                    </button>
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => {
+              const wIdx = winnerIdx(row);
+              return (
+                <tr key={row.label} className="border-b last:border-0">
+                  <td className="py-2 pr-3 text-muted-foreground">
+                    <button
+                      type="button"
+                      onClick={() => toggleSort(row.label)}
+                      className="inline-flex items-center gap-1 hover:text-foreground"
+                    >
+                      {row.label}
+                      {sortBy === row.label ? (
+                        sortDir === "asc" ? (
+                          <ArrowUp className="size-3" />
+                        ) : (
+                          <ArrowDown className="size-3" />
+                        )
+                      ) : (
+                        <ArrowUpDown className="size-3 opacity-40" />
+                      )}
+                    </button>
+                  </td>
+                  {orderedVariants.map((i) => (
+                    <td
+                      key={`${row.label}-${i}`}
+                      className={cn(
+                        "py-2 pr-3 tabular-nums",
+                        i === wIdx
+                          ? "font-semibold text-emerald-700 dark:text-emerald-300"
+                          : "",
+                      )}
+                    >
+                      {row.format(row.values[i])}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </GlassCard>
+  );
 }
 
 function VariantColumnSkeleton() {
@@ -172,6 +375,10 @@ export function VariantComparison({
         </div>
       ) : null}
 
+      {successfulVariants.length > 1 ? (
+        <ComparisonTable variants={successfulVariants} />
+      ) : null}
+
       {/* Per-variant columns */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {variants.map((v, i) => {
@@ -204,6 +411,10 @@ export function VariantComparison({
 
           const result = query.data;
           if (!result) return null;
+          const isLCCWinner =
+            successfulVariants.length > 1 &&
+            result.lcc ===
+              Math.min(...successfulVariants.map((entry) => entry.result.lcc));
 
           return (
             <motion.div
@@ -214,7 +425,18 @@ export function VariantComparison({
               variants={stagger}
             >
               <GlassCard className="space-y-4">
-                <h3 className="text-sm font-semibold">{v.label}</h3>
+                <h3 className="flex items-center gap-2 text-sm font-semibold">
+                  {v.label}
+                  {isLCCWinner ? (
+                    <span
+                      className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-200"
+                      title="Lowest LCC among compared variants"
+                    >
+                      <Award className="size-3" />
+                      Best LCC
+                    </span>
+                  ) : null}
+                </h3>
 
                 {/* Mini KPIs */}
                 <div className="grid grid-cols-1 gap-2 xl:grid-cols-3">
