@@ -17,7 +17,7 @@ const STATUS_CONFIG = {
     icon: Check,
     label: "Saved",
     variant: "secondary" as const,
-    className: "text-green-600",
+    className: "text-muted-foreground",
     iconClassName: "",
   },
   failed: {

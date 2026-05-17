@@ -37,6 +37,12 @@ export function computeResidualValue(
       continue;
     }
 
+    // Boundary convention: when referencePeriod is an exact multiple of
+    // lifespan, the modulo is 0 and remainingLife collapses to one full
+    // lifespan -> fraction = 1. Treated as a "fresh-replacement" boundary
+    // per ISO 15686-5 §6.3.3, NOT a "fully-amortised" boundary. Documented
+    // in 2026-05-15 independent audit §4.3; revisit if a future method
+    // profile (e.g. EPBD 2025) prescribes a different convention.
     const remainingLife = lifespan - (referencePeriod % lifespan);
     const fraction = Math.max(0, remainingLife / lifespan);
     const residual = sc.constructionCost * fraction * discountFactor;
