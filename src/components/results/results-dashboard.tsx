@@ -21,6 +21,7 @@ import {
   METHODOLOGY_CITATIONS,
   BOUNDARY_CITATIONS,
 } from "@/lib/citations";
+import { cn } from "@/lib/utils";
 import { getAnalysisYears } from "@/lib/results/time-series";
 
 const LCCStackedBar = dynamic(() =>
@@ -165,8 +166,8 @@ function RatioBar({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-sm">{label}</span>
-        <span className="inline-flex items-center gap-1 text-sm font-medium tabular-nums">
+        <span className="text-xs font-medium text-muted-foreground">{label}</span>
+        <span className="inline-flex items-center gap-1 text-xs font-semibold tabular-nums text-foreground">
           {isAnomaly ? (
             <AlertCircle
               className="size-3.5 text-destructive"
@@ -176,9 +177,12 @@ function RatioBar({
           {hasValue ? percentFormatter.format(value) : "N/A"}
         </span>
       </div>
-      <div className="h-1.5 rounded-full bg-muted" title={isAnomaly ? "Unexpected ratio > 100%" : undefined}>
+      <div className="h-2 rounded-full bg-muted/70 overflow-hidden" title={isAnomaly ? "Unexpected ratio > 100%" : undefined}>
         <div
-          className={isAnomaly ? "h-1.5 rounded-full bg-destructive" : `h-1.5 rounded-full ${RATIO_BAR_CLASSES[domain]}`}
+          className={cn(
+            "h-full rounded-full transition-all duration-300",
+            isAnomaly ? "bg-destructive" : RATIO_BAR_CLASSES[domain],
+          )}
           style={{ width: `${width}%` }}
         />
       </div>
@@ -368,7 +372,7 @@ export function ResultsDashboard({
         >
           <GlassCard>
             <div className="mb-4 flex items-start justify-between gap-3">
-              <h3 className="text-sm font-medium text-muted-foreground">
+              <h3 className="text-sm font-semibold tracking-tight text-foreground">
                 LCC Breakdown
               </h3>
               <ReferenceButton
@@ -383,7 +387,7 @@ export function ResultsDashboard({
         </motion.div>
         <motion.div custom={5} initial="hidden" animate="visible" variants={stagger}>
           <GlassCard>
-            <h3 className="mb-4 text-sm font-medium text-muted-foreground">
+            <h3 className="mb-4 text-sm font-semibold tracking-tight text-foreground">
               WLC / LCC Breakdown
             </h3>
             <WLCBreakdownTable
@@ -427,7 +431,7 @@ export function ResultsDashboard({
         <motion.div custom={7} initial="hidden" animate="visible" variants={stagger}>
           <GlassCard>
             <div className="mb-4 flex items-start justify-between gap-3">
-              <h3 className="text-sm font-medium text-muted-foreground">
+              <h3 className="text-sm font-semibold tracking-tight text-foreground">
                 Construction Cost Breakdown
               </h3>
               <ReferenceButton
@@ -447,7 +451,7 @@ export function ResultsDashboard({
         </motion.div>
         <motion.div custom={8} initial="hidden" animate="visible" variants={stagger}>
           <GlassCard>
-            <h3 className="mb-4 text-sm font-medium text-muted-foreground">
+            <h3 className="mb-4 text-sm font-semibold tracking-tight text-foreground">
               KPI Ratios
             </h3>
             <div className="space-y-3">

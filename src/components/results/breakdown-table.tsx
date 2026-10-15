@@ -145,13 +145,13 @@ export function WLCBreakdownTable(props: WLCBreakdownProps) {
         {rows.map((row) => (
           <TableRow
             key={row.label}
-            className={row.bold ? "bg-muted/30" : undefined}
+            className={row.bold ? "bg-muted/50 font-semibold" : undefined}
           >
-            <TableCell className={row.bold ? "font-bold" : undefined}>
+            <TableCell className={row.bold ? "font-bold text-foreground" : "text-muted-foreground"}>
               {row.label}
             </TableCell>
             <TableCell
-              className={`text-right tabular-nums ${row.bold ? "font-bold" : ""}`}
+              className={`text-right tabular-nums ${row.bold ? "font-bold text-foreground text-sm" : row.negate ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-foreground"}`}
             >
               {row.negate ? "-" : ""}
               {eurFormatter.format(Math.abs(row.value))}

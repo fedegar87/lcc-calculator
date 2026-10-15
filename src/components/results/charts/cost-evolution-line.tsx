@@ -43,10 +43,11 @@ export function CostEvolutionLine({ result }: CostEvolutionLineProps) {
   return (
     <div>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data} margin={{ left: 20, right: 20, top: 5 }}>
+        <LineChart data={data} margin={{ left: 20, right: 20, top: 10, bottom: 5 }}>
           <CartesianGrid
             strokeDasharray={chartTheme.strokeDasharray}
             stroke={chartTheme.gridStroke}
+            vertical={false}
           />
           <XAxis
             dataKey="year"
@@ -55,7 +56,7 @@ export function CostEvolutionLine({ result }: CostEvolutionLineProps) {
               position: "insideBottomRight",
               offset: -5,
               fontSize: 11,
-              fill: "#64748b",
+              fill: "var(--muted-foreground)",
             }}
             tick={chartTheme.axisTick}
             axisLine={chartTheme.axisLine}
@@ -71,12 +72,13 @@ export function CostEvolutionLine({ result }: CostEvolutionLineProps) {
             labelStyle={chartTheme.tooltipLabelStyle}
             itemStyle={chartTheme.tooltipItemStyle}
           />
-          <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+          <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10 }} />
           <Line
             type="monotone"
             dataKey="Energy"
             stroke={COLORS.energy}
             dot={false}
+            activeDot={{ r: 4, strokeWidth: 2, fill: "var(--card)" }}
             strokeWidth={2}
             isAnimationActive={!prefersReduced}
           />
@@ -85,6 +87,7 @@ export function CostEvolutionLine({ result }: CostEvolutionLineProps) {
             dataKey="Maintenance"
             stroke={COLORS.maintenance}
             dot={false}
+            activeDot={{ r: 4, strokeWidth: 2, fill: "var(--card)" }}
             strokeWidth={2}
             isAnimationActive={!prefersReduced}
           />
@@ -93,6 +96,7 @@ export function CostEvolutionLine({ result }: CostEvolutionLineProps) {
             dataKey="Total O&M"
             stroke={COLORS.total}
             dot={false}
+            activeDot={{ r: 5, strokeWidth: 2.5, fill: "var(--card)" }}
             strokeWidth={2.5}
             isAnimationActive={!prefersReduced}
           />

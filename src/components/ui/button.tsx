@@ -10,20 +10,21 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
+        default:
+          "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 hover:shadow-sm active:scale-[0.98] transition-all [a]:hover:bg-primary/80",
         outline:
-          "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+          "border-border/80 bg-background/90 shadow-2xs hover:bg-muted/80 hover:text-foreground active:scale-[0.98] transition-all aria-expanded:bg-muted aria-expanded:text-foreground dark:border-white/[0.08] dark:bg-card/40 dark:hover:bg-white/[0.06]",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "bg-secondary/90 text-secondary-foreground shadow-2xs hover:bg-secondary active:scale-[0.98] transition-all aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
-          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+          "hover:bg-muted hover:text-foreground active:scale-[0.98] transition-all aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
         brand:
-          "rounded-xl bg-eurac-red text-white shadow-lg shadow-eurac-red/20 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-eurac-red/25 focus-visible:border-eurac-red focus-visible:ring-eurac-red/30",
+          "rounded-xl bg-eurac-red text-white shadow-md shadow-eurac-red/25 glow-eurac hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all focus-visible:border-eurac-red focus-visible:ring-eurac-red/30",
         reference:
-          "rounded-xl bg-gradient-to-r from-fin-50 to-fin-100/80 text-fin-700 ring-1 ring-fin-200/60 hover:-translate-y-0.5 active:scale-[0.97] focus-visible:ring-fin-500/30",
+          "rounded-xl bg-gradient-to-r from-fin-50 to-fin-100/90 text-fin-700 ring-1 ring-fin-200/80 hover:-translate-y-0.5 active:scale-[0.97] dark:from-fin-950/80 dark:to-fin-900/60 dark:text-fin-300 dark:ring-fin-700/50 transition-all focus-visible:ring-fin-500/30",
       },
       size: {
         default:

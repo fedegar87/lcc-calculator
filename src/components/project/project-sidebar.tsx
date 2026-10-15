@@ -59,13 +59,15 @@ export function ProjectSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" render={<Link href="/" />}>
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-xl bg-eurac-red text-white shadow-xs glow-eurac">
                 <Building2 className="size-4" />
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
-                <span className="font-semibold">LCCzero</span>
-                <span className="text-xs text-muted-foreground">
-                  LCC Calculator
+                <span className="font-bold tracking-tight text-foreground">
+                  LCC<span className="text-eurac-red">zero</span>
+                </span>
+                <span className="text-[11px] font-medium text-muted-foreground">
+                  Life-Cycle Cost Engine
                 </span>
               </div>
             </SidebarMenuButton>
@@ -101,7 +103,7 @@ export function ProjectSidebar() {
                     <FolderOpen className="size-4" />
                     <span className="truncate">{project.name}</span>
                   </SidebarMenuButton>
-                  <SidebarMenuBadge>
+                  <SidebarMenuBadge className="text-[11px] font-semibold tabular-nums">
                     {project._count.variants}
                   </SidebarMenuBadge>
                 </SidebarMenuItem>

@@ -213,16 +213,16 @@ export function VariantTabs({
         >
           <div className="relative max-w-full after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-8 after:bg-gradient-to-l after:from-background after:to-transparent xl:after:hidden">
             <div className="overflow-x-auto pb-1 xl:overflow-visible xl:pb-0">
-              <TabsList className="h-auto w-max flex-nowrap items-stretch justify-start gap-2 bg-transparent p-0">
+              <TabsList className="h-auto w-max flex-nowrap items-stretch justify-start gap-2.5 bg-transparent p-0">
                 {variants.map((v) => (
                   <TabsTrigger
                     key={v.id}
                     value={v.id}
-                    className="min-w-[12rem] rounded-xl border bg-card px-3 py-2 data-[state=active]:border-l-4 data-[state=active]:border-primary data-[state=active]:bg-primary/5 data-[state=active]:pl-2"
+                    className="group relative min-w-[12.5rem] rounded-xl border border-border/80 bg-card/85 px-3.5 py-2.5 shadow-2xs transition-all hover:border-slate-300 hover:bg-muted/40 dark:border-white/[0.08] dark:hover:border-white/20 data-[state=active]:border-primary/60 data-[state=active]:bg-primary/[0.05] data-[state=active]:shadow-xs data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-primary/[0.09]"
                   >
                     <div className="flex w-full items-start justify-between gap-3">
                       <div className="min-w-0 text-left">
-                        <div className="truncate text-sm font-medium">
+                        <div className="truncate text-sm font-semibold tracking-tight text-foreground">
                           {humanLabel(v.label)}
                         </div>
                         <div className="mt-1 text-xs text-muted-foreground">
@@ -259,7 +259,7 @@ export function VariantTabs({
           <Button
             variant="outline"
             onClick={() => setDialogOpen(true)}
-            className="hidden md:inline-flex"
+            className="hidden md:inline-flex shadow-xs"
           >
             <Plus className="size-4" />
             New variant
@@ -269,7 +269,7 @@ export function VariantTabs({
 
       {canAdd ? (
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Create {humanLabel(nextLabel!)}</DialogTitle>
                 <DialogDescription>

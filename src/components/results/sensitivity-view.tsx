@@ -339,6 +339,7 @@ export function SensitivityView({
         <div className="mt-4 flex flex-wrap gap-2">
           <Button
             type="button"
+            variant="brand"
             onClick={handleQuickRun}
             disabled={runDSA.isPending || top4Available.length === 0}
           >
