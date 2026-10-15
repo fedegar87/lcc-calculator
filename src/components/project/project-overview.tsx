@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { BarChart3, ClipboardList, Layers3, Settings2 } from "lucide-react";
+import {
+  BarChart3,
+  ClipboardList,
+  Layers3,
+  SlidersHorizontal,
+  Zap,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -17,9 +23,9 @@ import type { ProjectReadiness } from "@/lib/project-readiness";
 
 const STEP_ICONS = {
   info: ClipboardList,
-  wlc: Settings2,
+  wlc: SlidersHorizontal,
   construction: Layers3,
-  energy: Settings2,
+  energy: Zap,
   results: BarChart3,
 } as const;
 

@@ -8,8 +8,8 @@ export function GlassCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-white/20 bg-white/70 p-6 shadow-xl backdrop-blur-lg",
-        "dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-100",
+        "rounded-2xl border border-slate-200/80 bg-white/80 p-6 shadow-md backdrop-blur-xl glass-specular transition-all duration-200",
+        "dark:border-white/[0.09] dark:bg-card/85 dark:text-slate-100 dark:shadow-2xl",
         className,
       )}
       {...props}

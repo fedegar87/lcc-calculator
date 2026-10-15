@@ -71,45 +71,55 @@ export function KPICard({
   const DeltaIcon = delta != null && delta >= 0 ? TrendingUp : TrendingDown;
 
   return (
-    <GlassCard className="flex flex-col gap-1 p-4">
-      <span className="text-sm text-muted-foreground">{title}</span>
-      <div className="flex items-baseline gap-1.5">
-        <span className="text-2xl font-bold tabular-nums">
-          {hasValue ? formatter.format(value) : "N/A"}
+    <GlassCard className="flex flex-col justify-between gap-2 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/90">
+          {title}
         </span>
-        {hasValue ? (
-          <span className="text-sm text-muted-foreground">{unit}</span>
-        ) : null}
         {trend && trend !== "neutral" && (
-          <span className="ml-auto">
+          <span>
             {trend === "up" ? (
-              <TrendingUp className="size-4 text-green-600" />
+              <TrendingUp className="size-4 text-emerald-600 dark:text-emerald-400" />
             ) : (
               <TrendingDown className="size-4 text-destructive" />
             )}
           </span>
         )}
       </div>
+
+      <div className="flex items-baseline gap-1.5">
+        <span className="text-2xl font-bold tracking-tight text-foreground lg:text-3xl tabular-nums">
+          {hasValue ? formatter.format(value) : "N/A"}
+        </span>
+        {hasValue ? (
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {unit}
+          </span>
+        ) : null}
+      </div>
+
       {!hasValue && emptyDescription ? (
-        <p className="text-xs text-muted-foreground">{emptyDescription}</p>
+        <p className="text-xs text-muted-foreground/80">{emptyDescription}</p>
       ) : delta != null && absoluteDelta != null ? (
-        <div className="mt-1 space-y-0.5">
+        <div className="mt-0.5 space-y-1">
           <div
             className={cn(
-              "inline-flex items-center gap-1 text-xs font-medium tabular-nums",
-              isImprovement ? "text-emerald-600" : "text-destructive",
+              "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-semibold tabular-nums border",
+              isImprovement
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/40"
+                : "bg-rose-50 text-rose-700 border-rose-200/80 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/40",
             )}
           >
-            <DeltaIcon className="size-3.5" />
+            <DeltaIcon className="size-3" />
             {percentFormatter.format(delta)}
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-[11px] text-muted-foreground">
             ({formatDeltaValue(Math.abs(absoluteDelta), unit)}{" "}
             {absoluteDelta >= 0 ? "more" : "less"} than Base)
           </div>
         </div>
       ) : subtitle ? (
-        <p className="text-xs text-muted-foreground">{subtitle}</p>
+        <p className="text-xs text-muted-foreground/80">{subtitle}</p>
       ) : null}
     </GlassCard>
   );

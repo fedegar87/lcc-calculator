@@ -47,31 +47,36 @@ export function domainColorStrong(domain: LCCDomain): string {
 
 export const chartTheme = {
   strokeDasharray: "3 3",
-  gridStroke: "#e2e8f0",
+  gridStroke: "var(--border)",
   barSize: 32,
-  barRadius: [4, 4, 0, 0] as [number, number, number, number],
+  barRadius: [6, 6, 0, 0] as [number, number, number, number],
   tooltipContentStyle: {
-    borderRadius: "12px",
-    border: "1px solid #e2e8f0",
-    backgroundColor: "rgba(255,255,255,0.92)",
-    boxShadow: "0 10px 30px rgba(15,23,42,0.08)",
-    fontSize: 11,
-    padding: "8px 10px",
+    borderRadius: "14px",
+    border: "1px solid var(--border)",
+    backgroundColor: "var(--card)",
+    color: "var(--foreground)",
+    boxShadow: "0 16px 36px -4px rgba(0,0,0,0.18), 0 4px 12px -2px rgba(0,0,0,0.1)",
+    fontSize: 12,
+    padding: "10px 14px",
+    backdropFilter: "blur(12px)",
   } as const,
   tooltipLabelStyle: {
-    color: "#0f172a",
+    color: "var(--foreground)",
     fontWeight: 600,
     marginBottom: 4,
+    fontSize: 12,
   } as const,
   tooltipItemStyle: {
-    color: "#334155",
+    color: "var(--muted-foreground)",
     fontSize: 11,
+    paddingTop: 2,
+    paddingBottom: 2,
   } as const,
   axisTick: {
     fontSize: 11,
-    fill: "#64748b",
+    fill: "var(--muted-foreground)",
   } as const,
   axisLine: {
-    stroke: "#e2e8f0",
+    stroke: "var(--border)",
   } as const,
 };

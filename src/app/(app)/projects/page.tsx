@@ -136,7 +136,7 @@ export default function ProjectsPage() {
             if (!open) reset();
           }}
         >
-          <DialogTrigger render={<Button />}>
+          <DialogTrigger render={<Button variant="brand" />}>
             <Plus className="mr-2 h-4 w-4" />
             New Project
           </DialogTrigger>
@@ -245,23 +245,23 @@ export default function ProjectsPage() {
           {projects.map((project) => (
             <GlassCard
               key={project.id}
-              className="cursor-pointer transition-shadow hover:shadow-md"
+              className="group cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-slate-300 dark:hover:border-white/20"
               onClick={() => router.push(`/projects/${project.id}`)}
             >
               <div className="flex items-start justify-between gap-2">
-                <h3 className="font-semibold leading-tight">
+                <h3 className="font-semibold text-base leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary">
                   {project.name}
                 </h3>
-                <div className="flex flex-col items-end gap-1 shrink-0">
+                <div className="flex flex-col items-end gap-1.5 shrink-0">
                   {project.isSample ? (
                     <Badge
                       variant="outline"
-                      className="border-fin-100 bg-fin-50 text-fin-700"
+                      className="border-fin-200 bg-fin-50 text-fin-700 dark:border-fin-700/50 dark:bg-fin-950/60 dark:text-fin-300"
                     >
                       CRAVEzero sample
                     </Badge>
                   ) : null}
-                  <Badge variant="secondary">
+                  <Badge variant="secondary" className="shadow-2xs">
                     {
                       BUILDING_USE_OPTIONS.find(
                         (o) => o.value === project.buildingUse

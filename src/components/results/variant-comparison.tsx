@@ -165,33 +165,29 @@ function ComparisonTable({
 
   return (
     <GlassCard>
-      <h3 className="mb-3 text-sm font-medium text-muted-foreground">
+      <h3 className="mb-3 text-sm font-semibold tracking-tight text-foreground">
         Side-by-side KPI table — click a variant header to sort
       </h3>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
-              <th className="py-2 pr-3 font-medium">Metric</th>
+            <tr className="border-b border-border/80 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <th className="py-2.5 pr-3">Metric</th>
               {orderedVariants.map((i) => {
                 const v = variants[i];
                 return (
                   <th
                     key={v.label}
-                    className="py-2 pr-3 font-medium"
+                    className="py-2.5 pr-3"
                   >
                     <button
                       type="button"
                       onClick={() => toggleSort(rows[0].label)}
-                      className="inline-flex items-center gap-1 hover:text-foreground"
+                      className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
                     >
                       {v.label}
                       {sortBy === rows[0].label ? (
-                        sortDir === "asc" ? (
-                          <ArrowUp className="size-3" />
-                        ) : (
-                          <ArrowDown className="size-3" />
-                        )
+                        <ArrowUp className="size-3 text-primary" />
                       ) : (
                         <ArrowUpDown className="size-3 opacity-40" />
                       )}
@@ -205,22 +201,18 @@ function ComparisonTable({
             {rows.map((row) => {
               const wIdx = winnerIdx(row);
               return (
-                <tr key={row.label} className="border-b last:border-0">
-                  <td className="py-2 pr-3 text-muted-foreground">
+                <tr key={row.label} className="border-b border-border/40 last:border-0 hover:bg-muted/20 transition-colors">
+                  <td className="py-2.5 pr-3 text-muted-foreground font-medium">
                     <button
                       type="button"
                       onClick={() => toggleSort(row.label)}
-                      className="inline-flex items-center gap-1 hover:text-foreground"
+                      className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
                     >
                       {row.label}
                       {sortBy === row.label ? (
-                        sortDir === "asc" ? (
-                          <ArrowUp className="size-3" />
-                        ) : (
-                          <ArrowDown className="size-3" />
-                        )
+                        <ArrowUp className="size-3 text-primary" />
                       ) : (
-                        <ArrowUpDown className="size-3 opacity-40" />
+                        <ArrowUpDown className="size-3 opacity-30" />
                       )}
                     </button>
                   </td>
@@ -228,9 +220,9 @@ function ComparisonTable({
                     <td
                       key={`${row.label}-${i}`}
                       className={cn(
-                        "py-2 pr-3 tabular-nums",
+                        "py-2.5 pr-3 tabular-nums",
                         i === wIdx
-                          ? "font-semibold text-emerald-700 dark:text-emerald-300"
+                          ? "font-bold text-emerald-700 dark:text-emerald-300"
                           : "",
                       )}
                     >
