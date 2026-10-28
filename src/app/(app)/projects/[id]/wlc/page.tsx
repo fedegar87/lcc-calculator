@@ -1,32 +1,16 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { useParams, useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { useTRPC } from "@/server/trpc/client";
-import { WLCForm } from "@/components/forms/wlc-form";
-import { Skeleton } from "@/components/ui/skeleton";
-
-export default function WLCPage() {
-  const params = useParams<{ id: string }>();
-  const searchParams = useSearchParams();
-  const trpc = useTRPC();
-
-  const projectId = params.id;
-
-  const { data: project } = useQuery(
-    trpc.project.getById.queryOptions({ projectId })
-  );
-
-  const variantId = searchParams.get("v") ?? project?.variants[0]?.id ?? "";
-
-  if (!variantId) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-32 w-full" />
-        <Skeleton className="h-32 w-full" />
-      </div>
-    );
-  }
-
-  return <WLCForm variantId={variantId} />;
+export default async function WLCPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ v?: string }>;
+}) {
+  const { id } = await params;
+  const { v } = await searchParams;
+  const search = new URLSearchParams();
+  if (v) search.set("v", v);
+  search.set("section", "wlc");
+  redirect(`/projects/${id}/construction?${search.toString()}`);
 }

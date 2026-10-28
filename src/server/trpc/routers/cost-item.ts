@@ -147,7 +147,7 @@ export const costItemRouter = createTRPCRouter({
       return items.map(serializeCostItem);
     }),
 
-  // 2. Upsert cost item by variant + category
+  // 2. Upsert cost item by variant + category (supports aggregate costs directly)
   upsert: protectedProcedure
     .input(
       z.object({
@@ -155,6 +155,9 @@ export const costItemRouter = createTRPCRouter({
         category: z.enum(COST_CATEGORY_VALUES),
         subcategory: z.string().optional(),
         description: z.string().optional(),
+        materialCostAgg: nullableNonNegativeNumber,
+        laborCostAgg: nullableNonNegativeNumber,
+        otherCostAgg: nullableNonNegativeNumber,
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -165,13 +168,29 @@ export const costItemRouter = createTRPCRouter({
         where: { variantId: input.variantId, category: input.category },
       });
 
+      const aggData: {
+        subcategory?: string;
+        description?: string;
+        materialCostAgg?: number;
+        laborCostAgg?: number;
+        otherCostAgg?: number;
+      } = {};
+      if (input.subcategory !== undefined) aggData.subcategory = input.subcategory;
+      if (input.description !== undefined) aggData.description = input.description;
+      if (input.materialCostAgg !== undefined) {
+        aggData.materialCostAgg = input.materialCostAgg ?? 0;
+      }
+      if (input.laborCostAgg !== undefined) {
+        aggData.laborCostAgg = input.laborCostAgg ?? 0;
+      }
+      if (input.otherCostAgg !== undefined) {
+        aggData.otherCostAgg = input.otherCostAgg ?? 0;
+      }
+
       if (existing) {
         return ctx.db.costItem.update({
           where: { id: existing.id },
-          data: {
-            subcategory: input.subcategory,
-            description: input.description,
-          },
+          data: aggData,
         });
       }
 
@@ -179,8 +198,7 @@ export const costItemRouter = createTRPCRouter({
         data: {
           variantId: input.variantId,
           category: input.category,
-          subcategory: input.subcategory,
-          description: input.description,
+          ...aggData,
         },
       });
     }),

@@ -81,7 +81,7 @@ export default function ProjectsPage() {
         queryClient.invalidateQueries({ queryKey: trpc.project.list.queryKey() });
         setDialogOpen(false);
         toast.success("Project created");
-        router.push(`/projects/${data.id}`);
+        router.push(`/projects/${data.id}/info`);
       },
       onError: (err) => {
         toast.error(err.message ?? "Failed to create project");
@@ -246,7 +246,7 @@ export default function ProjectsPage() {
             <GlassCard
               key={project.id}
               className="group cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-slate-300 dark:hover:border-white/20"
-              onClick={() => router.push(`/projects/${project.id}`)}
+              onClick={() => router.push(`/projects/${project.id}/info`)}
             >
               <div className="flex items-start justify-between gap-2">
                 <h3 className="font-semibold text-base leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary">

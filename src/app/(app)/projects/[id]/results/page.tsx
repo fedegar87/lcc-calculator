@@ -1,16 +1,26 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { ResultsDashboard } from "@/components/results/results-dashboard";
-import { ValidationSummaryCard } from "@/components/project/validation-summary-card";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  ArrowLeft,
   BarChart3,
   GitCompare,
   Download,
@@ -18,28 +28,29 @@ import {
   ClipboardList,
   FileText,
   FileSpreadsheet,
+  Settings2,
   Sparkles,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
-import { computeProjectReadiness } from "@/lib/project-readiness";
 import type { FormulaMode } from "@/engine/types";
 
 const ResultsAuditView = dynamic(() =>
   import("@/components/results/results-audit-view").then(
-    (module) => module.ResultsAuditView,
-  ),
+    (module) => module.ResultsAuditView
+  )
 );
 
 const VariantComparison = dynamic(() =>
   import("@/components/results/variant-comparison").then(
-    (module) => module.VariantComparison,
-  ),
+    (module) => module.VariantComparison
+  )
 );
 
 const SensitivityView = dynamic(() =>
   import("@/components/results/sensitivity-view").then(
-    (module) => module.SensitivityView,
-  ),
+    (module) => module.SensitivityView
+  )
 );
 
 function downloadTextFile(content: string, fileName: string, mimeType: string) {
@@ -72,7 +83,9 @@ function toCsvRows(rows: Array<Record<string, string | number>>) {
 
   return [
     headers.join(","),
-    ...rows.map((row) => headers.map((header) => escapeValue(row[header])).join(",")),
+    ...rows.map((row) =>
+      headers.map((header) => escapeValue(row[header])).join(",")
+    ),
   ].join("\n");
 }
 
@@ -81,7 +94,7 @@ export default function ResultsPage() {
   const searchParams = useSearchParams();
   const trpc = useTRPC();
   const [view, setView] = useState<
-    "dashboard" | "audit" | "compare" | "sensitivity"
+    "dashboard" | "compare" | "audit" | "sensitivity"
   >("dashboard");
   const [formulaMode, setFormulaMode] =
     useState<FormulaMode>("excel_bugfixed");
@@ -94,25 +107,14 @@ export default function ResultsPage() {
 
   const variantId = searchParams.get("v") ?? project?.variants[0]?.id ?? "";
 
-  const { data: variant } = useQuery({
-    ...trpc.variant.getById.queryOptions({ variantId }),
-    enabled: Boolean(variantId),
-  });
-
   const resultQuery = useQuery({
     ...trpc.calculation.calculate.queryOptions({ variantId, formulaMode }),
     enabled: Boolean(variantId),
   });
 
-  const readiness =
-    project && variant ? computeProjectReadiness(project, variant) : null;
-  const exportBlocked = readiness ? !readiness.previewReady : false;
-  const exportBlockedTitle = exportBlocked
-    ? "Resolve the blocking issues above before exporting"
-    : undefined;
   const variantLabelForExport =
-    project?.variants.find((variantRecord) => variantRecord.id === variantId)?.label ??
-    "BASE";
+    project?.variants.find((variantRecord) => variantRecord.id === variantId)
+      ?.label ?? "BASE";
 
   const variants = useMemo(
     () =>
@@ -120,7 +122,7 @@ export default function ResultsPage() {
         id: variantRecord.id,
         label:
           variantRecord.label === "BASE"
-            ? "Base"
+            ? "Base Case"
             : variantRecord.label.replace("_", " "),
       })),
     [project?.variants]
@@ -129,11 +131,12 @@ export default function ResultsPage() {
   const activeVariantLabel =
     variants.find((variantRecord) => variantRecord.id === variantId)?.label ??
     "Variant";
+
   const exportPdf = useMutation(
     trpc.export.generatePdf.mutationOptions({
       onSuccess: (payload) => {
         downloadBase64File(payload.data, payload.fileName, payload.mimeType);
-        toast.success("PDF export ready.");
+        toast.success("PDF report downloaded.");
       },
       onError: (error) => {
         toast.error(error.message);
@@ -144,7 +147,7 @@ export default function ResultsPage() {
     trpc.export.generateExcel.mutationOptions({
       onSuccess: (payload) => {
         downloadBase64File(payload.data, payload.fileName, payload.mimeType);
-        toast.success("Excel export ready.");
+        toast.success("Excel workbook downloaded.");
       },
       onError: (error) => {
         toast.error(error.message);
@@ -171,15 +174,15 @@ export default function ResultsPage() {
             Metric: "Non-construction",
             Amount: resultQuery.data.nonConstructionCosts,
           },
-	          {
-	            Metric: "Formula mode",
-	            Amount: formulaMode,
-	          },
-	          {
-	            Metric: "Method profile",
-	            Amount: resultQuery.data.methodProfile,
-	          },
-	          {
+          {
+            Metric: "Formula mode",
+            Amount: formulaMode,
+          },
+          {
+            Metric: "Method profile",
+            Amount: resultQuery.data.methodProfile,
+          },
+          {
             Metric: "Residual value",
             Amount: resultQuery.data.residualValue,
           },
@@ -191,7 +194,7 @@ export default function ResultsPage() {
 
   function handleExportJson() {
     if (!resultQuery.data) {
-      toast.error("Run a calculation first.");
+      toast.error("No calculation data available.");
       return;
     }
 
@@ -204,7 +207,7 @@ export default function ResultsPage() {
 
   function handleExportCsv() {
     if (exportRows.length === 0) {
-      toast.error("Run a calculation first.");
+      toast.error("No calculation data available.");
       return;
     }
 
@@ -250,117 +253,145 @@ export default function ResultsPage() {
 
   return (
     <div className="space-y-4">
-      {readiness ? (
-        <ValidationSummaryCard projectId={projectId} readiness={readiness} />
-      ) : null}
-
-      <div className="flex flex-wrap items-center gap-2 print:hidden">
-        <div
-          className="mr-1 inline-flex rounded-md border bg-muted p-1"
-          aria-label="Formula mode"
-        >
-          {([
-            ["excel_bugfixed", "Bugfixed"],
-            ["excel_replica", "Excel replica"],
-          ] as const).map(([mode, label]) => (
-            <Button
-              key={mode}
-              type="button"
-              onClick={() => setFormulaMode(mode)}
-              variant={formulaMode === mode ? "outline" : "ghost"}
-              size="sm"
-              className={formulaMode === mode ? "bg-background shadow-sm" : "text-muted-foreground"}
-            >
-              {label}
-            </Button>
-          ))}
-        </div>
-
-        <Button
-          type="button"
-          onClick={() => setView("dashboard")}
-          variant={view === "dashboard" ? "default" : "secondary"}
-          size="sm"
-        >
-          <BarChart3 className="size-4" />
-          Dashboard
-        </Button>
-        <Button
-          type="button"
-          onClick={() => setView("audit")}
-          variant={view === "audit" ? "default" : "secondary"}
-          size="sm"
-        >
-          <ClipboardList className="size-4" />
-          Audit
-        </Button>
-        {variants.length > 1 && (
+      {/* Clean Results Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
-            onClick={() => setView("compare")}
-            variant={view === "compare" ? "default" : "secondary"}
+            onClick={() => setView("dashboard")}
+            variant={view === "dashboard" ? "default" : "outline"}
             size="sm"
           >
-            <GitCompare className="size-4" />
-            Compare Variants
+            <BarChart3 className="size-4" />
+            Summary & Charts
           </Button>
-        )}
-        <Button
-          type="button"
-          onClick={() => setView("sensitivity")}
-          variant={view === "sensitivity" ? "default" : "secondary"}
-          size="sm"
-        >
-          <Sparkles className="size-4" />
-          Sensitivity
-        </Button>
 
-        <div className="mx-2 hidden h-5 w-px bg-border sm:block" />
+          {variants.length > 1 && (
+            <Button
+              type="button"
+              onClick={() => setView("compare")}
+              variant={view === "compare" ? "default" : "outline"}
+              size="sm"
+            >
+              <GitCompare className="size-4" />
+              Compare Scenarios ({variants.length})
+            </Button>
+          )}
 
-        <Button
-          type="button"
-          onClick={handleExportPdf}
-          disabled={exportPdf.isPending || exportBlocked}
-          title={exportBlockedTitle}
-          variant="outline"
-          size="sm"
-        >
-          <FileText className="size-4" />
-          {exportPdf.isPending ? "Exporting PDF..." : "Export PDF"}
-        </Button>
-        <Button
-          type="button"
-          onClick={handleExportExcel}
-          disabled={exportExcel.isPending || exportBlocked}
-          title={exportBlockedTitle}
-          variant="outline"
-          size="sm"
-        >
-          <FileSpreadsheet className="size-4" />
-          {exportExcel.isPending ? "Exporting Excel..." : "Export Excel"}
-        </Button>
-        <Button
-          type="button"
-          onClick={handleExportCsv}
-          disabled={!resultQuery.data || exportBlocked}
-          title={exportBlockedTitle}
-          variant="outline"
-          size="sm"
-        >
-          <Download className="size-4" />
-          Export CSV
-        </Button>
-        <Button
-          type="button"
-          onClick={handleExportJson}
-          disabled={!resultQuery.data || exportBlocked}
-          title={exportBlockedTitle}
-          variant="outline"
-          size="sm"
-        >
-          <FileJson className="size-4" />
-          Export JSON
-        </Button>
+          {(view === "audit" || view === "sensitivity") && (
+            <span className="inline-flex items-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+              {view === "audit" ? (
+                <>
+                  <ClipboardList className="size-3.5" />
+                  Formula Audit View
+                </>
+              ) : (
+                <>
+                  <Sparkles className="size-3.5" />
+                  Sensitivity Analysis
+                </>
+              )}
+              <button
+                type="button"
+                onClick={() => setView("dashboard")}
+                className="ml-1 underline hover:no-underline"
+              >
+                Back to Summary
+              </button>
+            </span>
+          )}
+        </div>
+
+        {/* Export & Advanced Tools */}
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            onClick={handleExportExcel}
+            disabled={exportExcel.isPending || !resultQuery.data}
+            variant="outline"
+            size="sm"
+          >
+            <FileSpreadsheet className="size-4" />
+            {exportExcel.isPending ? "Exporting..." : "Export Excel"}
+          </Button>
+          <Button
+            type="button"
+            onClick={handleExportPdf}
+            disabled={exportPdf.isPending || !resultQuery.data}
+            variant="outline"
+            size="sm"
+          >
+            <FileText className="size-4" />
+            {exportPdf.isPending ? "Exporting..." : "Export PDF"}
+          </Button>
+
+          {/* Advanced / Research Tools Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={<Button variant="ghost" size="sm" />}
+            >
+              <Settings2 className="size-4" />
+              <span>Advanced</span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>Analysis Views</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => setView("audit")}>
+                  <ClipboardList className="mr-2 size-4" />
+                  Formula Audit Tree
+                  {view === "audit" && <Check className="ml-auto size-4" />}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setView("sensitivity")}>
+                  <Sparkles className="mr-2 size-4" />
+                  Sensitivity Analysis (DSA/EE)
+                  {view === "sensitivity" && <Check className="ml-auto size-4" />}
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>Calculation Engine</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => setFormulaMode("excel_bugfixed")}
+                >
+                  Standard ISO 15686-5 (Bugfixed)
+                  {formulaMode === "excel_bugfixed" && (
+                    <Check className="ml-auto size-4" />
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setFormulaMode("excel_replica")}
+                >
+                  Exact Legacy Excel Replica
+                  {formulaMode === "excel_replica" && (
+                    <Check className="ml-auto size-4" />
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>Raw Data Export</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={handleExportCsv}
+                  disabled={!resultQuery.data}
+                >
+                  <Download className="mr-2 size-4" />
+                  Download CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleExportJson}
+                  disabled={!resultQuery.data}
+                >
+                  <FileJson className="mr-2 size-4" />
+                  Download JSON
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <ErrorBoundary
@@ -411,6 +442,20 @@ export default function ResultsPage() {
           />
         )}
       </ErrorBoundary>
+
+      <div className="flex items-center justify-start pt-2 print:hidden">
+        <Button
+          variant="outline"
+          render={
+            <Link
+              href={`/projects/${projectId}/construction?v=${encodeURIComponent(variantId)}`}
+            />
+          }
+        >
+          <ArrowLeft className="mr-1.5 size-4" />
+          3. Costs & Maintenance
+        </Button>
+      </div>
     </div>
   );
 }

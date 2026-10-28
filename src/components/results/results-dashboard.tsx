@@ -6,95 +6,40 @@ import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { GlassCard } from "@/components/shared/glass-card";
 import { KPICard } from "@/components/results/kpi-card";
-import { ConstructionBreakdownTable, WLCBreakdownTable } from "@/components/results/breakdown-table";
+import {
+  ConstructionBreakdownTable,
+  WLCBreakdownTable,
+} from "@/components/results/breakdown-table";
 import { Button } from "@/components/ui/button";
 import { ChartSkeleton } from "@/components/ui/chart-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { AlertCircle, BarChart3, RefreshCw } from "lucide-react";
 import * as motion from "motion/react-client";
-import type { LCCResult } from "@/engine/types";
-import type { FormulaMode } from "@/engine/types";
-import { ReferenceButton } from "@/components/shared/reference-button";
+import type { LCCResult, FormulaMode } from "@/engine/types";
 import { UNITS } from "@/lib/units";
-import {
-  FOUNDATIONAL_CITATIONS,
-  METHODOLOGY_CITATIONS,
-  BOUNDARY_CITATIONS,
-} from "@/lib/citations";
 import { cn } from "@/lib/utils";
-import { getAnalysisYears } from "@/lib/results/time-series";
 
-const LCCStackedBar = dynamic(() =>
-  import("@/components/results/charts/lcc-stacked-bar").then(
-    (module) => module.LCCStackedBar,
-  ),
+const LCCStackedBar = dynamic(
+  () =>
+    import("@/components/results/charts/lcc-stacked-bar").then(
+      (module) => module.LCCStackedBar
+    ),
   {
     ssr: false,
     loading: () => <ChartSkeleton variant="bar" className="h-72" />,
-  },
+  }
 );
 
-const CostEvolutionLine = dynamic(() =>
-  import("@/components/results/charts/cost-evolution-line").then(
-    (module) => module.CostEvolutionLine,
-  ),
+const CostEvolutionLine = dynamic(
+  () =>
+    import("@/components/results/charts/cost-evolution-line").then(
+      (module) => module.CostEvolutionLine
+    ),
   {
     ssr: false,
     loading: () => <ChartSkeleton variant="line" className="h-72" />,
-  },
+  }
 );
-
-function buildLccBreakdownAssumptions(result: LCCResult) {
-  return [
-    {
-      rule: `LCC calculated over a ${getAnalysisYears(result)}-year analysis period`,
-      rationale:
-        "The reference period comes from the variant boundary conditions and is reported with the calculation result.",
-      citationId: "iso-15686-5",
-    },
-    {
-      rule: "Residual value is calculated and shown separately",
-      rationale:
-        "Headline LCC/WLC are gross totals; LCC net residual subtracts the prorated service-component residual value.",
-      citationId: "vazquez-lopez-2020",
-    },
-    {
-      rule: "Maintenance uses nominal rate (Rint), energy uses real-rate discounting",
-      rationale:
-        "This convention is inherited from the CRAVEzero spreadsheet replica and is kept explicit until method profiles become selectable.",
-    },
-  ];
-}
-
-function buildCostEvolutionAssumptions(result: LCCResult) {
-  return [
-    {
-      rule: `Real discount rate = ${(result.realInterestRate * 100).toFixed(2)}%`,
-      rationale:
-        "The value is derived from the variant nominal interest and inflation rates using the active formula mode.",
-    },
-    {
-      rule: "Energy escalation uses per-carrier annual increase scalars",
-      rationale:
-        "Scenario curves are not implemented yet; current energy costs use the annual increase stored for each energy source.",
-      citationId: "eurostat-electricity",
-    },
-  ];
-}
-
-const CONSTRUCTION_ASSUMPTIONS = [
-  {
-    rule: "Element breakdown follows the European Code of Measurement (CEEC)",
-    rationale:
-      "Standardised structure for cross-country LCC comparability; same breakdown used for the 11 CRAVEzero case studies.",
-    citationId: "ceec-2004",
-  },
-  {
-    rule: "Detail cost = MAX(material, unit × area)",
-    rationale:
-      "Resolved in the tRPC layer before the engine runs — the engine sees pre-aggregated costs.",
-  },
-];
 
 interface ResultsDashboardProps {
   variantId: string;
@@ -120,20 +65,16 @@ function ResultsSkeleton() {
         <ChartSkeleton variant="table" className="h-80" />
       </div>
       <ChartSkeleton variant="line" className="h-72" />
-      <div className="grid grid-cols-2 gap-4">
-        <ChartSkeleton variant="table" className="h-64" />
-        <ChartSkeleton variant="bar" className="h-64" />
-      </div>
     </div>
   );
 }
 
 const stagger = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 16 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.08, duration: 0.3 },
+    transition: { delay: i * 0.06, duration: 0.25 },
   }),
 };
 
@@ -166,22 +107,24 @@ function RatioBar({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-xs font-medium text-muted-foreground">{label}</span>
+        <span className="text-xs font-medium text-muted-foreground">
+          {label}
+        </span>
         <span className="inline-flex items-center gap-1 text-xs font-semibold tabular-nums text-foreground">
           {isAnomaly ? (
             <AlertCircle
               className="size-3.5 text-destructive"
-              aria-label="Unexpected ratio greater than 100 percent"
+              aria-label="Ratio greater than 100 percent"
             />
           ) : null}
           {hasValue ? percentFormatter.format(value) : "N/A"}
         </span>
       </div>
-      <div className="h-2 rounded-full bg-muted/70 overflow-hidden" title={isAnomaly ? "Unexpected ratio > 100%" : undefined}>
+      <div className="h-2 rounded-full bg-muted/70 overflow-hidden">
         <div
           className={cn(
             "h-full rounded-full transition-all duration-300",
-            isAnomaly ? "bg-destructive" : RATIO_BAR_CLASSES[domain],
+            isAnomaly ? "bg-destructive" : RATIO_BAR_CLASSES[domain]
           )}
           style={{ width: `${width}%` }}
         />
@@ -210,8 +153,13 @@ export function ResultsDashboard({
     ...trpc.project.getById.queryOptions({ projectId }),
     enabled: Boolean(projectId),
   });
+  const { data: variant } = useQuery({
+    ...trpc.variant.getById.queryOptions({ variantId }),
+    enabled: Boolean(variantId),
+  });
+
   const baseVariantId = project?.variants.find(
-    (variant) => variant.label === "BASE",
+    (v) => v.label === "BASE"
   )?.id;
   const isBaseVariant = baseVariantId === variantId;
   const { data: baseResult } = useQuery({
@@ -221,6 +169,7 @@ export function ResultsDashboard({
     }),
     enabled: Boolean(baseVariantId && baseVariantId !== variantId),
   });
+
   const result = resultOverride ?? data;
   const isLoading = skipQuery ? loadingOverride : !resultOverride && isPending;
   const errorState = skipQuery ? errorOverride : error;
@@ -237,11 +186,17 @@ export function ResultsDashboard({
       return (
         <EmptyState
           icon={<BarChart3 className="size-5" />}
-          title="No results yet"
-          description="Complete the required WLC, project info, and construction inputs to generate the first LCC breakdown."
+          title="Missing basic inputs for calculation"
+          description="Please check that Treated Floor Area (Tab 1) and Economic Boundary Conditions (Tab 2) are filled in."
           action={
-            <Button render={<Link href={`/projects/${projectId}/wlc`} />}>
-              Go to WLC step
+            <Button
+              render={
+                <Link
+                  href={`/projects/${projectId}/info?v=${encodeURIComponent(variantId)}`}
+                />
+              }
+            >
+              Go to 1. Project & Geometry
             </Button>
           }
         />
@@ -251,9 +206,7 @@ export function ResultsDashboard({
     return (
       <GlassCard className="flex flex-col items-center gap-4 py-12">
         <AlertCircle className="size-10 text-destructive" />
-        <p className="text-sm text-muted-foreground">
-          {errorMessage}
-        </p>
+        <p className="text-sm text-muted-foreground">{errorMessage}</p>
         <Button
           type="button"
           variant="outline"
@@ -277,68 +230,72 @@ export function ResultsDashboard({
       <EmptyState
         icon={<BarChart3 className="size-5" />}
         title="No results yet"
-        description="Fill at least project info and one construction category to see the LCC breakdown."
+        description="Fill at least project geometry and construction or energy inputs to see the LCC breakdown."
         action={
-          <Button render={<Link href={`/projects/${projectId}/info`} />}>
-            Go to Step 1
+          <Button
+            render={
+              <Link
+                href={`/projects/${projectId}/info?v=${encodeURIComponent(variantId)}`}
+              />
+            }
+          >
+            Go to 1. Project & Geometry
           </Button>
         }
       />
     );
   }
 
-  const hasAnyConstructionData =
-    result.totalConstruction > 0 ||
-    Object.values(result.constructionByCategory).some((value) => value > 0);
+  const treatedFloorArea = variant?.geometry?.treatedFloorArea ?? 0;
+  const investmentCost =
+    result.totalConstruction +
+    result.designCosts +
+    result.buildingSiteManagement;
+  const baseInvestmentCost = baseResult
+    ? baseResult.totalConstruction +
+      baseResult.designCosts +
+      baseResult.buildingSiteManagement
+    : undefined;
 
-  if (result.lcc === 0 && !hasAnyConstructionData) {
-    return (
-      <EmptyState
-        icon={<BarChart3 className="size-5" />}
-        title="No results yet"
-        description="Fill at least project info and one construction category to see the LCC breakdown."
-        action={
-          <Button render={<Link href={`/projects/${projectId}/info`} />}>
-            Go to Step 1
-          </Button>
-        }
-      />
-    );
-  }
-
-  const baseSubtitle = isBaseVariant ? "Reference variant" : undefined;
-  const lccBreakdownAssumptions = buildLccBreakdownAssumptions(result);
-  const costEvolutionAssumptions = buildCostEvolutionAssumptions(result);
+  const formatPerM2Sub = (amount: number) => {
+    if (treatedFloorArea > 0) {
+      return `${Math.round(amount / treatedFloorArea).toLocaleString("en-US")} ${UNITS.EUR_m2}`;
+    }
+    return isBaseVariant ? "Reference scenario" : undefined;
+  };
 
   return (
     <div className="space-y-4">
-      {/* Row 1: KPI Cards */}
+      {/* Row 1: 4 Primary KPI Cards matching the CRAVEzero Results sheet */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {[
           {
-            title: "LCC",
+            title: "Life-Cycle Cost (LCC)",
             value: result.lcc,
             unit: "EUR",
             baseValue: baseResult?.lcc,
+            subtitle: formatPerM2Sub(result.lcc),
           },
           {
-            title: "WLC",
+            title: "Whole-Life Cost (WLC)",
             value: result.wlc,
             unit: "EUR",
             baseValue: baseResult?.wlc,
+            subtitle: formatPerM2Sub(result.wlc),
           },
           {
-            title: `LCC/${UNITS.m2}`,
-            value: result.kpiLCCPerM2,
-            unit: UNITS.EUR_m2,
-            baseValue: baseResult?.kpiLCCPerM2,
+            title: "Investment Cost",
+            value: investmentCost,
+            unit: "EUR",
+            baseValue: baseInvestmentCost,
+            subtitle: formatPerM2Sub(investmentCost),
           },
           {
-            title: "Payback",
-            value: result.income?.simplePaybackYears ?? null,
-            unit: "years",
-            baseValue: baseResult?.income?.simplePaybackYears ?? null,
-            emptyDescription: "Enable income inputs to compute payback.",
+            title: "Operation & Maint. (O&M)",
+            value: result.operationAndMaintenance,
+            unit: "EUR",
+            baseValue: baseResult?.operationAndMaintenance,
+            subtitle: formatPerM2Sub(result.operationAndMaintenance),
           },
         ].map((kpi, i) => (
           <motion.div
@@ -353,43 +310,83 @@ export function ResultsDashboard({
               value={kpi.value}
               unit={kpi.unit}
               baseValue={kpi.baseValue}
-              subtitle={baseSubtitle}
-              emptyDescription={kpi.emptyDescription}
+              subtitle={kpi.subtitle}
               lowerIsBetter
             />
           </motion.div>
         ))}
       </div>
 
-      {/* Row 2: LCC stacked bar (2 cols) + WLC breakdown table (1 col) */}
-      <div className="grid gap-4 md:grid-cols-3">
+      {/* Optional Income & Payback Strip if Income is enabled */}
+      {result.income && result.income.netAnnualIncome > 0 && (
+        <GlassCard className="flex flex-wrap items-center justify-between gap-4 py-3 px-4">
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Income & Profitability Indicators
+          </div>
+          <div className="flex flex-wrap items-center gap-6 text-sm">
+            <div>
+              <span className="text-muted-foreground">Net Annual Income: </span>
+              <strong className="tabular-nums">
+                €{Math.round(result.income.netAnnualIncome).toLocaleString("en-US")}/yr
+              </strong>
+            </div>
+            {result.income.simplePaybackYears != null && (
+              <div>
+                <span className="text-muted-foreground">Simple Payback: </span>
+                <strong className="tabular-nums">
+                  {result.income.simplePaybackYears.toFixed(1)} years
+                </strong>
+              </div>
+            )}
+            <div>
+              <span className="text-muted-foreground">Income NPV: </span>
+              <strong className="tabular-nums">
+                €{Math.round(result.income.npvIncomeStream).toLocaleString("en-US")}
+              </strong>
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
+      {/* Row 2: LCC Stacked Bar (left) + WLC/LCC Summary Table with EUR and EUR/m² (right) */}
+      <div className="grid gap-4 lg:grid-cols-12">
         <motion.div
-          className="md:col-span-2"
+          className="lg:col-span-7"
           custom={4}
           initial="hidden"
           animate="visible"
           variants={stagger}
         >
-          <GlassCard>
-            <div className="mb-4 flex items-start justify-between gap-3">
+          <GlassCard className="h-full">
+            <div className="mb-4">
               <h3 className="text-sm font-semibold tracking-tight text-foreground">
-                LCC Breakdown
+                LCC & WLC Breakdown Chart
               </h3>
-              <ReferenceButton
-                domain="construction"
-                title="LCC breakdown — methodology"
-                citations={FOUNDATIONAL_CITATIONS}
-                assumptions={lccBreakdownAssumptions}
-              />
+              <p className="text-xs text-muted-foreground">
+                Distribution of investment, operation, and maintenance costs over
+                the reference study period.
+              </p>
             </div>
             <LCCStackedBar result={result} />
           </GlassCard>
         </motion.div>
-        <motion.div custom={5} initial="hidden" animate="visible" variants={stagger}>
-          <GlassCard>
-            <h3 className="mb-4 text-sm font-semibold tracking-tight text-foreground">
-              WLC / LCC Breakdown
-            </h3>
+
+        <motion.div
+          className="lg:col-span-5"
+          custom={5}
+          initial="hidden"
+          animate="visible"
+          variants={stagger}
+        >
+          <GlassCard className="h-full">
+            <div className="mb-3">
+              <h3 className="text-sm font-semibold tracking-tight text-foreground">
+                Summary Table (WLC & LCC)
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Total EUR and specific {UNITS.EUR_m2} breakdown.
+              </p>
+            </div>
             <WLCBreakdownTable
               designCosts={result.designCosts}
               totalConstruction={result.totalConstruction}
@@ -403,58 +400,63 @@ export function ResultsDashboard({
               energyConsumed={result.energyConsumed}
               energyProduced={result.energyProduced}
               maintenanceAtRefPeriod={result.maintenanceAtRefPeriod}
+              treatedFloorArea={treatedFloorArea}
             />
           </GlassCard>
         </motion.div>
       </div>
 
-      {/* Row 3: Cost evolution line chart (full width) */}
+      {/* Row 3: Cost Evolution Line Chart */}
       <motion.div custom={6} initial="hidden" animate="visible" variants={stagger}>
         <GlassCard>
-          <div className="mb-4 flex items-start justify-between gap-3">
-            <h3 className="text-sm font-medium text-muted-foreground">
-              Cost Evolution over Reference Period
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold tracking-tight text-foreground">
+              Cumulative Cost Evolution over Reference Period
             </h3>
-            <ReferenceButton
-              domain="fin"
-              title="Cost evolution — boundary conditions"
-              citations={BOUNDARY_CITATIONS}
-              assumptions={costEvolutionAssumptions}
-            />
+            <p className="text-xs text-muted-foreground">
+              Discounted cumulative cash flows (Real discount rate:{" "}
+              {(result.realInterestRate * 100).toFixed(2)}%).
+            </p>
           </div>
           <CostEvolutionLine result={result} />
         </GlassCard>
       </motion.div>
 
-      {/* Row 4: Construction breakdown (left) + KPI ratio summary (right) */}
+      {/* Row 4: Construction Breakdown by Category (left) + KPI Ratios (right) */}
       <div className="grid gap-4 md:grid-cols-2">
         <motion.div custom={7} initial="hidden" animate="visible" variants={stagger}>
           <GlassCard>
-            <div className="mb-4 flex items-start justify-between gap-3">
+            <div className="mb-4">
               <h3 className="text-sm font-semibold tracking-tight text-foreground">
-                Construction Cost Breakdown
+                Construction Cost Breakdown (Categories A–E)
               </h3>
-              <ReferenceButton
-                domain="construction"
-                title="Construction breakdown — CEEC structure"
-                citations={METHODOLOGY_CITATIONS}
-                assumptions={CONSTRUCTION_ASSUMPTIONS}
-              />
+              <p className="text-xs text-muted-foreground">
+                Aggregated construction costs by European Code of Measurement
+                category.
+              </p>
             </div>
             <ConstructionBreakdownTable
               constructionByCategory={result.constructionByCategory}
               totalMaterials={result.totalMaterials}
               totalLabor={result.totalLabor}
               totalConstruction={result.totalConstruction}
+              treatedFloorArea={treatedFloorArea}
             />
           </GlassCard>
         </motion.div>
+
         <motion.div custom={8} initial="hidden" animate="visible" variants={stagger}>
           <GlassCard>
-            <h3 className="mb-4 text-sm font-semibold tracking-tight text-foreground">
-              KPI Ratios
-            </h3>
-            <div className="space-y-3">
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold tracking-tight text-foreground">
+                Investment & Life-Cycle Cost Ratios
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Relative weight of design, construction, labor, and O&M relative
+                to total investment cost.
+              </p>
+            </div>
+            <div className="space-y-3.5">
               {[
                 {
                   label: "Design / Investment Cost",

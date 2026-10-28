@@ -1,217 +1,150 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Link from "next/link";
 import {
-  AlertCircle,
-  AlertTriangle,
   BarChart3,
-  CheckCircle2,
-  Circle,
-  ClipboardList,
-  Home,
+  Building2,
+  Check,
   Layers3,
-  SlidersHorizontal,
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type {
-  ProjectReadiness,
-  ProjectReadinessSection,
-  ProjectStepId,
-} from "@/lib/project-readiness";
+import type { ProjectReadiness, ProjectStepId } from "@/lib/project-readiness";
 
-const STEPS = [
-  { id: "overview", label: "Overview", icon: Home },
-  { id: "info", label: "Info", icon: ClipboardList },
-  { id: "wlc", label: "WLC", icon: SlidersHorizontal },
-  { id: "construction", label: "Construction", icon: Layers3 },
-  { id: "energy", label: "Energy", icon: Zap },
-  { id: "results", label: "Results", icon: BarChart3 },
+const WORKBOOK_TABS = [
+  {
+    id: "info" as const,
+    stepNumber: 1,
+    label: "Project & Geometry",
+    subtitle: "General info & areas",
+    icon: Building2,
+  },
+  {
+    id: "energy" as const,
+    stepNumber: 2,
+    label: "Energy & Economy",
+    subtitle: "Rates, tariffs & demand",
+    icon: Zap,
+  },
+  {
+    id: "construction" as const,
+    stepNumber: 3,
+    label: "Costs & Maintenance",
+    subtitle: "Construction (A–E), O&M & WLC",
+    icon: Layers3,
+  },
+  {
+    id: "results" as const,
+    stepNumber: 4,
+    label: "Results & Charts",
+    subtitle: "LCC/WLC summary & graphs",
+    icon: BarChart3,
+  },
 ] as const;
 
 interface WizardStepsProps {
   projectId: string;
   currentStep: ProjectStepId;
+  activeVariantId?: string;
   readiness?: ProjectReadiness | null;
 }
 
-function getSection(
+function isTabPopulated(
   readiness: ProjectReadiness | null | undefined,
-  stepId: string,
-): ProjectReadinessSection | null {
-  if (!readiness || stepId === "overview") return null;
-  return readiness.sections.find((section) => section.id === stepId) ?? null;
-}
-
-function getStepHref(projectId: string, stepId: ProjectStepId) {
-  if (stepId === "overview") {
-    return `/projects/${projectId}`;
+  tabId: "info" | "energy" | "construction" | "results",
+): boolean {
+  if (!readiness) return false;
+  if (tabId === "results") {
+    return readiness.previewReady;
   }
-
-  return `/projects/${projectId}/${stepId}`;
+  if (tabId === "energy") {
+    const energySec = readiness.sections.find((s) => s.id === "energy");
+    const wlcSec = readiness.sections.find((s) => s.id === "wlc");
+    return Boolean(
+      (energySec?.requiredFilled ?? 0) > 0 && (wlcSec?.requiredFilled ?? 0) >= 2,
+    );
+  }
+  const sec = readiness.sections.find((s) => s.id === tabId);
+  return Boolean(sec && sec.requiredFilled >= sec.requiredTotal && sec.requiredTotal > 0);
 }
 
 export function WizardSteps({
   projectId,
   currentStep,
+  activeVariantId,
   readiness,
 }: WizardStepsProps) {
-  const stepRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
-  const overviewStatus = readiness
-    ? `${readiness.statusLabel}, ${readiness.blockers.length} blockers, ${readiness.warnings.length} warnings`
-    : "Project overview";
-  const currentIndex = STEPS.findIndex((step) => step.id === currentStep);
-  const currentLabel = STEPS[currentIndex]?.label ?? "Overview";
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      stepRefs.current[currentStep]?.scrollIntoView({
-        inline: "center",
-        block: "nearest",
-        behavior: "smooth",
-      });
-    }, 100);
-
-    return () => window.clearTimeout(timeout);
-  }, [currentStep]);
+  const normalizedStep =
+    currentStep === "wlc"
+      ? "construction"
+      : currentStep === "overview"
+        ? "info"
+        : currentStep;
 
   return (
-    <div className="min-w-0 space-y-2 md:space-y-0">
-      <nav
-        className="relative max-w-full after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-8 after:bg-gradient-to-l after:from-background after:to-transparent xl:after:hidden"
-        aria-label="Project sections"
-      >
-        <div className="flex max-w-full flex-nowrap items-center gap-2 overflow-x-auto pb-1 xl:flex-wrap xl:overflow-visible xl:pb-0">
-          {STEPS.map((step, i) => {
-            const isCurrent = step.id === currentStep;
-            const section = getSection(readiness, step.id);
-            const hasBlockers =
-              step.id === "overview"
-                ? Boolean(readiness?.blockers.length)
-                : Boolean(section?.blockers);
-            const hasWarnings =
-              step.id === "overview"
-                ? Boolean(readiness?.warnings.length)
-                : Boolean(section?.warnings);
-            const isReady =
-              step.id === "overview"
-                ? Boolean(readiness?.previewReady)
-                : Boolean(section?.isPreviewReady);
-            const readinessLabel = hasBlockers
-              ? "has blockers"
-              : hasWarnings
-                ? "has warnings"
-                : isReady
-                  ? "ready"
-                  : "pending";
-            const statusText =
-              step.id === "overview"
-                ? overviewStatus
-                : section
-                  ? `${section.requiredFilled} of ${section.requiredTotal} required, ${section.recommendedFilled} of ${section.recommendedTotal} recommended, ${section.blockers} blockers, ${section.warnings} warnings`
-                  : "No progress data";
-            const StepIcon = step.icon;
-            const StatusIcon = hasBlockers
-              ? AlertCircle
-              : hasWarnings
-                ? AlertTriangle
-                : isReady
-                  ? CheckCircle2
-                  : Circle;
+    <nav
+      aria-label="Workbook sheets"
+      className="w-full border-b border-border/80 bg-muted/25 px-1 pt-1 rounded-t-xl"
+    >
+      <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+        {WORKBOOK_TABS.map((tab) => {
+          const isCurrent = tab.id === normalizedStep;
+          const isComplete = isTabPopulated(readiness, tab.id);
+          const TabIcon = tab.icon;
+          const href = activeVariantId
+            ? `/projects/${projectId}/${tab.id}?v=${encodeURIComponent(activeVariantId)}`
+            : `/projects/${projectId}/${tab.id}`;
 
-            const progressPct =
-              section && section.requiredTotal > 0
-                ? Math.min(100, Math.round((section.requiredFilled / section.requiredTotal) * 100))
-                : isReady
-                  ? 100
-                  : 0;
-
-            return (
-              <div key={step.id} className="flex items-center gap-2">
-                <Link
-                  ref={(node) => {
-                    stepRefs.current[step.id] = node;
-                  }}
-                  href={getStepHref(projectId, step.id)}
-                  className={cn(
-                    "group flex min-w-12 flex-col gap-1 rounded-xl border px-2.5 py-2 transition-all md:min-w-[7.5rem] md:px-3",
-                    isCurrent
-                      ? "border-primary/60 bg-primary/[0.05] shadow-xs ring-1 ring-primary/20 dark:bg-primary/[0.09]"
-                      : "border-border/80 bg-card/80 hover:border-slate-300 hover:bg-muted/50 dark:border-white/[0.08] dark:hover:border-white/20",
-                  )}
-                  aria-current={isCurrent ? "step" : undefined}
-                  aria-label={`${step.label}, ${readinessLabel}. ${statusText}`}
-                >
-                  <div className="flex items-center justify-center gap-1.5 md:justify-between md:gap-2">
-                    <span
-                      className={cn(
-                        "inline-flex items-center gap-1.5 text-xs font-medium transition-colors",
-                        isCurrent
-                          ? "font-semibold text-primary"
-                          : "text-muted-foreground group-hover:text-foreground",
-                      )}
-                    >
-                      <span className="md:hidden">{i + 1}</span>
-                      <StepIcon className="size-3.5" />
-                      <span className="hidden md:inline">{step.label}</span>
-                    </span>
-                    <StatusIcon
-                      className={cn(
-                        "size-3.5 shrink-0 transition-transform group-hover:scale-110",
-                        hasBlockers && "text-destructive",
-                        !hasBlockers && hasWarnings && "text-amber-500",
-                        !hasBlockers && !hasWarnings && isReady && "text-emerald-500",
-                        !hasBlockers &&
-                          !hasWarnings &&
-                          !isReady &&
-                          "text-muted-foreground/40",
-                      )}
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <div className="hidden text-[11px] text-muted-foreground md:block">
-                    {step.id === "overview" ? (
-                      readiness ? readiness.statusLabel : "Overview"
-                    ) : section ? (
-                      <span className="tabular-nums">
-                        {section.requiredFilled}/{section.requiredTotal} req.
-                      </span>
-                    ) : (
-                      "Pending"
-                    )}
-                  </div>
-                  {/* Micro progress gauge */}
-                  {step.id !== "overview" && (
-                    <div className="hidden h-1 w-full overflow-hidden rounded-full bg-muted/60 md:block">
-                      <div
-                        className={cn(
-                          "h-full rounded-full transition-all duration-300",
-                          hasBlockers
-                            ? "bg-destructive"
-                            : hasWarnings
-                              ? "bg-amber-500"
-                              : isReady
-                                ? "bg-emerald-500"
-                                : "bg-primary/70",
-                        )}
-                        style={{ width: `${Math.max(progressPct > 0 ? 8 : 0, progressPct)}%` }}
-                      />
-                    </div>
-                  )}
-                </Link>
-                {i < STEPS.length - 1 && (
-                  <div className="hidden h-px w-2 bg-border xl:block" />
+          return (
+            <Link
+              key={tab.id}
+              href={href}
+              aria-current={isCurrent ? "page" : undefined}
+              className={cn(
+                "group relative flex items-center gap-2.5 rounded-t-lg border border-b-0 px-3.5 py-2.5 transition-all",
+                isCurrent
+                  ? "border-border/90 bg-card text-foreground shadow-2xs"
+                  : "border-transparent bg-transparent text-muted-foreground hover:bg-card/50 hover:text-foreground",
+              )}
+            >
+              {isCurrent && (
+                <span className="absolute inset-x-0 top-0 h-0.5 rounded-t-lg bg-primary" />
+              )}
+              <div
+                className={cn(
+                  "flex size-7 shrink-0 items-center justify-center rounded-md text-xs font-semibold transition-colors",
+                  isCurrent
+                    ? "bg-primary text-primary-foreground"
+                    : isComplete
+                      ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                      : "bg-muted text-muted-foreground group-hover:bg-muted/80",
+                )}
+              >
+                {isComplete && !isCurrent ? (
+                  <Check className="size-3.5" />
+                ) : (
+                  <TabIcon className="size-3.5" />
                 )}
               </div>
-            );
-          })}
-        </div>
-      </nav>
-      <div className="sticky top-0 z-10 rounded-lg border bg-background/95 px-3 py-2 text-xs font-medium shadow-sm md:hidden">
-        Step {currentIndex >= 0 ? currentIndex + 1 : 1} of {STEPS.length} —{" "}
-        {currentLabel}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={cn(
+                      "truncate text-xs font-semibold sm:text-sm",
+                      isCurrent ? "text-foreground" : "text-foreground/80",
+                    )}
+                  >
+                    {tab.stepNumber}. {tab.label}
+                  </span>
+                </div>
+                <p className="hidden truncate text-[11px] text-muted-foreground lg:block">
+                  {tab.subtitle}
+                </p>
+              </div>
+            </Link>
+          );
+        })}
       </div>
-    </div>
+    </nav>
   );
 }

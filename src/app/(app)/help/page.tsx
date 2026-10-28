@@ -5,106 +5,80 @@ import { UNITS } from "@/lib/units";
 
 const HELP_SECTIONS = [
   {
-    title: "Rates and discounting",
+    title: "1. Project & Geometry",
     items: [
       {
-        label: "Nominal interest rate",
+        label: "Treated Floor Area (TFA)",
         copy:
-          "Enter the financing or opportunity cost before inflation is removed. The app derives the real discount rate automatically.",
+          "Primary reference area (m²) used to calculate all specific costs (€/m²) and energy indicators (kWh/m²y), just like the Heated net floor area / TFA in the CRAVEzero Excel tool.",
       },
       {
-        label: "Inflation rate",
+        label: "GFA & NFA",
         copy:
-          "Use the expected long-term inflation assumption for the study horizon. This is separate from energy price escalation.",
+          "Gross Floor Area (external envelope) and Net Floor Area (usable internal area). You can copy NFA into TFA with one click if they coincide.",
       },
       {
-        label: "Real rate",
+        label: "Optional Envelope & Income Sections",
         copy:
-          "The engine discounts future costs using the derived real rate: (1 + nominal) / (1 + inflation) - 1.",
+          "PHPP envelope indicators (U-values, n50), unheated areas, and rental income are grouped inside optional collapsible drawers so they stay out of your way unless needed.",
       },
     ],
   },
   {
-    title: "Areas and units",
+    title: "2. Energy & Economy",
     items: [
       {
-        label: "GFA",
+        label: "Economic Boundary Conditions",
         copy:
-          "Gross Floor Area measured to the external envelope. Use it for whole-building size checks and benchmarking.",
+          "Set the Reference study period (e.g. 40 years), Nominal interest rate, and Inflation rate. The app automatically derives the Real discount rate: (1 + nominal) / (1 + inflation) - 1.",
       },
       {
-        label: "NFA",
-        copy:
-          "Net Floor Area after walls and major structure are excluded. This is the usable internal area.",
+        label: "Energy Consumption & PV",
+        copy: `Enter annual demand (${UNITS.kWh_m2_y}) for Heating, Cooling, Ventilation, DHW, Lighting, and Appliances, plus on-site PV production (${UNITS.kWh_y} or ${UNITS.kWh_m2_y}). Total kWh/y and Year 1 EUR/y are calculated live.`,
       },
       {
-        label: "TFA",
-        copy:
-          "Treated Floor Area used for energy scaling and per-area LCC KPIs. It should usually be less than or equal to GFA.",
-      },
-      {
-        label: "Percent fields",
-        copy:
-          "The UI shows percentages, but the engine stores decimal values. If you type 0.03, the field interprets it as 3.00%.",
+        label: "Energy Vector Prices",
+        copy: `Unit tariffs (€/kWh) and annual price escalation (%) are shown right below your energy demand table, highlighting the carriers actively used by your building.`,
       },
     ],
   },
   {
-    title: "Energy and PV",
+    title: "3. Costs & Maintenance",
     items: [
       {
-        label: "Energy source selection",
+        label: "Direct Spreadsheet Cost Entry (A1–E1)",
         copy:
-          "Choose the delivered energy source that pays the operating cost. 'Not selected' means the row is ignored in the calculation.",
+          "Enter Materials (€) and Labor (€) directly on each category row—just like the summary table in the original CRAVEzero Excel workbook. Total (€) and €/m² update immediately.",
       },
       {
-        label: "Dual systems",
+        label: "Optional Detail Layers",
         copy:
-          "Use Source 2 only when the building genuinely mixes systems for the same end use. Leave it empty otherwise.",
+          "Click 'Layers' on any construction row if you want to break a category down into individual stratigraphic layers with Area (m²) × Unit Price (€/m²).",
       },
       {
-        label: "PV production",
-        copy: `You can enter PV as total annual production in ${UNITS.kWh_y} or as a specific value in ${UNITS.kWh_m2_y}. The results use the same calculation engine either way.`,
+        label: "Maintenance (Group A + EN 15459) & WLC",
+        copy:
+          "Set the annual maintenance % for Group A building elements, configure EN 15459 service component lifespans/maintenance rates, and optionally include Land & Non-Construction costs (WLC).",
       },
     ],
   },
   {
-    title: "Construction and maintenance",
+    title: "4. Results & Scenarios",
     items: [
       {
-        label: "Resolved cost rule",
+        label: "KPIs & EUR / EUR/m² Tables",
         copy:
-          "For each detail row, the app uses the larger of material cost and unit price multiplied by area, then adds labor and other costs.",
+          "View Life-Cycle Cost (LCC), Whole-Life Cost (WLC), Investment Cost, and Operation & Maintenance (O&M) both in total EUR and specific EUR/m², alongside stacked and cumulative cash-flow charts.",
       },
       {
-        label: "EN 15459 components",
+        label: "Scenario Comparison (Base vs Variants)",
         copy:
-          "Service components are variant-level maintenance items. Their lifespan and maintenance percentage drive replacement cycles and maintenance totals.",
+          "Use the scenario pills at the top of the workspace to switch between Base Case and design variants, or clone the active variant in one click to test alternative solutions.",
       },
       {
-        label: "Building element maintenance",
+        label: "Excel / PDF Export & Advanced Tools",
         copy:
-          "This slider applies a flat annual maintenance percentage to building elements that do not use EN 15459 replacement logic.",
-      },
-    ],
-  },
-  {
-    title: "Variants and results",
-    items: [
-      {
-        label: "Clone Base",
-        copy:
-          "Create a new variant by copying Base when you want to edit only the differences. The app keeps a diff count so you can see how far each variant diverges.",
-      },
-      {
-        label: "Validation summary",
-        copy:
-          "Preview-ready means the minimum fields for a meaningful first result are present. Publish-ready means the major sections are complete enough for reporting.",
-      },
-      {
-        label: "Audit view",
-        copy:
-          "Use the audit panels in Results to understand how LCC is composed from design, construction, O&M, non-construction, and residual value.",
+          "Export a CRAVEzero-structured Excel workbook (.xlsx) or print a PDF report directly. Academic tools (Formula Audit, Sensitivity Analysis, Engine mode) are tucked inside the Advanced menu.",
       },
     ],
   },
@@ -114,11 +88,11 @@ export default function HelpCenterPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold">Help Center</h1>
+        <h1 className="text-2xl font-semibold">Manual & Quick Guide</h1>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Short reference notes for the concepts that most often slow down LCC
-          studies. Use this page when a tooltip is not enough and you need the
-          practical meaning of a field inside the current workflow.
+          The workspace follows the 4-tab structure of the original CRAVEzero /
+          Skanska LCC Excel workbook so you can move naturally from geometry and
+          energy inputs to construction costs and life-cycle results.
         </p>
       </div>
 
@@ -128,7 +102,10 @@ export default function HelpCenterPage() {
             <h2 className="text-lg font-semibold">{section.title}</h2>
             <div className="mt-4 space-y-4">
               {section.items.map((item) => (
-                <div key={item.label} className="rounded-xl border bg-muted/20 p-4">
+                <div
+                  key={item.label}
+                  className="rounded-xl border bg-muted/20 p-4"
+                >
                   <div className="text-sm font-medium">{item.label}</div>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {item.copy}
@@ -139,16 +116,6 @@ export default function HelpCenterPage() {
           </GlassCard>
         ))}
       </div>
-
-      <GlassCard>
-        <h2 className="text-lg font-semibold">Worked-example pattern</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          For training and onboarding, create a project from a known case study,
-          keep Base as the reference model, then clone Base for alternative
-          scenarios. Use the Overview page to confirm readiness, then compare
-          variants in Results once the required sections are complete.
-        </p>
-      </GlassCard>
     </div>
   );
 }

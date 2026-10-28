@@ -98,7 +98,7 @@ export function ProjectSidebar() {
                 <SidebarMenuItem key={project.id}>
                   <SidebarMenuButton
                     tooltip={project.name}
-                    render={<Link href={`/projects/${project.id}`} />}
+                    render={<Link href={`/projects/${project.id}/info`} />}
                   >
                     <FolderOpen className="size-4" />
                     <span className="truncate">{project.name}</span>

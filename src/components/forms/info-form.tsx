@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import Link from "next/link";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -10,8 +11,10 @@ import { useAutosave } from "@/hooks/use-autosave";
 import { GlassCard } from "@/components/shared/glass-card";
 import { CurrencyInput } from "@/components/forms/shared/currency-input";
 import { NumberInput } from "@/components/forms/shared/number-input";
+import { PercentInput } from "@/components/forms/shared/percent-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -20,15 +23,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { ConfirmAction } from "@/components/ui/confirm-action";
 import { InfoTooltip } from "@/components/shared/info-tooltip";
 import { UNIT_LABELS, UNITS } from "@/lib/units";
+import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 
 const BUILDING_USE_OPTIONS = [
-  { value: "RESIDENTIAL_SINGLE", label: "Residential (Single)" },
-  { value: "RESIDENTIAL_MULTI", label: "Residential (Multi)" },
+  { value: "RESIDENTIAL_SINGLE", label: "Residential (Single-family)" },
+  { value: "RESIDENTIAL_MULTI", label: "Residential (Multi-family / Terraced)" },
   { value: "OFFICE", label: "Office" },
   { value: "EDUCATION", label: "Education" },
   { value: "COMMERCIAL", label: "Commercial" },
@@ -106,8 +109,6 @@ const incomeSchema = z.object({
 
 type IncomeValues = z.infer<typeof incomeSchema>;
 
-// -- Component --
-
 interface InfoFormProps {
   projectId: string;
   variantId: string;
@@ -129,7 +130,6 @@ export function InfoForm({ projectId, variantId }: InfoFormProps) {
       <div className="space-y-6">
         <Skeleton className="h-48 w-full" />
         <Skeleton className="h-64 w-full" />
-        <Skeleton className="h-48 w-full" />
       </div>
     );
   }
@@ -149,6 +149,19 @@ export function InfoForm({ projectId, variantId }: InfoFormProps) {
         variantId={variantId}
         projectId={projectId}
       />
+
+      <div className="flex items-center justify-end pt-2">
+        <Button
+          render={
+            <Link
+              href={`/projects/${projectId}/energy?v=${encodeURIComponent(variantId)}`}
+            />
+          }
+        >
+          Next: 2. Energy & Economy
+          <ArrowRight className="ml-1.5 size-4" />
+        </Button>
+      </div>
     </div>
   );
 }
@@ -193,7 +206,9 @@ function MetadataSection({
       city: project.city ?? "",
       location: project.location ?? "",
       author: project.author ?? "",
-      buildingUse: (project.buildingUse as MetadataValues["buildingUse"]) ?? "RESIDENTIAL_MULTI",
+      buildingUse:
+        (project.buildingUse as MetadataValues["buildingUse"]) ??
+        "RESIDENTIAL_MULTI",
       constructionYear: project.constructionYear?.toString() ?? "",
     },
   });
@@ -214,55 +229,34 @@ function MetadataSection({
 
   useAutosave({ control: form.control, onSave });
 
-  const { register, formState: { errors } } = form;
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   return (
-      <GlassCard>
-        <div className="mb-4 space-y-1">
-          <h2 className="text-lg font-semibold">Project profile</h2>
-          <p className="text-sm text-muted-foreground">
-            Start with the project identity and the building use. The rest of the
-            form adapts around these choices.
+    <GlassCard>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 className="text-base font-semibold">Project Data</h2>
+          <p className="text-xs text-muted-foreground">
+            General identification and building typology (Project Information — Part I).
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="space-y-1">
-            <Label htmlFor="name">Project Name</Label>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-1">
+          <Label htmlFor="name">Project Name *</Label>
           <Input id="name" {...register("name")} />
           {errors.name && (
-            <p className="text-sm text-destructive">{errors.name.message}</p>
+            <p className="text-xs text-destructive">{errors.name.message}</p>
           )}
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="country">Country</Label>
-          <Input id="country" {...register("country")} />
-        </div>
-
-        <div className="space-y-1">
-          <Label htmlFor="region">Region</Label>
-          <Input id="region" {...register("region")} />
-        </div>
-
-        <div className="space-y-1">
-          <Label htmlFor="city">City</Label>
-          <Input id="city" {...register("city")} />
-        </div>
-
-        <div className="space-y-1">
-          <Label htmlFor="location">Location</Label>
-          <Input id="location" {...register("location")} />
-        </div>
-
-        <div className="space-y-1">
-          <Label htmlFor="author">Author</Label>
-          <Input id="author" {...register("author")} />
-        </div>
-
-        <div className="space-y-1">
           <div className="flex items-center gap-1.5">
-            <Label>Building Use</Label>
-            <InfoTooltip content="The building use drives which inputs are treated as core for preview and validation." />
+            <Label>Building Use / Typology *</Label>
           </div>
           <Controller
             name="buildingUse"
@@ -289,8 +283,24 @@ function MetadataSection({
           <Input
             id="constructionYear"
             type="number"
+            placeholder="e.g. 2015"
             {...register("constructionYear")}
           />
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="country">Country</Label>
+          <Input id="country" placeholder="e.g. Sweden" {...register("country")} />
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="city">City</Label>
+          <Input id="city" placeholder="e.g. Växjö" {...register("city")} />
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="author">Author / Compiler</Label>
+          <Input id="author" placeholder="Optional" {...register("author")} />
         </div>
       </div>
     </GlassCard>
@@ -353,7 +363,21 @@ function GeometrySection({
     })
   );
   const g = variant.geometry;
-  const [showAdvanced, setShowAdvanced] = useState(
+
+  const [showPhppIndicators, setShowPhppIndicators] = useState(
+    Boolean(
+      g?.totalThermalEnvelope ||
+        g?.avgUvalueOpaque ||
+        g?.avgUvalueGlazing ||
+        g?.avgHeatRecovery ||
+        g?.airTightness ||
+        g?.pvInstalledCapacity ||
+        g?.windowArea ||
+        g?.manualDesignConstructionCost
+    )
+  );
+
+  const [showUnheated, setShowUnheated] = useState(
     Boolean(
       g?.balconiesArea ||
         g?.otherSurfacesArea ||
@@ -403,264 +427,278 @@ function GeometrySection({
     "grossFloorArea",
     "netFloorArea",
     "treatedFloorArea",
-    "avgUvalueOpaque",
-    "airTightness",
   ]);
-  const [
-    grossFloorArea,
-    netFloorArea,
-    treatedFloorArea,
-    avgUvalueOpaque,
-    airTightness,
-  ] = watched;
+  const [grossFloorArea, netFloorArea, treatedFloorArea] = watched;
 
-  const geometryWarnings = useMemo(() => {
-    const warnings: string[] = [];
-
+  const geometryWarning = useMemo(() => {
     if (
       typeof treatedFloorArea === "number" &&
       typeof grossFloorArea === "number" &&
       treatedFloorArea > grossFloorArea &&
       grossFloorArea > 0
     ) {
-      warnings.push("Treated floor area is greater than gross floor area.");
+      return "Note: Treated floor area (TFA) is larger than Gross floor area (GFA). Typically TFA ≤ GFA.";
     }
-    if (
-      typeof netFloorArea === "number" &&
-      typeof grossFloorArea === "number" &&
-      netFloorArea > grossFloorArea &&
-      grossFloorArea > 0
-    ) {
-      warnings.push("Net floor area is greater than gross floor area.");
-    }
-    if (
-      typeof avgUvalueOpaque === "number" &&
-      avgUvalueOpaque > 0 &&
-      (avgUvalueOpaque < 0.05 || avgUvalueOpaque > 3)
-    ) {
-      warnings.push("Opaque U-value is outside the usual building range.");
-    }
-    if (
-      typeof airTightness === "number" &&
-      airTightness > 0 &&
-      (airTightness < 0.1 || airTightness > 20)
-    ) {
-      warnings.push("Air tightness looks unusual for a 1/h input.");
-    }
-
-    return warnings;
-  }, [airTightness, avgUvalueOpaque, grossFloorArea, netFloorArea, treatedFloorArea]);
+    return null;
+  }, [grossFloorArea, treatedFloorArea]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <GlassCard>
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
-          <div className="space-y-6">
-            <div>
-              <div className="mb-4 space-y-1">
-                <h2 className="text-lg font-semibold">Geometry essentials</h2>
-                <p className="text-sm text-muted-foreground">
-                  Enter the heated building first. These values unlock the main
-                  readiness checks and per-area KPIs.
-                </p>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                <NumberInput
-                  name="grossFloorArea"
-                  control={form.control}
-                  label="Gross Floor Area"
-                  suffix={` ${UNITS.m2}`}
-                  ariaLabel={`Gross floor area in ${UNIT_LABELS.m2}`}
-                />
-                <NumberInput
-                  name="netFloorArea"
-                  control={form.control}
-                  label="Net Floor Area"
-                  suffix={` ${UNITS.m2}`}
-                  ariaLabel={`Net floor area in ${UNIT_LABELS.m2}`}
-                />
-                <NumberInput
-                  name="treatedFloorArea"
-                  control={form.control}
-                  label="Treated Floor Area"
-                  suffix={` ${UNITS.m2}`}
-                  hint={`Used for LCC/${UNITS.m2} and WLC/${UNITS.m2}.`}
-                  ariaLabel={`Treated floor area in ${UNIT_LABELS.m2}`}
-                />
-                <NumberInput
-                  name="grossVolume"
-                  control={form.control}
-                  label="Gross Volume"
-                  suffix={` ${UNITS.m3}`}
-                  ariaLabel={`Gross volume in ${UNIT_LABELS.m3}`}
-                />
-                <NumberInput
-                  name="netVolume"
-                  control={form.control}
-                  label="Net Volume"
-                  suffix={` ${UNITS.m3}`}
-                  ariaLabel={`Net volume in ${UNIT_LABELS.m3}`}
-                />
-                <NumberInput
-                  name="windowArea"
-                  control={form.control}
-                  label="Window Area"
-                  suffix={` ${UNITS.m2}`}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-4 space-y-1">
-                <h2 className="text-lg font-semibold">Envelope and systems</h2>
-                <p className="text-sm text-muted-foreground">
-                  Add the core thermal indicators next. Advanced secondary areas
-                  stay hidden until you need them.
-                </p>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                <NumberInput
-                  name="totalThermalEnvelope"
-                  control={form.control}
-                  label="Total Thermal Envelope"
-                  suffix={` ${UNITS.m2}`}
-                />
-                <NumberInput
-                  name="avgUvalueOpaque"
-                  control={form.control}
-                  label="Avg U-value Opaque"
-                  suffix={` ${UNITS.uvalue}`}
-                  decimalScale={3}
-                  ariaLabel={`Average opaque U-value in ${UNIT_LABELS.uvalue}`}
-                />
-                <NumberInput
-                  name="avgUvalueGlazing"
-                  control={form.control}
-                  label="Avg U-value Glazing"
-                  suffix={` ${UNITS.uvalue}`}
-                  decimalScale={3}
-                  ariaLabel={`Average glazing U-value in ${UNIT_LABELS.uvalue}`}
-                />
-                <NumberInput
-                  name="avgHeatRecovery"
-                  control={form.control}
-                  label="Avg Heat Recovery"
-                  suffix=" %"
-                />
-                <NumberInput
-                  name="airTightness"
-                  control={form.control}
-                  label="Air Tightness"
-                  suffix=" 1/h"
-                  decimalScale={2}
-                />
-                <NumberInput
-                  name="pvInstalledCapacity"
-                  control={form.control}
-                  label="PV Installed Capacity"
-                  suffix=" kWp"
-                />
-                <CurrencyInput
-                  name="manualDesignConstructionCost"
-                  control={form.control}
-                  label="Manual Design & Construction Cost"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-3">
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h2 className="text-base font-semibold">
+              Building Surfaces & Volumes (Heated)
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Enter the heated reference surfaces.{" "}
+              <strong>Treated Floor Area (TFA)</strong> is the reference area used
+              to calculate all {UNITS.EUR_m2} and {UNITS.kWh_m2_y} indicators.
+            </p>
+          </div>
+          {(!treatedFloorArea || treatedFloorArea === 0) &&
+            typeof netFloorArea === "number" &&
+            netFloorArea > 0 && (
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => setShowAdvanced((current) => !current)}
+                onClick={() => {
+                  form.setValue("treatedFloorArea", netFloorArea, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                  });
+                  void onSave({
+                    ...form.getValues(),
+                    treatedFloorArea: netFloorArea,
+                  });
+                }}
               >
-                {showAdvanced ? "Hide advanced geometry" : "Show advanced geometry"}
+                Copy Net Floor Area ({netFloorArea} {UNITS.m2}) to TFA
               </Button>
-
-              {showAdvanced && (
-                <div className="grid gap-4 rounded-xl border bg-muted/20 p-4 sm:grid-cols-2 xl:grid-cols-4">
-                  <NumberInput
-                    name="balconiesArea"
-                    control={form.control}
-                    label="Balconies Area"
-                    suffix={` ${UNITS.m2}`}
-                  />
-                  <NumberInput
-                    name="otherSurfacesArea"
-                    control={form.control}
-                    label="Other Surfaces"
-                    suffix={` ${UNITS.m2}`}
-                  />
-                  <NumberInput
-                    name="unheatedGFA"
-                    control={form.control}
-                    label="Unheated GFA"
-                    suffix={` ${UNITS.m2}`}
-                  />
-                  <NumberInput
-                    name="unheatedNFA"
-                    control={form.control}
-                    label="Unheated NFA"
-                    suffix={` ${UNITS.m2}`}
-                  />
-                  <NumberInput
-                    name="unheatedGrossVol"
-                    control={form.control}
-                    label="Unheated Gross Volume"
-                    suffix={` ${UNITS.m3}`}
-                  />
-                  <NumberInput
-                    name="unheatedNetVol"
-                    control={form.control}
-                    label="Unheated Net Volume"
-                    suffix={` ${UNITS.m3}`}
-                  />
-                </div>
-              )}
-            </div>
-
-            {geometryWarnings.length > 0 && (
-              <div className="rounded-xl border border-amber-300 bg-amber-50/70 p-4 dark:bg-amber-950/20">
-                <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-100">
-                  Review these geometry warnings
-                </h3>
-                <ul className="mt-2 space-y-1 text-sm text-amber-900/90 dark:text-amber-100/90">
-                  {geometryWarnings.map((warning) => (
-                    <li key={warning}>{warning}</li>
-                  ))}
-                </ul>
-              </div>
             )}
-          </div>
+        </div>
 
-          <div className="rounded-xl border bg-muted/30 p-4">
-            <h3 className="text-sm font-semibold">Area definitions</h3>
-            <div className="mt-4 space-y-4 text-sm">
-              <div>
-                <div className="font-medium">GFA</div>
-                <p className="text-muted-foreground">
-                  Area measured to the external building envelope.
-                </p>
-              </div>
-              <div>
-                <div className="font-medium">NFA</div>
-                <p className="text-muted-foreground">
-                  Usable internal area after walls and major structure are excluded.
-                </p>
-              </div>
-              <div>
-                <div className="font-medium">TFA</div>
-                <p className="text-muted-foreground">
-                  Conditioned area used for per-area LCC KPIs.
-                </p>
-              </div>
-              <div className="rounded-lg border bg-background p-3 text-muted-foreground">
-                TFA should usually be less than or equal to GFA.
-              </div>
-            </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="rounded-xl border border-primary/30 bg-primary/[0.03] p-3 sm:col-span-2 lg:col-span-1">
+            <NumberInput
+              name="treatedFloorArea"
+              control={form.control}
+              label="Treated Floor Area (TFA) *"
+              suffix={` ${UNITS.m2}`}
+              hint="PHPP reference area (or NFA)"
+              ariaLabel={`Treated floor area in ${UNIT_LABELS.m2}`}
+            />
+          </div>
+          <div className="p-3">
+            <NumberInput
+              name="grossFloorArea"
+              control={form.control}
+              label="Gross Floor Area (GFA)"
+              suffix={` ${UNITS.m2}`}
+              hint="Total heated external area"
+              ariaLabel={`Gross floor area in ${UNIT_LABELS.m2}`}
+            />
+          </div>
+          <div className="p-3">
+            <NumberInput
+              name="netFloorArea"
+              control={form.control}
+              label="Net Floor Area (NFA)"
+              suffix={` ${UNITS.m2}`}
+              hint="Usable heated internal area"
+              ariaLabel={`Net floor area in ${UNIT_LABELS.m2}`}
+            />
+          </div>
+          <div className="p-3">
+            <NumberInput
+              name="grossVolume"
+              control={form.control}
+              label="Gross Volume"
+              suffix={` ${UNITS.m3}`}
+              hint="Heated gross volume"
+              ariaLabel={`Gross volume in ${UNIT_LABELS.m3}`}
+            />
+          </div>
+          <div className="p-3">
+            <NumberInput
+              name="netVolume"
+              control={form.control}
+              label="Net Volume"
+              suffix={` ${UNITS.m3}`}
+              hint="Heated net volume"
+              ariaLabel={`Net volume in ${UNIT_LABELS.m3}`}
+            />
           </div>
         </div>
+
+        {geometryWarning && (
+          <p className="mt-3 text-xs text-amber-700 dark:text-amber-300">
+            {geometryWarning}
+          </p>
+        )}
+
+        {/* Collapsible Optional Sections */}
+        <div className="mt-4 flex flex-wrap gap-2 border-t pt-4">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground hover:text-foreground"
+            onClick={() => setShowPhppIndicators((v) => !v)}
+          >
+            {showPhppIndicators ? (
+              <ChevronUp className="mr-1.5 size-3.5" />
+            ) : (
+              <ChevronDown className="mr-1.5 size-3.5" />
+            )}
+            PHPP & Envelope Indicators (Optional)
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground hover:text-foreground"
+            onClick={() => setShowUnheated((v) => !v)}
+          >
+            {showUnheated ? (
+              <ChevronUp className="mr-1.5 size-3.5" />
+            ) : (
+              <ChevronDown className="mr-1.5 size-3.5" />
+            )}
+            Unheated & Secondary Areas (Optional)
+          </Button>
+        </div>
+
+        {showPhppIndicators && (
+          <div className="mt-3 rounded-xl border bg-muted/20 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium">
+                  Energy Tool (PHPP) & Cost Verification Indicators
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Descriptive parameters from the energy model. Not required to
+                  compute LCC totals.
+                </p>
+              </div>
+              <Badge variant="secondary" className="text-[11px]">
+                Optional
+              </Badge>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <NumberInput
+                name="totalThermalEnvelope"
+                control={form.control}
+                label="Thermal Envelope Area"
+                suffix={` ${UNITS.m2}`}
+              />
+              <NumberInput
+                name="windowArea"
+                control={form.control}
+                label="Windows Area"
+                suffix={` ${UNITS.m2}`}
+              />
+              <NumberInput
+                name="avgUvalueOpaque"
+                control={form.control}
+                label="Avg U-value Opaque"
+                suffix={` ${UNITS.uvalue}`}
+                decimalScale={3}
+                ariaLabel={`Average opaque U-value in ${UNIT_LABELS.uvalue}`}
+              />
+              <NumberInput
+                name="avgUvalueGlazing"
+                control={form.control}
+                label="Avg U-value Glazing"
+                suffix={` ${UNITS.uvalue}`}
+                decimalScale={3}
+                ariaLabel={`Average glazing U-value in ${UNIT_LABELS.uvalue}`}
+              />
+              <NumberInput
+                name="avgHeatRecovery"
+                control={form.control}
+                label="Heat Recovery Efficiency"
+                suffix=" %"
+              />
+              <NumberInput
+                name="airTightness"
+                control={form.control}
+                label="Air Tightness (n50)"
+                suffix=" 1/h"
+                decimalScale={2}
+              />
+              <NumberInput
+                name="pvInstalledCapacity"
+                control={form.control}
+                label="PV Installed Capacity"
+                suffix=" kWp"
+              />
+              <CurrencyInput
+                name="manualDesignConstructionCost"
+                control={form.control}
+                label="Manual Total Cost Check"
+              />
+            </div>
+          </div>
+        )}
+
+        {showUnheated && (
+          <div className="mt-3 rounded-xl border bg-muted/20 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium">
+                  Unheated Areas & Secondary Surfaces
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Garages, cellars, balconies, and other unheated spaces.
+                </p>
+              </div>
+              <Badge variant="secondary" className="text-[11px]">
+                Optional
+              </Badge>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <NumberInput
+                name="unheatedGFA"
+                control={form.control}
+                label="Unheated GFA"
+                suffix={` ${UNITS.m2}`}
+              />
+              <NumberInput
+                name="unheatedNFA"
+                control={form.control}
+                label="Unheated NFA"
+                suffix={` ${UNITS.m2}`}
+              />
+              <NumberInput
+                name="unheatedGrossVol"
+                control={form.control}
+                label="Unheated Gross Volume"
+                suffix={` ${UNITS.m3}`}
+              />
+              <NumberInput
+                name="unheatedNetVol"
+                control={form.control}
+                label="Unheated Net Volume"
+                suffix={` ${UNITS.m3}`}
+              />
+              <NumberInput
+                name="balconiesArea"
+                control={form.control}
+                label="Balconies & Terraces"
+                suffix={` ${UNITS.m2}`}
+              />
+              <NumberInput
+                name="otherSurfacesArea"
+                control={form.control}
+                label="Other Surfaces"
+                suffix={` ${UNITS.m2}`}
+              />
+            </div>
+          </div>
+        )}
       </GlassCard>
     </div>
   );
@@ -726,7 +764,8 @@ function IncomeSection({
         inc?.rent3MonthlyPerM2 ||
         inc?.otherIncome1 ||
         inc?.otherIncome2 ||
-        inc?.otherIncome3
+        inc?.otherIncome3 ||
+        inc?.expectedPricePerM2
     )
   );
 
@@ -789,21 +828,26 @@ function IncomeSection({
 
   if (!showIncome) {
     return (
-      <GlassCard>
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold">Income analysis</h2>
-            <p className="text-sm text-muted-foreground">
-              Enable this only if you want payback and NPV-style profitability
-              indicators. It does not change LCC or WLC totals.
-            </p>
+      <GlassCard className="py-3.5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">
+              Rental & Operational Income (Optional)
+            </span>
+            <Badge variant="secondary" className="text-[11px]">
+              Not enabled
+            </Badge>
+            <span className="hidden text-xs text-muted-foreground md:inline">
+              — Enable only if you want to calculate Simple Payback or Income NPV.
+            </span>
           </div>
           <Button
             type="button"
             variant="outline"
+            size="sm"
             onClick={() => setShowIncome(true)}
           >
-            Enable income inputs
+            Enable Income Data
           </Button>
         </div>
       </GlassCard>
@@ -814,96 +858,80 @@ function IncomeSection({
     <GlassCard>
       <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Income input</h2>
-          <p className="text-sm text-muted-foreground">
-            Use this section when the study includes rent or other income. Leave
-            it disabled for cost-only comparisons.
+          <h2 className="text-base font-semibold">Income & Revenues</h2>
+          <p className="text-xs text-muted-foreground">
+            Operational revenues from rent or other sources (used for payback and
+            NPV; does not alter LCC/WLC totals).
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setShowIncome(false)}
-          >
-            Collapse income inputs
-          </Button>
-          <ConfirmAction
-            title="Disable income inputs?"
-            description="Rental income, occupancy, and tariff data will be cleared. You can re-enable income later, but the values will not be restored."
-            confirmLabel="Disable income"
-            destructive
-            onConfirm={handleDisableIncome}
-            trigger={
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={upsertIncome.isPending}
-              >
-                Disable income analysis
-              </Button>
-            }
-          />
-        </div>
+        <ConfirmAction
+          title="Clear income data?"
+          description="This will reset all rent and income fields to zero and hide the section."
+          confirmLabel="Clear & hide"
+          onConfirm={handleDisableIncome}
+          trigger={
+            <Button type="button" variant="outline" size="sm">
+              Disable Income
+            </Button>
+          }
+        />
       </div>
 
       <div className="space-y-6">
-        {/* Rent rows */}
-        {([1, 2, 3] as const).map((n) => (
-          <div key={n}>
-            <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-              Rent {n}
-            </h3>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <CurrencyInput
-                name={`rent${n}MonthlyPerM2` as keyof IncomeValues}
-                control={form.control}
-                label={`Monthly / ${UNITS.m2}`}
-              />
-              <NumberInput
-                name={`rent${n}Area` as keyof IncomeValues}
-                control={form.control}
-                label={`Area (${UNITS.m2})`}
-                suffix={` ${UNITS.m2}`}
-              />
-              <CurrencyInput
-                name={`rent${n}Taxes` as keyof IncomeValues}
-                control={form.control}
-                label="Annual Taxes"
-              />
-            </div>
+        <div>
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Rental Income
+          </h3>
+          <div className="space-y-3">
+            {([1, 2, 3] as const).map((n) => (
+              <div key={n} className="grid gap-4 sm:grid-cols-3">
+                <CurrencyInput
+                  name={`rent${n}MonthlyPerM2`}
+                  control={form.control}
+                  label={`Rent ${n} — Monthly/${UNITS.m2}`}
+                />
+                <NumberInput
+                  name={`rent${n}Area`}
+                  control={form.control}
+                  label={`Rent ${n} — Rented Area`}
+                  suffix={` ${UNITS.m2}`}
+                />
+                <CurrencyInput
+                  name={`rent${n}Taxes`}
+                  control={form.control}
+                  label={`Rent ${n} — Annual Taxes (€/y)`}
+                />
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
 
-        {/* Other income rows */}
-        {([1, 2, 3] as const).map((n) => (
-          <div key={`other-${n}`}>
-            <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-              Other Income {n}
-            </h3>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <CurrencyInput
-                name={`otherIncome${n}` as keyof IncomeValues}
-                control={form.control}
-                label="Amount"
-              />
-              <CurrencyInput
-                name={`otherIncome${n}Taxes` as keyof IncomeValues}
-                control={form.control}
-                label="Taxes"
-              />
-            </div>
+        <div>
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Other Annual Income & Expected Building Price
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <CurrencyInput
+              name="otherIncome1"
+              control={form.control}
+              label="Other Income 1 (€/y)"
+            />
+            <CurrencyInput
+              name="otherIncome1Taxes"
+              control={form.control}
+              label="Other 1 — Taxes (€/y)"
+            />
+            <CurrencyInput
+              name="otherIncome2"
+              control={form.control}
+              label="Other Income 2 (€/y)"
+            />
+            <CurrencyInput
+              name="expectedPricePerM2"
+              control={form.control}
+              label="Expected Selling Price"
+            />
           </div>
-        ))}
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <CurrencyInput
-            name="expectedPricePerM2"
-            control={form.control}
-            label={`Expected Price / ${UNITS.m2}`}
-          />
         </div>
       </div>
     </GlassCard>

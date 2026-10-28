@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { LCCResult } from "@/engine/types";
+import { UNITS } from "@/lib/units";
 
 const eurFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -18,28 +19,33 @@ const eurFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+const perM2Formatter = new Intl.NumberFormat("en-US", {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 1,
+});
+
 const CATEGORY_LABELS: Record<string, string> = {
-  A1_ROOFS: "A1 - Roofs",
-  A2_FACADES: "A2 - Facades",
-  A3_FLOORS: "A3 - Floors",
-  A4_WALLS: "A4 - Walls",
-  A5_WINDOWS: "A5 - Windows",
-  A6_SHADING: "A6 - Shading",
-  A7_DOORS: "A7 - Doors",
-  A8_INTERNAL: "A8 - Internal",
-  A9_STRUCTURE: "A9 - Structure",
-  A10_OTHER: "A10 - Other",
-  B1_HEATING: "B1 - Heating",
-  B2_COOLING: "B2 - Cooling",
-  B3_VENTILATION: "B3 - Ventilation",
-  B4_HVAC_COMBINED: "B4 - HVAC Combined",
-  B5_ELECTRICAL: "B5 - Electrical",
-  B6_HYDRAULIC: "B6 - Hydraulic",
-  C1_SOLAR_THERMAL: "C1 - Solar Thermal",
-  C2_PV: "C2 - PV",
-  C3_OTHER_RES: "C3 - Other RES",
-  D1_FURNISHINGS: "D1 - Furnishings",
-  E1_OUTDOOR: "E1 - Outdoor",
+  A1_ROOFS: "A1 — Roofs",
+  A2_FACADES: "A2 — Facades",
+  A3_FLOORS: "A3 — Floors",
+  A4_WALLS: "A4 — Walls",
+  A5_WINDOWS: "A5 — Windows",
+  A6_SHADING: "A6 — Shading",
+  A7_DOORS: "A7 — Doors",
+  A8_INTERNAL: "A8 — Internal",
+  A9_STRUCTURE: "A9 — Structure",
+  A10_OTHER: "A10 — Other",
+  B1_HEATING: "B1 — Heating",
+  B2_COOLING: "B2 — Cooling",
+  B3_VENTILATION: "B3 — Ventilation",
+  B4_HVAC_COMBINED: "B4 — HVAC Combined",
+  B5_ELECTRICAL: "B5 — Electrical",
+  B6_HYDRAULIC: "B6 — Hydraulic",
+  C1_SOLAR_THERMAL: "C1 — Solar Thermal",
+  C2_PV: "C2 — PV",
+  C3_OTHER_RES: "C3 — Other RES",
+  D1_FURNISHINGS: "D1 — Furnishings",
+  E1_OUTDOOR: "E1 — Outdoor",
 };
 
 interface ConstructionBreakdownTableProps {
@@ -47,15 +53,20 @@ interface ConstructionBreakdownTableProps {
   totalMaterials: number;
   totalLabor: number;
   totalConstruction: number;
+  treatedFloorArea?: number;
 }
 
 export function ConstructionBreakdownTable({
   constructionByCategory,
+  totalMaterials,
+  totalLabor,
   totalConstruction,
+  treatedFloorArea = 0,
 }: ConstructionBreakdownTableProps) {
   const entries = Object.entries(constructionByCategory).filter(
     ([, cost]) => cost > 0
   );
+  const showPerM2 = treatedFloorArea > 0;
 
   return (
     <Table>
@@ -63,6 +74,9 @@ export function ConstructionBreakdownTable({
         <TableRow>
           <TableHead>Category</TableHead>
           <TableHead className="text-right">Cost (EUR)</TableHead>
+          {showPerM2 && (
+            <TableHead className="text-right">{UNITS.EUR_m2}</TableHead>
+          )}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -72,22 +86,45 @@ export function ConstructionBreakdownTable({
             <TableCell className="text-right tabular-nums">
               {eurFormatter.format(cost)}
             </TableCell>
+            {showPerM2 && (
+              <TableCell className="text-right text-xs tabular-nums text-muted-foreground">
+                {perM2Formatter.format(cost / treatedFloorArea)}
+              </TableCell>
+            )}
           </TableRow>
         ))}
         {entries.length === 0 && (
           <TableRow>
-            <TableCell colSpan={2} className="text-center text-muted-foreground">
+            <TableCell
+              colSpan={showPerM2 ? 3 : 2}
+              className="text-center text-muted-foreground"
+            >
               No construction costs entered
             </TableCell>
           </TableRow>
         )}
       </TableBody>
       <TableFooter>
+        <TableRow className="text-xs text-muted-foreground">
+          <TableCell>Materials / Labor split</TableCell>
+          <TableCell
+            colSpan={showPerM2 ? 2 : 1}
+            className="text-right tabular-nums"
+          >
+            {eurFormatter.format(totalMaterials)} mat. ·{" "}
+            {eurFormatter.format(totalLabor)} lab.
+          </TableCell>
+        </TableRow>
         <TableRow>
           <TableCell className="font-bold">Total Construction</TableCell>
           <TableCell className="text-right font-bold tabular-nums">
             {eurFormatter.format(totalConstruction)}
           </TableCell>
+          {showPerM2 && (
+            <TableCell className="text-right font-bold tabular-nums">
+              {perM2Formatter.format(totalConstruction / treatedFloorArea)}
+            </TableCell>
+          )}
         </TableRow>
       </TableFooter>
     </Table>
@@ -108,29 +145,40 @@ type WLCBreakdownProps = Pick<
   | "energyConsumed"
   | "energyProduced"
   | "maintenanceAtRefPeriod"
->;
+> & {
+  treatedFloorArea?: number;
+};
 
 interface WLCRow {
   label: string;
   value: number;
   bold?: boolean;
   negate?: boolean;
+  indent?: boolean;
 }
 
 export function WLCBreakdownTable(props: WLCBreakdownProps) {
+  const tfa = props.treatedFloorArea ?? 0;
+  const showPerM2 = tfa > 0;
+
   const rows: WLCRow[] = [
-    { label: "Design Costs", value: props.designCosts },
-    { label: "Construction", value: props.totalConstruction },
-    { label: "Energy (consumed)", value: props.energyConsumed },
-    { label: "Energy (PV produced)", value: props.energyProduced, negate: true },
-    { label: "Maintenance", value: props.maintenanceAtRefPeriod },
-    { label: "O&M Total", value: props.operationAndMaintenance },
-    { label: "Site Management", value: props.buildingSiteManagement },
-    { label: "LCC", value: props.lcc, bold: true },
-    { label: "Non-Construction", value: props.nonConstructionCosts },
-    { label: "WLC", value: props.wlc, bold: true },
-    { label: "Residual Value", value: props.residualValue, negate: true },
-    { label: "LCC net Residual", value: props.lccNetResidual },
+    { label: "Whole-Life Cost (WLC)", value: props.wlc, bold: true },
+    { label: "Non-Construction Costs (Land, Fees)", value: props.nonConstructionCosts },
+    { label: "Life-Cycle Cost (LCC)", value: props.lcc, bold: true },
+    { label: "Construction Costs (A–E)", value: props.totalConstruction },
+    { label: "Design Fees", value: props.designCosts },
+    { label: "Building Site Management", value: props.buildingSiteManagement },
+    { label: "Operation & Maintenance (O&M)", value: props.operationAndMaintenance, bold: true },
+    { label: "↳ Energy Consumed", value: props.energyConsumed, indent: true },
+    {
+      label: "↳ PV Energy Produced",
+      value: props.energyProduced,
+      negate: true,
+      indent: true,
+    },
+    { label: "↳ Maintenance & Replacements", value: props.maintenanceAtRefPeriod, indent: true },
+    { label: "Residual Value (ISO 15686-5)", value: props.residualValue, negate: true },
+    { label: "LCC Net of Residual", value: props.lccNetResidual },
   ];
 
   return (
@@ -138,7 +186,10 @@ export function WLCBreakdownTable(props: WLCBreakdownProps) {
       <TableHeader>
         <TableRow>
           <TableHead>Component</TableHead>
-          <TableHead className="text-right">Amount (EUR)</TableHead>
+          <TableHead className="text-right">Total (EUR)</TableHead>
+          {showPerM2 && (
+            <TableHead className="text-right">{UNITS.EUR_m2}</TableHead>
+          )}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -147,15 +198,35 @@ export function WLCBreakdownTable(props: WLCBreakdownProps) {
             key={row.label}
             className={row.bold ? "bg-muted/50 font-semibold" : undefined}
           >
-            <TableCell className={row.bold ? "font-bold text-foreground" : "text-muted-foreground"}>
+            <TableCell
+              className={
+                row.bold
+                  ? "font-bold text-foreground"
+                  : row.indent
+                    ? "pl-5 text-xs text-muted-foreground"
+                    : "text-muted-foreground"
+              }
+            >
               {row.label}
             </TableCell>
             <TableCell
-              className={`text-right tabular-nums ${row.bold ? "font-bold text-foreground text-sm" : row.negate ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-foreground"}`}
+              className={`text-right tabular-nums ${
+                row.bold
+                  ? "font-bold text-foreground text-sm"
+                  : row.negate
+                    ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                    : "text-foreground"
+              }`}
             >
-              {row.negate ? "-" : ""}
+              {row.negate && row.value !== 0 ? "-" : ""}
               {eurFormatter.format(Math.abs(row.value))}
             </TableCell>
+            {showPerM2 && (
+              <TableCell className="text-right text-xs tabular-nums text-muted-foreground">
+                {row.negate && row.value !== 0 ? "-" : ""}
+                {perM2Formatter.format(Math.abs(row.value) / tfa)}
+              </TableCell>
+            )}
           </TableRow>
         ))}
       </TableBody>

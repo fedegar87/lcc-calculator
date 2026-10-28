@@ -3,7 +3,7 @@
 import { Suspense, useCallback } from "react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { SaveStatusProvider, useSaveStatus } from "@/hooks/use-save-status";
 import { SaveStatusBadge } from "@/components/project/save-status";
@@ -11,15 +11,15 @@ import { WizardSteps } from "@/components/project/wizard-steps";
 import { VariantTabs } from "@/components/project/variant-tabs";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { HelpCircle } from "lucide-react";
 import {
   computeProjectReadiness,
-  computeVariantDiff,
   type ProjectStepId,
 } from "@/lib/project-readiness";
 
 function extractStep(pathname: string): ProjectStepId {
   const segments = pathname.split("/");
-  return (segments[3] as ProjectStepId | undefined) ?? "overview";
+  return (segments[3] as ProjectStepId | undefined) ?? "info";
 }
 
 function ProjectLayoutInner({ children }: { children: React.ReactNode }) {
@@ -38,47 +38,16 @@ function ProjectLayoutInner({ children }: { children: React.ReactNode }) {
 
   const activeVariantId = searchParams.get("v") ?? project?.variants[0]?.id ?? "";
   const currentStep = extractStep(pathname);
-  const variantQueries = useQueries({
-    queries:
-      project?.variants.map((variant) => ({
-        ...trpc.variant.getById.queryOptions({ variantId: variant.id }),
-        enabled: Boolean(project),
-      })) ?? [],
+
+  const { data: activeVariant } = useQuery({
+    ...trpc.variant.getById.queryOptions({ variantId: activeVariantId }),
+    enabled: Boolean(activeVariantId),
   });
 
-  const activeVariant = variantQueries.find(
-    (query) => query.data?.id === activeVariantId
-  )?.data;
-  const baseVariant = variantQueries.find(
-    (query) => query.data?.label === "BASE"
-  )?.data;
   const readiness =
     project && activeVariant
       ? computeProjectReadiness(project, activeVariant)
       : null;
-
-  const variantsWithSummary =
-    project?.variants.map((variant) => {
-      const variantData = variantQueries.find(
-        (query) => query.data?.id === variant.id
-      )?.data;
-      const variantReadiness =
-        project && variantData
-          ? computeProjectReadiness(project, variantData)
-          : null;
-
-      const diff =
-        variant.label === "BASE"
-          ? []
-          : computeVariantDiff(baseVariant ?? null, variantData ?? null);
-
-      return {
-        ...variant,
-        readiness: variantReadiness,
-        diff,
-        diffCount: diff.length,
-      };
-    }) ?? [];
 
   const handleVariantChange = useCallback(
     (variantId: string) => {
@@ -94,9 +63,9 @@ function ProjectLayoutInner({ children }: { children: React.ReactNode }) {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Skeleton className="h-7 w-48" />
-          <Skeleton className="h-6 w-64" />
+          <Skeleton className="h-8 w-64" />
         </div>
-        <Skeleton className="h-9 w-72" />
+        <Skeleton className="h-12 w-full" />
         <Skeleton className="h-64 w-full" />
       </div>
     );
@@ -106,9 +75,16 @@ function ProjectLayoutInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Compact Workbook Top Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl font-semibold">{project.name}</h1>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <h1 className="text-xl font-bold tracking-tight">{project.name}</h1>
+          {project.city && (
+            <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+              {project.city}
+              {project.country ? `, ${project.country}` : ""}
+            </span>
+          )}
           <SaveStatusBadge status={status} />
           <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
             {status === "saving"
@@ -120,23 +96,34 @@ function ProjectLayoutInner({ children }: { children: React.ReactNode }) {
                   : "Idle"}
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" size="sm" render={<Link href="/help" />}>
-            Help Center
-          </Button>
-          <WizardSteps
+
+        <div className="flex flex-wrap items-center gap-2.5">
+          <VariantTabs
             projectId={projectId}
-            currentStep={currentStep}
-            readiness={readiness}
+            variants={project.variants}
+            activeVariantId={activeVariantId}
+            onVariantChange={handleVariantChange}
           />
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground"
+            render={<Link href="/help" />}
+          >
+            <HelpCircle className="size-4" />
+            <span className="hidden sm:inline">Manual & Help</span>
+          </Button>
         </div>
       </div>
-      <VariantTabs
+
+      {/* 4 Workbook Sheet Tabs */}
+      <WizardSteps
         projectId={projectId}
-        variants={variantsWithSummary}
+        currentStep={currentStep}
         activeVariantId={activeVariantId}
-        onVariantChange={handleVariantChange}
+        readiness={readiness}
       />
+
       <Suspense
         fallback={
           <div className="space-y-4">

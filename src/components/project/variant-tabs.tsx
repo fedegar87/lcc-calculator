@@ -1,17 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/server/trpc/client";
 import { toast } from "sonner";
-import { Plus, Loader2 } from "lucide-react";
-import { ReadinessPill } from "@/components/project/readiness-pill";
-import { VariantDiffPopover } from "@/components/project/variant-diff-popover";
-import type {
-  ProjectReadiness,
-  VariantDiffGroup,
-} from "@/lib/project-readiness";
+import { Plus, Loader2, Layers } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -30,14 +23,12 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface Variant {
   id: string;
   label: string;
   description?: string | null;
-  readiness?: ProjectReadiness | null;
-  diffCount?: number;
-  diff?: VariantDiffGroup[];
 }
 
 interface VariantTabsProps {
@@ -48,21 +39,13 @@ interface VariantTabsProps {
 }
 
 const LABEL_DISPLAY: Record<string, string> = {
-  BASE: "Base",
+  BASE: "Base Case",
   VARIANT_1: "Variant 1",
   VARIANT_2: "Variant 2",
 };
 
 function humanLabel(label: string): string {
   return LABEL_DISPLAY[label] ?? label;
-}
-
-function variantSummary(variant: Variant): string {
-  if (variant.diffCount) {
-    return `${variant.diffCount} changed input groups`;
-  }
-
-  return variant.label === "BASE" ? "Reference variant" : "No delta yet";
 }
 
 function getNextVariantLabel(
@@ -95,20 +78,19 @@ export function VariantTabs({
         queryClient.invalidateQueries({
           queryKey: trpc.project.getById.queryKey({ projectId }),
         });
+        setDialogOpen(false);
+        setDescription("");
         onVariantChange(data.id);
       },
       onError: (err) => {
         toast.error(err.message);
-        queryClient.invalidateQueries({
-          queryKey: trpc.project.getById.queryKey({ projectId }),
-        });
       },
     })
   );
   const cloneVariant = useMutation(
     trpc.project.cloneVariant.mutationOptions({
       onSuccess: (data) => {
-        toast.success(`${humanLabel(data.label)} created from existing data`);
+        toast.success(`${humanLabel(data.label)} cloned from existing data`);
         queryClient.invalidateQueries({
           queryKey: trpc.project.getById.queryKey({ projectId }),
         });
@@ -119,9 +101,6 @@ export function VariantTabs({
       },
       onError: (err) => {
         toast.error(err.message);
-        queryClient.invalidateQueries({
-          queryKey: trpc.project.getById.queryKey({ projectId }),
-        });
       },
     })
   );
@@ -130,15 +109,11 @@ export function VariantTabs({
   const canAdd = nextLabel !== null;
   const isPending = addVariant.isPending || cloneVariant.isPending;
   const baseVariantId = variants.find((variant) => variant.label === "BASE")?.id;
-  const activeVariant = variants.find(
-    (variant) => variant.id === activeVariantId,
-  );
-  const activeDiff = activeVariant?.diff ?? [];
+
   const cloneSourceId = useMemo(() => {
     if (creationMode === "clone_current") {
       return activeVariantId;
     }
-
     return baseVariantId ?? activeVariantId;
   }, [activeVariantId, baseVariantId, creationMode]);
 
@@ -170,173 +145,114 @@ export function VariantTabs({
 
   return (
     <>
-      <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-center">
-        <div className="flex min-w-0 gap-2 md:hidden">
-          <Select
-            value={activeVariantId}
-            onValueChange={(value) => {
-              if (value) onVariantChange(value);
-            }}
-          >
-            <SelectTrigger className="h-11 w-full min-w-0 flex-1">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent align="start">
-              {variants.map((variant) => (
-                <SelectItem
-                  key={variant.id}
-                  value={variant.id}
-                  className={variant.id === activeVariantId ? "font-semibold" : undefined}
-                >
-                  {humanLabel(variant.label)} · {variantSummary(variant)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {canAdd ? (
-            <Button
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="mr-1 hidden items-center gap-1 text-xs font-medium text-muted-foreground sm:inline-flex">
+          <Layers className="size-3.5" />
+          Scenario:
+        </span>
+        <div className="inline-flex flex-wrap items-center gap-1 rounded-lg border bg-muted/40 p-1">
+          {variants.map((v) => {
+            const isActive = v.id === activeVariantId;
+            return (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => onVariantChange(v.id)}
+                title={v.description || humanLabel(v.label)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition-all",
+                  isActive
+                    ? "bg-background text-foreground shadow-xs ring-1 ring-border"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <span>{humanLabel(v.label)}</span>
+                {v.description && (
+                  <span className="hidden max-w-[9rem] truncate text-[11px] font-normal text-muted-foreground lg:inline">
+                    ({v.description})
+                  </span>
+                )}
+              </button>
+            );
+          })}
+          {canAdd && (
+            <button
               type="button"
-              variant="outline"
               onClick={() => setDialogOpen(true)}
-              aria-label="Create new variant"
+              className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+              title="Add comparison variant (up to 2 variants)"
             >
-              <Plus className="size-4" />
-              New
-            </Button>
-          ) : null}
+              <Plus className="size-3.5" />
+              <span>Add Variant</span>
+            </button>
+          )}
         </div>
-
-        <Tabs
-          value={activeVariantId}
-          onValueChange={onVariantChange}
-          className="hidden min-w-0 flex-1 md:block"
-        >
-          <div className="relative max-w-full after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-8 after:bg-gradient-to-l after:from-background after:to-transparent xl:after:hidden">
-            <div className="overflow-x-auto pb-1 xl:overflow-visible xl:pb-0">
-              <TabsList className="h-auto w-max flex-nowrap items-stretch justify-start gap-2.5 bg-transparent p-0">
-                {variants.map((v) => (
-                  <TabsTrigger
-                    key={v.id}
-                    value={v.id}
-                    className="group relative min-w-[12.5rem] rounded-xl border border-border/80 bg-card/85 px-3.5 py-2.5 shadow-2xs transition-all hover:border-slate-300 hover:bg-muted/40 dark:border-white/[0.08] dark:hover:border-white/20 data-[state=active]:border-primary/60 data-[state=active]:bg-primary/[0.05] data-[state=active]:shadow-xs data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-primary/[0.09]"
-                  >
-                    <div className="flex w-full items-start justify-between gap-3">
-                      <div className="min-w-0 text-left">
-                        <div className="truncate text-sm font-semibold tracking-tight text-foreground">
-                          {humanLabel(v.label)}
-                        </div>
-                        <div className="mt-1 text-xs text-muted-foreground">
-                          {variantSummary(v)}
-                        </div>
-                        {v.description ? (
-                          <div className="mt-1 truncate text-[11px] text-muted-foreground/80">
-                            {v.description}
-                          </div>
-                        ) : null}
-                      </div>
-                      {v.readiness ? (
-                        <ReadinessPill status={v.readiness.status} className="shrink-0" />
-                      ) : null}
-                    </div>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </div>
-          </div>
-        </Tabs>
-
-        {activeVariant && activeVariant.label !== "BASE" && activeDiff.length > 0 ? (
-          <div className="hidden md:inline-flex">
-            <VariantDiffPopover
-              projectId={projectId}
-              variantId={activeVariantId}
-              diff={activeDiff}
-            />
-          </div>
-        ) : null}
-
-        {canAdd ? (
-          <Button
-            variant="outline"
-            onClick={() => setDialogOpen(true)}
-            className="hidden md:inline-flex shadow-xs"
-          >
-            <Plus className="size-4" />
-            New variant
-          </Button>
-        ) : null}
       </div>
 
       {canAdd ? (
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Create {humanLabel(nextLabel!)}</DialogTitle>
-                <DialogDescription>
-                  Start from Base, clone the current variant, or create an empty shell.
-                </DialogDescription>
-              </DialogHeader>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Add {humanLabel(nextLabel!)}</DialogTitle>
+              <DialogDescription>
+                Clone the Base Case to test an alternative design or energy system without re-entering all inputs.
+              </DialogDescription>
+            </DialogHeader>
 
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Creation mode</Label>
-                  <Select
-                    value={creationMode}
-                    onValueChange={(value) => {
-                      if (value) setCreationMode(value as typeof creationMode);
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {baseVariantId ? (
-                        <SelectItem value="clone_base">Clone Base</SelectItem>
-                      ) : null}
-                      <SelectItem value="clone_current">
-                        Clone current variant
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Starting data</Label>
+                <Select
+                  value={creationMode}
+                  onValueChange={(value) => {
+                    if (value) setCreationMode(value as typeof creationMode);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {baseVariantId ? (
+                      <SelectItem value="clone_base">
+                        Copy from Base Case (recommended)
                       </SelectItem>
-                      <SelectItem value="empty">Empty variant</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="variant-description">Variant note</Label>
-                  <Input
-                    id="variant-description"
-                    value={description}
-                    onChange={(event) => setDescription(event.target.value)}
-                    placeholder="Facade upgrade, lower O&M scenario..."
-                  />
-                </div>
-
-                <div className="rounded-xl border bg-muted/30 p-3 text-sm text-muted-foreground">
-                  {creationMode === "empty"
-                    ? "The new variant will start with empty inputs and default records only."
-                    : creationMode === "clone_current"
-                      ? "The new variant will copy all current inputs, including construction, energy, WLC, and income data."
-                      : "The new variant will copy the Base inputs so you can edit only the differences."}
-                </div>
+                    ) : null}
+                    <SelectItem value="clone_current">
+                      Copy from active scenario
+                    </SelectItem>
+                    <SelectItem value="empty">Start blank</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleCreateVariant} disabled={isPending}>
-                  {isPending ? (
-                    <>
-                      <Loader2 className="size-4 animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    "Create variant"
-                  )}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              <div className="space-y-2">
+                <Label htmlFor="variant-description">Short label / note (optional)</Label>
+                <Input
+                  id="variant-description"
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                  placeholder="e.g., Heat pump + 120 kWp PV"
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleCreateVariant} disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create Variant"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       ) : null}
     </>
   );
