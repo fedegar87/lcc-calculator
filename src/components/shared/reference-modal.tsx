@@ -168,7 +168,8 @@ export function ReferenceModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm animate-fade-in"
+      data-slot="dialog-overlay"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 supports-backdrop-filter:backdrop-blur-xs animate-fade-in"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -176,7 +177,8 @@ export function ReferenceModal({
     >
       <div
         ref={modalRef}
-        className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-slate-200 animate-scale-in dark:bg-slate-900 dark:ring-slate-800"
+        data-slot="dialog-content"
+        className="material-sheet flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-popover ring-1 ring-slate-200 animate-scale-in dark:ring-slate-800"
         onClick={(e) => e.stopPropagation()}
         tabIndex={-1}
       >

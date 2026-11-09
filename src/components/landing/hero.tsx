@@ -1,12 +1,15 @@
 import { LandingCTA } from "./landing-cta";
 
 /**
- * Hero card â€” title cluster + auth-aware CTA pair.
+ * Hero card — title cluster + auth-aware CTA pair.
  * Visual hook for the landing page (top of overview).
  */
 export function Hero() {
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/85 p-8 shadow-xl glass-specular ring-1 ring-black/[0.04] backdrop-blur-xl lg:p-12 dark:border-white/[0.08] dark:bg-card/85">
+    <section
+      data-slot="card"
+      className="relative overflow-hidden rounded-3xl border bg-card p-8 text-card-foreground lg:p-12"
+    >
       <div className="pattern-dots absolute inset-0 -z-0" aria-hidden="true" />
       <div className="relative space-y-8">
         <div className="mx-auto max-w-3xl space-y-4 text-center">

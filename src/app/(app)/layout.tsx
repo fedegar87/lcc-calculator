@@ -11,9 +11,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <AnonymousSessionGate>
       <SidebarProvider>
         <ProjectSidebar />
-        <SidebarInset className="relative isolate print:bg-white">
+        <SidebarInset className="relative isolate bg-transparent print:bg-white">
           <AmbientBackground />
-          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border/80 bg-white/80 px-4 shadow-2xs backdrop-blur-xl dark:border-white/[0.08] dark:bg-card/75 print:hidden">
+          <header className="material-bar sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-border/80 px-4 print:hidden">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             {/* Save status badge slot -- filled by child pages via portal or context */}

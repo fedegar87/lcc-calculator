@@ -64,7 +64,7 @@ export function ProjectOverview({
 
   return (
     <div className="space-y-6">
-      <Card className="border-border/70 bg-card/95 backdrop-blur-sm">
+      <Card className="border-border/70 bg-card/95">
         <CardHeader className="flex-row flex-wrap items-start justify-between gap-4">
           <div>
             <CardTitle>Active variant</CardTitle>

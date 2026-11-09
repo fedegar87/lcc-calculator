@@ -33,7 +33,7 @@ export function DomainSection({
   return (
     <section
       className={cn(
-        "rounded-2xl border border-l-4 p-5 shadow-xs backdrop-blur-xs transition-all",
+        "rounded-2xl border border-l-4 p-5 shadow-xs transition-[transform,box-shadow,border-color]",
         DOMAIN_SURFACE_CLASSES[domain],
         className,
       )}

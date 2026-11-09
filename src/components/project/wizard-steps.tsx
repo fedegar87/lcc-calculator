@@ -84,7 +84,7 @@ export function WizardSteps({
   return (
     <nav
       aria-label="Workbook sheets"
-      className="w-full border-b border-border/80 bg-muted/25 px-1 pt-1 rounded-t-xl"
+      className="material-bar w-full border-b border-border/80 px-1 pt-1 rounded-t-xl"
     >
       <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
         {WORKBOOK_TABS.map((tab) => {

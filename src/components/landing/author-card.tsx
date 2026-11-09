@@ -65,7 +65,8 @@ export function AuthorCard() {
   return (
     <section
       id="author"
-      className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/80 p-8 shadow-xl ring-1 ring-white/40 backdrop-blur-lg lg:p-12 dark:border-white/10 dark:bg-slate-900/70"
+      data-slot="card"
+      className="relative overflow-hidden rounded-3xl border bg-card p-8 text-card-foreground lg:p-12"
     >
       <div className="pattern-dots absolute inset-0 -z-0" aria-hidden="true" />
       <div className="relative grid gap-10 lg:grid-cols-2">

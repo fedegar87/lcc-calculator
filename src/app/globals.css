@@ -148,6 +148,16 @@
   --sidebar-border: oklch(0.91 0.005 240);
   --sidebar-ring: oklch(0.708 0 0);
   --pattern-dot-color: rgb(15 23 42 / 0.03);
+  --material-bar-background: color-mix(in srgb, var(--popover, var(--card)) 74%, transparent);
+  --material-nav-background: color-mix(in srgb, var(--popover, var(--card)) 76%, transparent);
+  --material-sheet-background: color-mix(in srgb, var(--popover, var(--card)) 84%, transparent);
+  --material-bar-filter: saturate(145%) blur(22px);
+  --material-sheet-filter: saturate(135%) blur(26px);
+  --material-edge: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --material-label-secondary: color-mix(in srgb, var(--muted-foreground) 82%, var(--foreground));
+  --material-bar-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+  --material-nav-shadow: 0 -8px 28px -4px rgba(0, 0, 0, 0.1), 0 -1px 4px rgba(0, 0, 0, 0.05);
+  --material-sheet-shadow: 0 16px 44px -6px rgba(0, 0, 0, 0.14), 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
 .dark {
@@ -178,6 +188,16 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.55 0.18 27.5);
   --pattern-dot-color: rgb(248 250 252 / 0.04);
+  --material-bar-background: color-mix(in srgb, var(--popover, var(--card)) 74%, transparent);
+  --material-nav-background: color-mix(in srgb, var(--popover, var(--card)) 76%, transparent);
+  --material-sheet-background: color-mix(in srgb, var(--popover, var(--card)) 84%, transparent);
+  --material-bar-filter: saturate(145%) blur(22px);
+  --material-sheet-filter: saturate(135%) blur(26px);
+  --material-edge: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --material-label-secondary: color-mix(in srgb, var(--muted-foreground) 82%, var(--foreground));
+  --material-bar-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.42), 0 2px 6px rgba(0, 0, 0, 0.24);
+  --material-nav-shadow: 0 -8px 28px -4px rgba(0, 0, 0, 0.48), 0 -1px 4px rgba(0, 0, 0, 0.25);
+  --material-sheet-shadow: 0 16px 44px -6px rgba(0, 0, 0, 0.62), 0 4px 14px rgba(0, 0, 0, 0.36);
 }
 
 @layer base {
@@ -186,6 +206,18 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(
+        ellipse 85% 45% at 50% -8%,
+        color-mix(in srgb, var(--primary) 8.5%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 60% 40% at 85% 15%,
+        color-mix(in srgb, var(--foreground) 3.5%, transparent),
+        transparent 65%
+      );
+    background-attachment: fixed;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -193,6 +225,114 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+.material-bar {
+  --muted-foreground: var(--material-label-secondary);
+  background: var(--popover, var(--card));
+  box-shadow:
+    var(--material-bar-shadow),
+    inset 0 1px 0 var(--material-edge);
+}
+
+.material-nav.material-bar {
+  --material-bar-background: var(--material-nav-background);
+  --material-bar-shadow: var(--material-nav-shadow);
+}
+
+.material-sheet {
+  background: var(--popover, var(--card));
+  box-shadow:
+    var(--material-sheet-shadow),
+    inset 0 1px 0 var(--material-edge);
+  transition-property: opacity, transform, translate;
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .material-bar {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--foreground) 3%, transparent) 0%,
+        transparent 100%
+      ),
+      var(--material-bar-background);
+    /* IMPORTANTE: lascia sempre -webkit-backdrop-filter PRIMA di backdrop-filter
+       per evitare che il minifier CSS di produzione rimuova la proprietà standard. */
+    -webkit-backdrop-filter: var(--material-bar-filter);
+    backdrop-filter: var(--material-bar-filter);
+  }
+
+  .material-sheet {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--foreground) 3.5%, transparent) 0%,
+        transparent 100%
+      ),
+      var(--material-sheet-background);
+    -webkit-backdrop-filter: var(--material-sheet-filter);
+    backdrop-filter: var(--material-sheet-filter);
+  }
+}
+
+[data-slot="card"] {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--foreground) 3.5%, transparent) 0%,
+    color-mix(in srgb, var(--foreground) 0.8%, transparent) 42%,
+    rgba(0, 0, 0, 0.14) 100%
+  );
+  border-color: color-mix(in srgb, var(--foreground) 11%, transparent);
+  box-shadow:
+    0 10px 30px -10px rgba(0, 0, 0, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 0 color-mix(in srgb, var(--foreground) 9%, transparent);
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  body,
+  [data-slot="card"] {
+    background-image: none;
+  }
+
+  .material-bar,
+  .material-sheet {
+    background: var(--popover, var(--card));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  [data-slot="sheet-overlay"],
+  [data-slot="dialog-overlay"],
+  [data-slot="alert-dialog-overlay"] {
+    background: rgba(0, 0, 0, 0.5);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  [data-slot="card"],
+  .material-bar,
+  .material-sheet {
+    border-color: var(--muted-foreground);
+  }
+}
+
+@media (forced-colors: active) {
+  body,
+  [data-slot="card"],
+  .material-bar,
+  .material-sheet {
+    background: Canvas;
+    background-image: none;
+    color: CanvasText;
+    border-color: CanvasText;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 
@@ -211,20 +351,6 @@
 }
 
 @layer utilities {
-  /* Legacy glass utilities, kept for backwards compatibility. New code
-   * should use the GlassCard component or the identity-aligned classes
-   * described in docs/visual-identity.md. */
-  .glass {
-    background: oklch(1 0 0 / 0.1);
-    backdrop-filter: blur(12px);
-    border: 1px solid oklch(1 0 0 / 0.2);
-  }
-  .glass-dark {
-    background: oklch(0 0 0 / 0.2);
-    backdrop-filter: blur(12px);
-    border: 1px solid oklch(1 0 0 / 0.1);
-  }
-
   /* Subtle dot texture overlay for primary hero cards. */
   .pattern-dots {
     background-image: radial-gradient(var(--pattern-dot-color) 1px, transparent 1px);

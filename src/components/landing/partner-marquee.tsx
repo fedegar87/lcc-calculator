@@ -66,11 +66,11 @@ const PARTNERS: Partner[] = [
 function PartnerCard({ partner }: { partner: Partner }) {
   const inner = (
     <div
+      data-slot="card"
       className={cn(
-        "flex shrink-0 items-center gap-3 rounded-xl border border-slate-200 bg-white/80 px-4 py-3",
-        "min-w-[220px] shadow-sm backdrop-blur-sm transition",
-        "hover:-translate-y-0.5 hover:border-eurac-red/40 hover:shadow-md",
-        "dark:border-slate-700 dark:bg-slate-900/60",
+        "flex shrink-0 items-center gap-3 rounded-xl border bg-card px-4 py-3",
+        "min-w-[220px] transition-[transform,box-shadow,border-color]",
+        "hover:-translate-y-0.5 hover:border-eurac-red/40",
       )}
     >
       <span

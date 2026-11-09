@@ -82,7 +82,7 @@ export function LandingNav({ mode }: { mode: LandingNavMode }) {
     return (
       <nav
         aria-label="Landing page sections"
-        className="rounded-2xl border border-white/20 bg-white/70 p-3 shadow-xl backdrop-blur-lg dark:border-white/10 dark:bg-slate-900/70"
+        className="material-bar rounded-2xl border border-border/80 p-3"
       >
         <div className="space-y-1">
           {items.map((item) => {
